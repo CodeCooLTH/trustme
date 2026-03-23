@@ -6,6 +6,9 @@ import {
   Clock, Eye, Landmark, BadgeCheck, HeartHandshake,
   Phone, Mail, MapPin, ChevronRight,
 } from 'lucide-react'
+import { HeroIllustration } from '@/components/illustrations/HeroIllustration'
+import { EscrowFlowIllustration } from '@/components/illustrations/EscrowFlowIllustration'
+import { SecurityIllustration } from '@/components/illustrations/SecurityIllustration'
 
 export default function HomePage() {
   return (
@@ -41,58 +44,65 @@ export default function HomePage() {
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/20 rounded-full blur-3xl" />
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl" />
 
-        <div className="relative max-w-6xl mx-auto px-4 py-20 lg:py-32">
-          <div className="max-w-3xl mx-auto text-center">
-            {/* Trust badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted-foreground mb-8">
-              <ShieldCheck className="h-4 w-4 text-green-600" />
-              <span>ระบบ Escrow ที่ได้รับความไว้วางใจ</span>
+        <div className="relative max-w-6xl mx-auto px-4 py-16 lg:py-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Text */}
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted-foreground mb-6">
+                <ShieldCheck className="h-4 w-4 text-green-600" />
+                <span>ระบบ Escrow ที่ได้รับความไว้วางใจ</span>
+              </div>
+
+              <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-foreground leading-tight">
+                ซื้อขายออนไลน์<br />
+                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  ปลอดภัยทุกดีล
+                </span>
+              </h1>
+
+              <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-lg">
+                ระบบตัวกลางพักเงินสำหรับการซื้อขายออนไลน์ ผู้ซื้อมั่นใจว่าได้ของ
+                ผู้ขายมั่นใจว่าได้เงิน ทุกธุรกรรมมีระบบ Escrow ค้ำประกัน
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <Link href="/login">
+                  <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-base">
+                    เริ่มต้นใช้งานฟรี
+                    <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </Link>
+                <a href="#how-it-works">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-base">
+                    ดูวิธีการทำงาน
+                  </Button>
+                </a>
+              </div>
+
+              {/* Trust stats */}
+              <div className="mt-10 flex flex-wrap gap-6">
+                {[
+                  { icon: ShieldCheck, value: '100%', label: 'ปลอดภัย' },
+                  { icon: Clock, value: '24/7', label: 'ติดตามได้' },
+                  { icon: CreditCard, value: '0฿', label: 'ค่าธรรมเนียม' },
+                  { icon: Eye, value: 'โปร่งใส', label: 'ทุกขั้นตอน' },
+                ].map((stat) => (
+                  <div key={stat.label} className="flex items-center gap-2.5">
+                    <div className="rounded-lg bg-primary/10 p-1.5">
+                      <stat.icon className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground">{stat.value}</p>
+                      <p className="text-[11px] text-muted-foreground">{stat.label}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              ซื้อขายออนไลน์<br />
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                ปลอดภัยทุกดีล
-              </span>
-            </h1>
-
-            <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              ระบบตัวกลางพักเงินสำหรับการซื้อขายออนไลน์ ผู้ซื้อมั่นใจว่าได้ของ
-              ผู้ขายมั่นใจว่าได้เงิน ทุกธุรกรรมมีระบบ Escrow ค้ำประกัน
-            </p>
-
-            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/login">
-                <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-base">
-                  เริ่มต้นใช้งานฟรี
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
-              </Link>
-              <a href="#how-it-works">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-base">
-                  ดูวิธีการทำงาน
-                </Button>
-              </a>
-            </div>
-
-            {/* Trust stats */}
-            <div className="mt-16 flex flex-wrap justify-center gap-8 lg:gap-16">
-              {[
-                { icon: ShieldCheck, value: '100%', label: 'ปลอดภัย' },
-                { icon: Clock, value: '24/7', label: 'ติดตามได้ตลอดเวลา' },
-                { icon: CreditCard, value: '0฿', label: 'ค่าธรรมเนียม' },
-                { icon: Eye, value: 'โปร่งใส', label: 'ทุกขั้นตอน' },
-              ].map((stat) => (
-                <div key={stat.label} className="flex items-center gap-3">
-                  <div className="rounded-lg bg-primary/10 p-2">
-                    <stat.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-lg font-bold text-foreground">{stat.value}</p>
-                    <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  </div>
-                </div>
-              ))}
+            {/* Right: Illustration */}
+            <div className="hidden lg:block">
+              <HeroIllustration className="w-full max-w-lg mx-auto" />
             </div>
           </div>
         </div>
@@ -210,27 +220,38 @@ export default function HomePage() {
             </div>
 
             {/* Illustration: Escrow flow diagram */}
-            <div className="rounded-2xl border border-border bg-background p-8">
-              <div className="space-y-6">
-                <h3 className="font-semibold text-center text-foreground">Escrow Flow</h3>
+            <div className="rounded-2xl border border-border bg-background p-4 lg:p-6">
+              <EscrowFlowIllustration className="w-full" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Security Visual ─── */}
+      <section className="border-t border-border bg-card">
+        <div className="max-w-6xl mx-auto px-4 py-16 lg:py-20">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="order-2 lg:order-1">
+              <SecurityIllustration className="w-full max-w-sm mx-auto" />
+            </div>
+            <div className="order-1 lg:order-2">
+              <p className="text-sm font-medium text-primary mb-2">ความปลอดภัย</p>
+              <h2 className="text-3xl font-bold text-foreground">ปกป้องทุกธุรกรรม<br />ด้วยระบบหลายชั้น</h2>
+              <p className="mt-4 text-muted-foreground leading-relaxed">
+                SafePay ออกแบบระบบรักษาความปลอดภัยหลายชั้น เพื่อให้มั่นใจว่าทุกธุรกรรม
+                ของคุณจะได้รับการปกป้องอย่างสูงสุด
+              </p>
+              <div className="mt-6 grid grid-cols-2 gap-4">
                 {[
-                  { step: '1', label: 'ผู้ขายสร้างดีล', sub: 'สินค้า + ราคา + ขนส่ง', icon: Package, color: 'bg-blue-600' },
-                  { step: '2', label: 'ผู้ซื้อโอนเงินมาที่ SafePay', sub: 'เงินถูกพักไว้อย่างปลอดภัย', icon: Lock, color: 'bg-indigo-600' },
-                  { step: '3', label: 'ผู้ขายจัดส่งสินค้า', sub: 'ใส่เลข tracking ติดตามได้', icon: Truck, color: 'bg-violet-600' },
-                  { step: '4', label: 'ผู้ซื้อยืนยันรับสินค้า', sub: 'ตรวจสอบความเรียบร้อย', icon: Eye, color: 'bg-amber-600' },
-                  { step: '5', label: 'ระบบปล่อยเงินให้ผู้ขาย', sub: 'ดีลสำเร็จ ทั้งคู่ได้คะแนน', icon: CheckCircle, color: 'bg-green-600' },
-                ].map((item, idx) => (
-                  <div key={item.step} className="flex items-start gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className={`${item.color} text-white rounded-full p-2`}>
-                        <item.icon className="h-4 w-4" />
-                      </div>
-                      {idx < 4 && <div className="w-px h-6 bg-border mt-1" />}
-                    </div>
-                    <div className="pt-0.5">
-                      <p className="font-medium text-sm text-foreground">{item.label}</p>
-                      <p className="text-xs text-muted-foreground">{item.sub}</p>
-                    </div>
+                  { icon: Lock, title: 'เข้ารหัสข้อมูล', desc: 'ทุกข้อมูลถูกเข้ารหัสด้วย SSL' },
+                  { icon: BadgeCheck, title: 'ยืนยันตัวตน', desc: 'ทุกผู้ใช้ผ่าน Facebook' },
+                  { icon: Eye, title: 'โปร่งใส', desc: 'ติดตามทุกขั้นตอนได้' },
+                  { icon: Scale, title: 'ยุติธรรม', desc: 'ระบบ Dispute อิสระ' },
+                ].map((item) => (
+                  <div key={item.title} className="rounded-xl border border-border bg-background p-3">
+                    <item.icon className="h-5 w-5 text-primary mb-2" />
+                    <p className="font-medium text-sm text-foreground">{item.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
                   </div>
                 ))}
               </div>
