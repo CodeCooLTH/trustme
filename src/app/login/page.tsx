@@ -1,8 +1,15 @@
 'use client'
+import Image from 'next/image'
 import { signIn } from 'next-auth/react'
 import { Button } from '@/components/ui/Button'
 import { Shield, Lock, CheckCircle } from 'lucide-react'
-import Link from 'next/link'
+
+const avatars = [
+  { src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face', alt: 'ผู้ใช้งาน' },
+  { src: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face', alt: 'ผู้ใช้งาน' },
+  { src: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face', alt: 'ผู้ใช้งาน' },
+  { src: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face', alt: 'ผู้ใช้งาน' },
+]
 
 export default function LoginPage() {
   return (
@@ -24,7 +31,7 @@ export default function LoginPage() {
       {/* Facebook Login */}
       <div className="space-y-3">
         <Button
-          onClick={() => signIn('facebook', { callbackUrl: '/orders' })}
+          onClick={() => signIn('facebook', { callbackUrl: '/dashboard' })}
           className="w-full bg-[#1877F2] hover:bg-[#166FE5] h-12 text-base"
           size="lg"
         >
@@ -37,7 +44,7 @@ export default function LoginPage() {
         {/* Dev login — development only */}
         {process.env.NODE_ENV === 'development' && (
           <Button
-            onClick={() => signIn('credentials', { username: 'demo-buyer', password: 'demo', callbackUrl: '/orders' })}
+            onClick={() => signIn('credentials', { username: 'demo-buyer', password: 'demo', callbackUrl: '/dashboard' })}
             variant="outline"
             className="w-full h-12 text-base"
             size="lg"
@@ -45,6 +52,38 @@ export default function LoginPage() {
             Dev: เข้าสู่ระบบเป็น demo-buyer
           </Button>
         )}
+      </div>
+
+      {/* Trust badge strip */}
+      <div className="flex items-center justify-center gap-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex items-center gap-1.5">
+          <Lock className="h-3.5 w-3.5 text-green-700" />
+          <span className="text-xs text-green-700 font-medium">SafePay คุ้มครอง</span>
+        </div>
+        <div className="h-3.5 w-px bg-green-200" />
+        <div className="flex items-center gap-1.5">
+          <Shield className="h-3.5 w-3.5 text-green-700" />
+          <span className="text-xs text-green-700 font-medium">ข้อมูลเข้ารหัส</span>
+        </div>
+      </div>
+
+      {/* Avatar stack + social proof */}
+      <div className="flex items-center justify-center gap-3">
+        <div className="flex -space-x-2">
+          {avatars.map((avatar, i) => (
+            <Image
+              key={i}
+              src={avatar.src}
+              alt={avatar.alt}
+              width={28}
+              height={28}
+              className="rounded-full border-2 border-white object-cover"
+            />
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          ผู้ใช้ <span className="font-semibold text-foreground">10,000+</span> คนไว้วางใจ
+        </p>
       </div>
 
       {/* Trust indicators */}
@@ -55,7 +94,7 @@ export default function LoginPage() {
         </div>
         <div className="flex items-start gap-3">
           <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
-          <p className="text-xs text-muted-foreground">ระบบ Escrow ค้ำประกันทุกธุรกรรม เงินจะถูกพักไว้จนกว่าคุณจะได้รับสินค้า</p>
+          <p className="text-xs text-muted-foreground">SafePay ค้ำประกันทุกธุรกรรม เงินจะถูกพักไว้จนกว่าคุณจะได้รับสินค้า</p>
         </div>
       </div>
 

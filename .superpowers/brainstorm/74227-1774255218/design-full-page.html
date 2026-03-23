@@ -1,0 +1,184 @@
+<h2>Design: หน้า Login เต็ม — ทั้งสองฝั่ง</h2>
+<p class="subtitle">Hybrid Trust Layer — ซ้าย: branding + ภาพ | ขวา: ฟอร์ม Login + trust elements</p>
+
+<div class="mockup">
+  <div class="mockup-header">Full Login Page — Desktop View</div>
+  <div class="mockup-body" style="display: flex; min-height: 680px; padding: 0; overflow: hidden; border-radius: 0 0 8px 8px;">
+
+    <!-- ===== LEFT PANEL ===== -->
+    <div style="width: 45%; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #3730a3 100%); color: white; padding: 36px 28px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+      <!-- Background hero image -->
+      <div style="position: absolute; inset: 0; z-index: 0;">
+        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.12;" />
+      </div>
+
+      <div style="position: relative; z-index: 1;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 32px;">
+          <div style="font-size: 18px;">🛡️</div>
+          <span style="font-size: 18px; font-weight: 700;">SafePay</span>
+        </div>
+        <h1 style="font-size: 24px; font-weight: 700; line-height: 1.3; margin: 0;">
+          ซื้อขายออนไลน์<br/>อย่างปลอดภัย<br/>
+          <span style="color: #93c5fd;">ด้วยระบบ Escrow</span>
+        </h1>
+        <p style="color: #bfdbfe; margin-top: 12px; font-size: 13px; max-width: 300px; line-height: 1.6;">
+          ระบบตัวกลางพักเงินที่ได้รับความไว้วางใจ ผู้ซื้อมั่นใจว่าได้ของ ผู้ขายมั่นใจว่าได้เงิน
+        </p>
+      </div>
+
+      <div style="position: relative; z-index: 1;">
+        <!-- Escrow Flow -->
+        <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+          <p style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #93c5fd; margin: 0 0 12px 0; font-weight: 600;">ระบบ Escrow ทำงานอย่างไร</p>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+            <div style="text-align: center; flex: 1;">
+              <div style="width: 38px; height: 38px; background: rgba(74,222,128,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 16px;">💳</div>
+              <p style="font-size: 10px; font-weight: 600; margin: 0;">ผู้ซื้อชำระเงิน</p>
+            </div>
+            <div style="color: #93c5fd; font-size: 14px;">→</div>
+            <div style="text-align: center; flex: 1;">
+              <div style="width: 38px; height: 38px; background: rgba(96,165,250,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 16px;">🔒</div>
+              <p style="font-size: 10px; font-weight: 600; margin: 0;">SafePay ล็อคเงิน</p>
+            </div>
+            <div style="color: #93c5fd; font-size: 14px;">→</div>
+            <div style="text-align: center; flex: 1;">
+              <div style="width: 38px; height: 38px; background: rgba(74,222,128,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 16px;">✅</div>
+              <p style="font-size: 10px; font-weight: 600; margin: 0;">ได้ของ → ปล่อยเงิน</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial -->
+        <div style="border-top: 1px solid rgba(96,165,250,0.2); padding-top: 16px; margin-bottom: 20px;">
+          <div style="color: rgba(96,165,250,0.3); font-size: 20px; margin-bottom: 8px;">❝</div>
+          <p style="color: #eff6ff; font-size: 13px; line-height: 1.6; font-style: italic; margin: 0;">
+            "เคยโดนโกงจากการซื้อของออนไลน์ ตั้งแต่ใช้ SafePay ไม่ต้องกังวลอีกเลย"
+          </p>
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+            <div style="width: 32px; height: 32px; background: rgba(96,165,250,0.2); border: 1px solid rgba(96,165,250,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">ว</div>
+            <div>
+              <p style="font-size: 12px; font-weight: 600; margin: 0;">คุณวิภา</p>
+              <p style="font-size: 10px; color: #bfdbfe; margin: 0;">ผู้ซื้อ</p>
+            </div>
+            <div style="margin-left: auto; color: #facc15; font-size: 10px;">⭐⭐⭐⭐⭐</div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div style="display: flex; align-items: center; gap: 24px;">
+          <div>
+            <p style="font-size: 20px; font-weight: 700; margin: 0;">100%</p>
+            <p style="color: #93c5fd; font-size: 10px; margin: 0;">ปลอดภัย</p>
+          </div>
+          <div style="height: 28px; width: 1px; background: rgba(96,165,250,0.2);"></div>
+          <div>
+            <p style="font-size: 20px; font-weight: 700; margin: 0;">24/7</p>
+            <p style="color: #93c5fd; font-size: 10px; margin: 0;">ติดตามได้</p>
+          </div>
+          <div style="height: 28px; width: 1px; background: rgba(96,165,250,0.2);"></div>
+          <div>
+            <p style="font-size: 20px; font-weight: 700; margin: 0;">0฿</p>
+            <p style="color: #93c5fd; font-size: 10px; margin: 0;">ค่าธรรมเนียม</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT PANEL (LOGIN FORM) ===== -->
+    <div style="flex: 1; background: #fafafa; display: flex; align-items: center; justify-content: center; padding: 40px;">
+      <div style="width: 100%; max-width: 360px;">
+
+        <!-- Header -->
+        <h1 style="font-size: 22px; font-weight: 700; color: #1a1a1a; margin: 0;">เข้าสู่ระบบ</h1>
+        <p style="color: #666; font-size: 13px; margin: 8px 0 0 0;">เข้าสู่ระบบเพื่อเริ่มซื้อขายอย่างปลอดภัย</p>
+
+        <!-- Facebook button -->
+        <button style="width: 100%; background: #1877F2; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 28px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span style="font-size: 18px;">f</span>
+          เข้าสู่ระบบด้วย Facebook
+        </button>
+
+        <!-- NEW: Trust badge strip -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 20px; padding: 12px 16px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 14px;">🔒</span>
+            <span style="font-size: 11px; color: #15803d; font-weight: 500;">Escrow ปลอดภัย</span>
+          </div>
+          <div style="height: 14px; width: 1px; background: #bbf7d0;"></div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 14px;">🛡️</span>
+            <span style="font-size: 11px; color: #15803d; font-weight: 500;">ข้อมูลเข้ารหัส</span>
+          </div>
+        </div>
+
+        <!-- NEW: Avatar stack + social proof -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px;">
+          <div style="display: flex;">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; object-fit: cover;" />
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; margin-left: -8px; object-fit: cover;" />
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; margin-left: -8px; object-fit: cover;" />
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; margin-left: -8px; object-fit: cover;" />
+          </div>
+          <p style="font-size: 12px; color: #666; margin: 0;">ผู้ใช้ <strong style="color: #1a1a1a;">10,000+</strong> คนไว้วางใจ</p>
+        </div>
+
+        <!-- Trust indicators (existing, refined) -->
+        <div style="margin-top: 24px; space-y: 12px;">
+          <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;">
+            <span style="font-size: 13px; margin-top: 1px;">🔐</span>
+            <p style="font-size: 11px; color: #888; margin: 0; line-height: 1.5;">ข้อมูลของคุณถูกเข้ารหัสและปลอดภัย เราไม่เก็บรหัสผ่าน Facebook ของคุณ</p>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <span style="font-size: 13px; margin-top: 1px;">✅</span>
+            <p style="font-size: 11px; color: #888; margin: 0; line-height: 1.5;">ระบบ Escrow ค้ำประกันทุกธุรกรรม เงินจะถูกพักไว้จนกว่าคุณจะได้รับสินค้า</p>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div style="border-top: 1px solid #e5e5e5; margin-top: 24px; padding-top: 20px; text-align: center;">
+          <p style="font-size: 13px; color: #666; margin: 0;">
+            ยังไม่มีบัญชี? <a style="color: #2563eb; font-weight: 500; text-decoration: none;">สมัครสมาชิก</a>
+          </p>
+          <p style="font-size: 11px; color: #999; margin: 10px 0 0 0;">
+            การเข้าสู่ระบบถือว่าคุณยอมรับ <a style="color: #2563eb; text-decoration: none;">เงื่อนไขการใช้งาน</a> และ <a style="color: #2563eb; text-decoration: none;">นโยบายความเป็นส่วนตัว</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>สรุปสิ่งที่เพิ่ม/เปลี่ยน</h3>
+  <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+    <thead>
+      <tr style="border-bottom: 2px solid #333;">
+        <th style="text-align: left; padding: 8px;">ตำแหน่ง</th>
+        <th style="text-align: left; padding: 8px;">สิ่งที่เพิ่ม</th>
+        <th style="text-align: left; padding: 8px;">ประเภท</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 8px;">ฝั่งซ้าย</td>
+        <td style="padding: 8px;">Hero image background (คนช้อปปิ้งออนไลน์)</td>
+        <td style="padding: 8px;">ภาพคนจริง (Unsplash)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 8px;">ฝั่งซ้าย</td>
+        <td style="padding: 8px;">Escrow Flow Card — 3 ขั้นตอน</td>
+        <td style="padding: 8px;">Illustration/Icon</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 8px;">ฝั่งขวา</td>
+        <td style="padding: 8px;">Trust badge strip (Escrow ปลอดภัย + ข้อมูลเข้ารหัส)</td>
+        <td style="padding: 8px;">Badge/Icon</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 8px;">ฝั่งขวา</td>
+        <td style="padding: 8px;">Avatar stack + "ผู้ใช้ 10,000+ คนไว้วางใจ"</td>
+        <td style="padding: 8px;">ภาพคนจริง (Unsplash) + Social proof</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
