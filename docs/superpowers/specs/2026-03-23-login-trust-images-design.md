@@ -65,9 +65,9 @@ Images loaded via Unsplash URL with `w=` sizing parameter for performance.
 
 ## Files to Modify
 
-1. `src/app/(auth)/layout.tsx` — Add hero image background, add SafePay flow card, update "Escrow" text
-2. `src/app/(auth)/login/page.tsx` — Add trust badge strip, avatar stack, update "Escrow" text
-3. `src/components/auth/TestimonialSlider.tsx` — No changes needed
+1. `src/app/login/layout.tsx` — Add hero image background, add SafePay flow card, update "Escrow" text
+2. `src/app/login/page.tsx` — Add trust badge strip, avatar stack, update "Escrow" text
+3. `next.config.ts` — Add `images.remotePatterns` for `images.unsplash.com` to allow `next/image` usage
 
 ## Design Tone
 
@@ -77,8 +77,15 @@ Images loaded via Unsplash URL with `w=` sizing parameter for performance.
 - Green accents for trust/safety elements on right panel
 - Blue gradient maintained on left panel
 
+## Implementation Notes
+
+- Hero image uses `next/image` with `fill` + `object-cover` for performance (requires `next.config.ts` remote pattern)
+- Avatar images use `next/image` with fixed width/height
+- SafePay Flow Card and Avatar Stack are small enough to be inline in layout/page — no separate components needed
+- "10,000+" is static marketing copy, not a live count
+
 ## Out of Scope
 
 - Mobile layout changes (existing mobile layout works fine)
 - Animation/motion beyond existing TestimonialSlider
-- New components (all changes are inline in existing files)
+- Extracting new reusable components
