@@ -119,7 +119,7 @@ export default function SellerDashboardPage() {
                   <YAxis tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} />
                   <Tooltip
                     contentStyle={{ borderRadius: 8, border: '1px solid var(--border)', background: 'var(--card)', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
-                    formatter={(value: number) => [`฿${value.toLocaleString()}`, 'รายได้']}
+                    formatter={(value: any) => [`฿${Number(value).toLocaleString()}`, 'รายได้']}
                   />
                   <Area type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2.5} fill="url(#revenueGradient)" />
                 </AreaChart>
@@ -150,7 +150,7 @@ export default function SellerDashboardPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={{ borderRadius: 8, border: '1px solid var(--border)', background: 'var(--card)' }}
-                    formatter={(value: number, name: string) => [`${value} รายการ`, name]}
+                    formatter={(value: any, name: any) => [`${value} รายการ`, name]}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -182,8 +182,8 @@ export default function SellerDashboardPage() {
                 <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
                   contentStyle={{ borderRadius: 8, border: '1px solid var(--border)', background: 'var(--card)', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
-                  formatter={(value: number, name: string) => [
-                    name === 'orders' ? `${value} รายการ` : `฿${value.toLocaleString()}`,
+                  formatter={(value: any, name: any) => [
+                    name === 'orders' ? `${value} รายการ` : `฿${Number(value).toLocaleString()}`,
                     name === 'orders' ? 'ออเดอร์' : 'รายได้',
                   ]}
                 />

@@ -5,7 +5,6 @@ import { LayoutDashboard, Tag, Package, Scale, Bell, UserCircle, Settings } from
 
 const sellerNav = [
   { href: '/seller/dashboard', label: 'แดชบอร์ด', icon: LayoutDashboard },
-  { href: '/seller/deals', label: 'ดีลของฉัน', icon: Tag },
   { href: '/seller/orders', label: 'ออเดอร์', icon: Package },
   { href: '/seller/disputes', label: 'ข้อพิพาท', icon: Scale },
   { href: '/seller/notifications', label: 'แจ้งเตือน', icon: Bell },
