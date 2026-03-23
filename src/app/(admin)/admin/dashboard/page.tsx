@@ -1,7 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { Header } from '@/components/layouts/Header'
 import { StatsCard } from '@/components/ui/StatsCard'
-import { Card } from '@/components/ui/Card'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { PageLoading } from '@/components/ui/Loading'
+import { ShoppingBag, Package, CheckCircle, DollarSign, TrendingUp, Users, CreditCard, AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<any>(null)
@@ -14,33 +19,51 @@ export default function AdminDashboardPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p className="text-gray-500">กำลังโหลด...</p>
+  if (loading) return <PageLoading />
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">แดชบอร์ด Admin</h1>
+    <>
+      <Header title="แดชบอร์ด" description="ภาพรวมระบบ SafePay" />
+      <div className="p-4 lg:p-6 space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard title="ดีลทั้งหมด" value={stats?.totalDeals || 0} icon={ShoppingBag} />
+          <StatsCard title="ออเดอร์ทั้งหมด" value={stats?.totalOrders || 0} icon={Package} />
+          <StatsCard title="ดีลสำเร็จ" value={stats?.completedOrders || 0} icon={CheckCircle} />
+          <StatsCard title="ผู้ใช้ทั้งหมด" value={stats?.totalUsers || 0} icon={Users} />
+        </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        <StatsCard title="ดีลทั้งหมด" value={stats?.totalDeals || 0} />
-        <StatsCard title="ออเดอร์ทั้งหมด" value={stats?.totalOrders || 0} />
-        <StatsCard title="ดีลสำเร็จ" value={stats?.completedOrders || 0} />
-        <StatsCard title="GMV" value={`฿${Number(stats?.gmv || 0).toLocaleString()}`} />
-        <StatsCard title="Success Rate" value={`${stats?.successRate || 0}%`} />
-        <StatsCard title="ผู้ใช้ทั้งหมด" value={stats?.totalUsers || 0} />
-      </div>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          <StatsCard title="GMV" value={`฿${Number(stats?.gmv || 0).toLocaleString()}`} icon={DollarSign} />
+          <StatsCard title="Success Rate" value={`${stats?.successRate || 0}%`} icon={TrendingUp} />
+        </div>
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        <Card>
-          <h3 className="font-semibold text-gray-900 mb-2">สลิปรอตรวจ</h3>
-          <p className="text-3xl font-bold text-yellow-600">{stats?.pendingPayments || 0}</p>
-          <a href="/admin/payments" className="text-sm text-blue-600 hover:underline mt-2 block">ไปตรวจสลิป →</a>
-        </Card>
-        <Card>
-          <h3 className="font-semibold text-gray-900 mb-2">ข้อพิพาทเปิดอยู่</h3>
-          <p className="text-3xl font-bold text-red-600">{stats?.openDisputes || 0}</p>
-          <a href="/admin/disputes" className="text-sm text-blue-600 hover:underline mt-2 block">ไปจัดการ →</a>
-        </Card>
+        <div className="grid lg:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                สลิปรอตรวจ
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold text-primary">{stats?.pendingPayments || 0}</p>
+              <Link href="/admin/payments" className="text-sm text-primary hover:underline mt-2 block">ไปตรวจสลิป →</Link>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                ข้อพิพาทเปิดอยู่
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold text-destructive">{stats?.openDisputes || 0}</p>
+              <Link href="/admin/disputes" className="text-sm text-primary hover:underline mt-2 block">ไปจัดการ →</Link>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

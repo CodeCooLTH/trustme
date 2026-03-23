@@ -1,10 +1,15 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Card } from '@/components/ui/Card'
+import { Header } from '@/components/layouts/Header'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table'
 import { Badge } from '@/components/ui/Badge'
+import { PageLoading } from '@/components/ui/Loading'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Tag } from 'lucide-react'
+import type { BadgeVariant } from '@/components/ui/Badge'
 
 const statusLabels: Record<string, string> = { DRAFT: 'แบบร่าง', ACTIVE: 'เผยแพร่', CLOSED: 'ปิดแล้ว' }
-const statusColors: Record<string, string> = { DRAFT: 'gray', ACTIVE: 'green', CLOSED: 'red' }
+const statusVariants: Record<string, BadgeVariant> = { DRAFT: 'secondary', ACTIVE: 'success', CLOSED: 'destructive' }
 
 export default function AdminDealsPage() {
   const [deals, setDeals] = useState<any[]>([])
@@ -17,38 +22,39 @@ export default function AdminDealsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">ดีลทั้งหมด</h1>
+  if (loading) return <PageLoading />
 
-      {loading ? <p className="text-gray-500">กำลังโหลด...</p> : (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-gray-500">
-                  <th className="pb-3 pr-4">สินค้า</th>
-                  <th className="pb-3 pr-4">ผู้ขาย</th>
-                  <th className="pb-3 pr-4">ราคา</th>
-                  <th className="pb-3 pr-4">สถานะ</th>
-                  <th className="pb-3">ออเดอร์</th>
-                </tr>
-              </thead>
-              <tbody>
-                {deals.map((d: any) => (
-                  <tr key={d.id} className="border-b last:border-0">
-                    <td className="py-3 pr-4 font-medium">{d.productName}</td>
-                    <td className="py-3 pr-4 text-gray-500">{d.seller?.name}</td>
-                    <td className="py-3 pr-4">฿{Number(d.price).toLocaleString()}</td>
-                    <td className="py-3 pr-4"><Badge color={statusColors[d.status]}>{statusLabels[d.status]}</Badge></td>
-                    <td className="py-3">{d._count?.orders || 0}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
-    </div>
+  return (
+    <>
+      <Header title="ดีลทั้งหมด" description={`ทั้งหมด ${deals.length} รายการ`} />
+      <div className="p-4 lg:p-6">
+        {deals.length === 0 ? (
+          <EmptyState icon={Tag} title="ไม่มีดีล" />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>สินค้า</TableHead>
+                <TableHead>ผู้ขาย</TableHead>
+                <TableHead>ราคา</TableHead>
+                <TableHead>สถานะ</TableHead>
+                <TableHead>ออเดอร์</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {deals.map((d: any) => (
+                <TableRow key={d.id}>
+                  <TableCell className="font-medium">{d.productName}</TableCell>
+                  <TableCell className="text-muted-foreground">{d.seller?.name}</TableCell>
+                  <TableCell>฿{Number(d.price).toLocaleString()}</TableCell>
+                  <TableCell><Badge variant={statusVariants[d.status]}>{statusLabels[d.status]}</Badge></TableCell>
+                  <TableCell>{d._count?.orders || 0}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
+    </>
   )
 }

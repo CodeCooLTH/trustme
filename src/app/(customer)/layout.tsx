@@ -1,3 +1,4 @@
+'use client'
 import { Sidebar } from '@/components/layouts/Sidebar'
 import { Topbar } from '@/components/layouts/Topbar'
 import { LayoutDashboard, Tag, Package, Scale, Bell, UserCircle } from 'lucide-react'

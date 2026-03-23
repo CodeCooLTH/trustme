@@ -1,3 +1,4 @@
+'use client'
 import { Header } from '@/components/layouts/Header'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Scale } from 'lucide-react'

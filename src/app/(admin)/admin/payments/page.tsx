@@ -1,8 +1,14 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Card } from '@/components/ui/Card'
+import { Header } from '@/components/layouts/Header'
+import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Modal } from '@/components/ui/Modal'
+import { Dialog } from '@/components/ui/Dialog'
+import { Input } from '@/components/ui/Input'
+import { Badge } from '@/components/ui/Badge'
+import { PageLoading } from '@/components/ui/Loading'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { CreditCard, CheckCircle, XCircle } from 'lucide-react'
 
 export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<any[]>([])
@@ -38,58 +44,65 @@ export default function AdminPaymentsPage() {
     }
   }
 
+  if (loading) return <PageLoading />
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">ตรวจสอบสลิป</h1>
+    <>
+      <Header title="ตรวจสอบสลิป" description={`รอตรวจ ${payments.length} รายการ`} />
+      <div className="p-4 lg:p-6">
+        {payments.length === 0 ? (
+          <EmptyState icon={CreditCard} title="ไม่มีสลิปรอตรวจ" description="สลิปทั้งหมดถูกตรวจสอบแล้ว" />
+        ) : (
+          <div className="grid gap-4">
+            {payments.map((p: any) => (
+              <Card key={p.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setSelected(p)}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="font-medium text-foreground">{p.order?.deal?.productName || 'สินค้า'}</p>
+                      <p className="text-sm text-muted-foreground">ผู้ซื้อ: {p.order?.buyer?.name}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-semibold text-primary">฿{Number(p.amount).toLocaleString()}</p>
+                      <Badge variant="warning">รอตรวจ</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
 
-      {loading ? <p className="text-gray-500">กำลังโหลด...</p> : payments.length === 0 ? (
-        <Card className="text-center py-12">
-          <p className="text-gray-500">ไม่มีสลิปรอตรวจ</p>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {payments.map((p: any) => (
-            <Card key={p.id}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">{p.order?.deal?.productName || 'สินค้า'}</p>
-                  <p className="text-sm text-gray-500">ผู้ซื้อ: {p.order?.buyer?.name}</p>
-                  <p className="text-lg font-bold text-blue-600 mt-1">฿{Number(p.amount).toLocaleString()}</p>
-                </div>
-                <Button size="sm" onClick={() => setSelected(p)}>ตรวจสอบ</Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      <Modal isOpen={!!selected} onClose={() => setSelected(null)} title="ตรวจสอบสลิป">
+      <Dialog open={!!selected} onClose={() => setSelected(null)} title="ตรวจสอบสลิป" description="ตรวจสอบและอนุมัติหรือปฏิเสธสลิปการชำระเงิน">
         {selected && (
           <div className="space-y-4">
-            <div className="text-sm space-y-1">
+            <div className="rounded-lg bg-muted p-3 text-sm space-y-1">
               <p>สินค้า: <span className="font-medium">{selected.order?.deal?.productName}</span></p>
-              <p>จำนวน: <span className="font-bold text-blue-600">฿{Number(selected.amount).toLocaleString()}</span></p>
-              <p>สลิป: <span className="text-gray-500">{selected.slipImage}</span></p>
+              <p>จำนวน: <span className="font-semibold text-primary">฿{Number(selected.amount).toLocaleString()}</span></p>
+              <p>สลิป: <span className="text-muted-foreground">{selected.slipImage}</span></p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">เหตุผล (กรณี reject)</label>
-              <input
-                type="text"
-                value={rejectedReason}
-                onChange={e => setRejectedReason(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                placeholder="สลิปไม่ชัด, ยอดไม่ตรง, etc."
-              />
-            </div>
+            <Input
+              label="เหตุผล (กรณีปฏิเสธ)"
+              value={rejectedReason}
+              onChange={e => setRejectedReason(e.target.value)}
+              placeholder="สลิปไม่ชัด, ยอดไม่ตรง, etc."
+            />
 
-            <div className="flex gap-3">
-              <Button onClick={() => handleVerify('approve')} loading={processing}>อนุมัติ</Button>
-              <Button variant="danger" onClick={() => handleVerify('reject')} loading={processing}>ปฏิเสธ</Button>
+            <div className="flex gap-2">
+              <Button onClick={() => handleVerify('approve')} loading={processing} className="flex-1">
+                <CheckCircle className="h-4 w-4" />
+                อนุมัติ
+              </Button>
+              <Button variant="destructive" onClick={() => handleVerify('reject')} loading={processing} className="flex-1">
+                <XCircle className="h-4 w-4" />
+                ปฏิเสธ
+              </Button>
             </div>
           </div>
         )}
-      </Modal>
-    </div>
+      </Dialog>
+    </>
   )
 }
