@@ -44,39 +44,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  // ── Auth checks ──
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
-
-  // Seller protected routes (except login)
-  if (path.startsWith('/seller') && path !== '/seller/login') {
-    if (!token) {
-      const loginUrl = req.nextUrl.clone()
-      loginUrl.pathname = '/seller/login'
-      return NextResponse.redirect(loginUrl)
-    }
-    if (token.role !== 'SELLER') {
-      return NextResponse.redirect(new URL('/', req.url))
-    }
-  }
-
-  // Admin protected routes (except login)
-  if (path.startsWith('/admin') && path !== '/admin/login') {
-    if (!token) {
-      const loginUrl = req.nextUrl.clone()
-      loginUrl.pathname = '/admin/login'
-      return NextResponse.redirect(loginUrl)
-    }
-    if (token.role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/', req.url))
-    }
-  }
-
-  // Buyer protected: /orders
-  if (path === '/orders') {
-    if (!token) {
-      return NextResponse.redirect(new URL('/login', req.url))
-    }
-  }
+  // ── Auth checks (disabled for MVP demo — enable when auth is ready) ──
+  // TODO: uncomment when Facebook OAuth is configured
+  // const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+  // if (path.startsWith('/seller') && path !== '/seller/login') { ... }
+  // if (path.startsWith('/admin') && path !== '/admin/login') { ... }
 
   return NextResponse.next()
 }
