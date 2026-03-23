@@ -17,7 +17,7 @@ export function paginatedResponse<T>(data: T[], total: number, page: number, lim
 
 export function errorResponse(error: unknown) {
   if (error instanceof ZodError) {
-    return NextResponse.json({ success: false, error: error.errors[0]?.message ?? 'ข้อมูลไม่ถูกต้อง' }, { status: 422 })
+    return NextResponse.json({ success: false, error: error.issues[0]?.message ?? 'ข้อมูลไม่ถูกต้อง' }, { status: 422 })
   }
   if (error instanceof AppError) {
     return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode })

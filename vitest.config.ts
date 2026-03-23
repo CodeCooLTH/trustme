@@ -7,6 +7,7 @@ export default defineConfig({
     environment: 'node',
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.test.ts'],
+    fileParallelism: false,
     env: {
       DATABASE_URL: 'postgresql://safepay:changeme@localhost:5433/safepay_test',
       NEXTAUTH_SECRET: 'test-secret',
