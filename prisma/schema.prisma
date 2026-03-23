@@ -53,6 +53,7 @@ enum ShipmentStatus {
 model User {
   id         String   @id @default(cuid())
   facebookId String   @unique
+  slug       String?  @unique
   name       String
   email      String?
   avatar     String?

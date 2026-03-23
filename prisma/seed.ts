@@ -21,6 +21,7 @@ async function main() {
     update: {},
     create: {
       facebookId: 'demo-seller',
+      slug: 'somchai-shop',
       name: 'สมชาย ขายดี',
       email: 'seller@demo.com',
       role: UserRole.SELLER,
