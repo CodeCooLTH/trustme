@@ -1,31 +1,31 @@
 'use client'
 import { signIn } from 'next-auth/react'
-import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { useState } from 'react'
+import { Shield, Lock, CheckCircle } from 'lucide-react'
+import Link from 'next/link'
 
 export default function LoginPage() {
-  const [loading, setLoading] = useState<string | null>(null)
-
-  const handleDevLogin = async (facebookId: string) => {
-    setLoading(facebookId)
-    await signIn('dev-login', {
-      facebookId,
-      callbackUrl: facebookId === 'admin-system' ? '/admin/dashboard' : '/dashboard',
-    })
-  }
-
   return (
-    <Card>
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">SafePay</h1>
-        <p className="mt-2 text-gray-500">ระบบ Escrow สำหรับซื้อขายออนไลน์</p>
+    <div className="space-y-8">
+      {/* Logo — mobile only */}
+      <div className="lg:hidden flex items-center justify-center gap-2">
+        <Shield className="h-8 w-8 text-primary" />
+        <span className="text-2xl font-bold text-foreground">SafePay</span>
       </div>
 
-      <div className="mt-8 space-y-4">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">เข้าสู่ระบบ</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          เข้าสู่ระบบเพื่อเริ่มซื้อขายอย่างปลอดภัย
+        </p>
+      </div>
+
+      {/* Facebook Login */}
+      <div className="space-y-3">
         <Button
           onClick={() => signIn('facebook', { callbackUrl: '/dashboard' })}
-          className="w-full bg-[#1877F2] hover:bg-[#166FE5]"
+          className="w-full bg-[#1877F2] hover:bg-[#166FE5] h-12 text-base"
           size="lg"
         >
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -35,57 +35,33 @@ export default function LoginPage() {
         </Button>
       </div>
 
-      {/* Dev Login */}
-      <div className="mt-8 border-t pt-6">
-        <p className="text-center text-xs text-gray-400 mb-4">Demo Login (สำหรับทดสอบ)</p>
-        <div className="space-y-2">
-          <button
-            onClick={() => handleDevLogin('demo-seller')}
-            disabled={!!loading}
-            className="w-full rounded-lg border-2 border-gray-200 p-3 text-left hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="font-semibold text-gray-900">🏪 ผู้ขาย</span>
-                <span className="text-sm text-gray-500 ml-2">สมชาย ขายดี</span>
-              </div>
-              {loading === 'demo-seller' && <span className="text-xs text-gray-400">กำลังเข้าสู่ระบบ...</span>}
-            </div>
-          </button>
-
-          <button
-            onClick={() => handleDevLogin('demo-buyer')}
-            disabled={!!loading}
-            className="w-full rounded-lg border-2 border-gray-200 p-3 text-left hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="font-semibold text-gray-900">🛒 ผู้ซื้อ</span>
-                <span className="text-sm text-gray-500 ml-2">สมหญิง ซื้อเก่ง</span>
-              </div>
-              {loading === 'demo-buyer' && <span className="text-xs text-gray-400">กำลังเข้าสู่ระบบ...</span>}
-            </div>
-          </button>
-
-          <button
-            onClick={() => handleDevLogin('admin-system')}
-            disabled={!!loading}
-            className="w-full rounded-lg border-2 border-gray-200 p-3 text-left hover:border-purple-500 hover:bg-purple-50 transition-colors disabled:opacity-50"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="font-semibold text-gray-900">🛡️ แอดมิน</span>
-                <span className="text-sm text-gray-500 ml-2">System Admin</span>
-              </div>
-              {loading === 'admin-system' && <span className="text-xs text-gray-400">กำลังเข้าสู่ระบบ...</span>}
-            </div>
-          </button>
+      {/* Trust indicators */}
+      <div className="space-y-3 pt-2">
+        <div className="flex items-start gap-3">
+          <Lock className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+          <p className="text-xs text-muted-foreground">ข้อมูลของคุณถูกเข้ารหัสและปลอดภัย เราไม่เก็บรหัสผ่าน Facebook ของคุณ</p>
+        </div>
+        <div className="flex items-start gap-3">
+          <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+          <p className="text-xs text-muted-foreground">ระบบ Escrow ค้ำประกันทุกธุรกรรม เงินจะถูกพักไว้จนกว่าคุณจะได้รับสินค้า</p>
         </div>
       </div>
 
-      <p className="mt-6 text-center text-xs text-gray-400">
-        การเข้าสู่ระบบถือว่าคุณยอมรับเงื่อนไขการใช้งาน
-      </p>
-    </Card>
+      {/* Links */}
+      <div className="border-t border-border pt-6 space-y-3">
+        <p className="text-sm text-center text-muted-foreground">
+          ยังไม่มีบัญชี?{' '}
+          <Link href="/register" className="text-primary font-medium hover:underline">
+            สมัครสมาชิก
+          </Link>
+        </p>
+        <p className="text-center text-xs text-muted-foreground">
+          การเข้าสู่ระบบถือว่าคุณยอมรับ{' '}
+          <span className="text-primary cursor-pointer hover:underline">เงื่อนไขการใช้งาน</span>
+          {' '}และ{' '}
+          <span className="text-primary cursor-pointer hover:underline">นโยบายความเป็นส่วนตัว</span>
+        </p>
+      </div>
+    </div>
   )
 }
