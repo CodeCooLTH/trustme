@@ -1,13 +1,14 @@
-'use client'
-import { Card } from '@/components/ui/Card'
+import { Header } from '@/components/layouts/Header'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Scale } from 'lucide-react'
 
 export default function DisputesPage() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">ข้อพิพาท</h1>
-      <Card>
-        <p className="text-gray-500 text-sm">ดูข้อพิพาทได้จากหน้าออเดอร์</p>
-      </Card>
-    </div>
+    <>
+      <Header title="ข้อพิพาท" />
+      <div className="p-4 lg:p-6">
+        <EmptyState icon={Scale} title="ดูข้อพิพาทได้จากหน้าออเดอร์" />
+      </div>
+    </>
   )
 }

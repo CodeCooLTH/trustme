@@ -1,11 +1,16 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Card } from '@/components/ui/Card'
+import { Header } from '@/components/layouts/Header'
+import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { PageLoading } from '@/components/ui/Loading'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Plus, Tag } from 'lucide-react'
 import Link from 'next/link'
+import type { BadgeVariant } from '@/components/ui/Badge'
 
-const statusColors: Record<string, string> = { DRAFT: 'gray', ACTIVE: 'green', CLOSED: 'red' }
+const statusVariants: Record<string, BadgeVariant> = { DRAFT: 'secondary', ACTIVE: 'success', CLOSED: 'destructive' }
 const statusLabels: Record<string, string> = { DRAFT: 'แบบร่าง', ACTIVE: 'เผยแพร่', CLOSED: 'ปิดแล้ว' }
 
 export default function DealsPage() {
@@ -19,38 +24,37 @@ export default function DealsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">ดีลของฉัน</h1>
-        <Link href="/deals/create">
-          <Button>สร้างดีลใหม่</Button>
-        </Link>
-      </div>
+  if (loading) return <PageLoading />
 
-      {loading ? (
-        <p className="text-gray-500">กำลังโหลด...</p>
-      ) : deals.length === 0 ? (
-        <Card className="text-center py-12">
-          <p className="text-gray-500 mb-4">ยังไม่มีดีล</p>
-          <Link href="/deals/create"><Button>สร้างดีลแรก</Button></Link>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {deals.map((deal: any) => (
-            <Card key={deal.id}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-gray-900">{deal.productName}</h3>
-                  <p className="text-sm text-gray-500 mt-1">฿{Number(deal.price).toLocaleString()}</p>
-                  <p className="text-xs text-gray-400 mt-1">{deal._count?.orders || 0} ออเดอร์</p>
-                </div>
-                <Badge color={statusColors[deal.status]}>{statusLabels[deal.status]}</Badge>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
+  return (
+    <>
+      <Header title="ดีลของฉัน" actions={
+        <Link href="/deals/create"><Button size="sm"><Plus className="h-4 w-4" /> สร้างดีลใหม่</Button></Link>
+      } />
+      <div className="p-4 lg:p-6">
+        {deals.length === 0 ? (
+          <EmptyState icon={Tag} title="ยังไม่มีดีล" description="สร้างดีลแรกของคุณ" action={
+            <Link href="/deals/create"><Button><Plus className="h-4 w-4" /> สร้างดีลแรก</Button></Link>
+          } />
+        ) : (
+          <div className="grid gap-3">
+            {deals.map((deal: any) => (
+              <Card key={deal.id}>
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-foreground truncate">{deal.productName}</h3>
+                      <p className="text-sm text-primary font-medium mt-1">฿{Number(deal.price).toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{deal._count?.orders || 0} ออเดอร์</p>
+                    </div>
+                    <Badge variant={statusVariants[deal.status]}>{statusLabels[deal.status]}</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   )
 }

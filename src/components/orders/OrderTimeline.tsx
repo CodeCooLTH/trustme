@@ -1,3 +1,6 @@
+import { cn } from '@/lib/cn'
+import { Check, AlertTriangle } from 'lucide-react'
+
 const steps = [
   { key: 'PENDING_PAYMENT', label: 'รอชำระเงิน' },
   { key: 'PAYMENT_UPLOADED', label: 'อัพโหลดสลิป' },
@@ -10,9 +13,13 @@ const steps = [
 const statusIndex: Record<string, number> = {}
 steps.forEach((s, i) => { statusIndex[s.key] = i })
 
+const terminalLabels: Record<string, string> = {
+  CANCELLED: 'ยกเลิก', DISPUTE: 'ข้อพิพาท', REFUNDED: 'คืนเงินแล้ว', RELEASED: 'ปล่อยเงินแล้ว',
+}
+
 export function OrderTimeline({ status }: { status: string }) {
   const currentIdx = statusIndex[status] ?? -1
-  const isTerminal = ['CANCELLED', 'DISPUTE', 'REFUNDED', 'RELEASED'].includes(status)
+  const isTerminal = status in terminalLabels
 
   return (
     <div className="space-y-3">
@@ -22,12 +29,14 @@ export function OrderTimeline({ status }: { status: string }) {
 
         return (
           <div key={step.key} className="flex items-center gap-3">
-            <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
-              isDone ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
-            } ${isCurrent ? 'ring-2 ring-blue-300' : ''}`}>
-              {isDone ? '✓' : idx + 1}
+            <div className={cn(
+              'flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold shrink-0',
+              isDone ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground',
+              isCurrent && 'ring-2 ring-ring ring-offset-2 ring-offset-background'
+            )}>
+              {isDone ? <Check className="h-3.5 w-3.5" /> : idx + 1}
             </div>
-            <span className={`text-sm ${isDone ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+            <span className={cn('text-sm', isDone ? 'text-foreground font-medium' : 'text-muted-foreground')}>
               {step.label}
             </span>
           </div>
@@ -35,10 +44,10 @@ export function OrderTimeline({ status }: { status: string }) {
       })}
       {isTerminal && (
         <div className="flex items-center gap-3">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-red-600 text-xs font-bold">!</div>
-          <span className="text-sm font-medium text-red-600">
-            {status === 'CANCELLED' ? 'ยกเลิก' : status === 'DISPUTE' ? 'ข้อพิพาท' : status === 'REFUNDED' ? 'คืนเงินแล้ว' : 'ปล่อยเงินแล้ว'}
-          </span>
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-destructive/10 shrink-0">
+            <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
+          </div>
+          <span className="text-sm font-medium text-destructive">{terminalLabels[status]}</span>
         </div>
       )}
     </div>

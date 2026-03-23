@@ -3,10 +3,10 @@ import { Button } from '@/components/ui/Button'
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <span className="text-xl font-bold text-blue-600">SafePay</span>
+        <span className="text-xl font-bold text-primary">SafePay</span>
         <div className="flex gap-3">
           <Link href="/login">
             <Button variant="ghost" size="sm">เข้าสู่ระบบ</Button>
@@ -19,11 +19,11 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground">
           ซื้อขายออนไลน์<br />
-          <span className="text-blue-600">ปลอดภัยทุกดีล</span>
+          <span className="text-primary">ปลอดภัยทุกดีล</span>
         </h1>
-        <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
           ระบบ Escrow ตัวกลางพักเงิน ผู้ซื้อมั่นใจว่าได้ของ ผู้ขายมั่นใจว่าได้เงิน
         </p>
         <div className="mt-8 flex gap-4 justify-center">
@@ -35,7 +35,7 @@ export default function HomePage() {
 
       {/* How it works */}
       <section className="max-w-6xl mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold text-center text-gray-900 mb-12">ทำงานอย่างไร</h2>
+        <h2 className="text-2xl font-bold text-center text-foreground mb-12">ทำงานอย่างไร</h2>
         <div className="grid md:grid-cols-4 gap-8">
           {[
             { step: '1', title: 'สร้างดีล', desc: 'ผู้ขายสร้างรายการสินค้าและส่งลิงก์ให้ผู้ซื้อ', icon: '🏷️' },
@@ -45,17 +45,17 @@ export default function HomePage() {
           ].map((item) => (
             <div key={item.step} className="text-center">
               <div className="text-4xl mb-3">{item.icon}</div>
-              <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-sm font-bold mb-2">{item.step}</div>
-              <h3 className="font-semibold text-gray-900">{item.title}</h3>
-              <p className="mt-1 text-sm text-gray-500">{item.desc}</p>
+              <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold mb-2">{item.step}</div>
+              <h3 className="font-semibold text-foreground">{item.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 mt-16">
-        <div className="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-gray-400">
+      <footer className="border-t border-border mt-16">
+        <div className="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
           SafePay Escrow Marketplace
         </div>
       </footer>

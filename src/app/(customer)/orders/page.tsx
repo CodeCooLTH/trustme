@@ -1,7 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Card } from '@/components/ui/Card'
+import { Header } from '@/components/layouts/Header'
+import { Card, CardContent } from '@/components/ui/Card'
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge'
+import { PageLoading } from '@/components/ui/Loading'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Package } from 'lucide-react'
 import Link from 'next/link'
 
 export default function OrdersPage() {
@@ -15,39 +19,38 @@ export default function OrdersPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">ออเดอร์ของฉัน</h1>
+  if (loading) return <PageLoading />
 
-      {loading ? (
-        <p className="text-gray-500">กำลังโหลด...</p>
-      ) : orders.length === 0 ? (
-        <Card className="text-center py-12">
-          <p className="text-gray-500">ยังไม่มีออเดอร์</p>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {orders.map((order: any) => (
-            <Link key={order.id} href={`/orders/${order.publicToken}`}>
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900">{order.deal?.productName}</p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      ฿{Number(order.amount).toLocaleString()}
-                      {order.buyer && <span className="ml-2">• {order.buyer.name}</span>}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {new Date(order.createdAt).toLocaleDateString('th-TH')}
-                    </p>
-                  </div>
-                  <OrderStatusBadge status={order.status} />
-                </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+  return (
+    <>
+      <Header title="ออเดอร์ของฉัน" description={`ทั้งหมด ${orders.length} รายการ`} />
+      <div className="p-4 lg:p-6">
+        {orders.length === 0 ? (
+          <EmptyState icon={Package} title="ยังไม่มีออเดอร์" />
+        ) : (
+          <div className="space-y-2">
+            {orders.map((order: any) => (
+              <Link key={order.id} href={`/orders/${order.publicToken}`}>
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground truncate">{order.deal?.productName}</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          ฿{Number(order.amount).toLocaleString()}
+                          {order.buyer && <span className="ml-2">• {order.buyer.name}</span>}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{new Date(order.createdAt).toLocaleDateString('th-TH')}</p>
+                      </div>
+                      <OrderStatusBadge status={order.status} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   )
 }
