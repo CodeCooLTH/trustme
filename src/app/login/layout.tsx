@@ -18,7 +18,7 @@ export default function LoginLayout({ children }: { children: React.ReactNode })
           priority
         />
 
-        <div className="relative z-10">
+        <div className="relative z-10 h-14 flex items-center">
           <div className="flex items-center gap-2.5">
             <Shield className="h-7 w-7" />
             <span className="text-xl font-bold tracking-tight">SafePay</span>
