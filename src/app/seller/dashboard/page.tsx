@@ -78,16 +78,14 @@ export default function SellerDashboardPage() {
 
   return (
     <>
-      <Header
-        title="แดชบอร์ด"
-        description="ภาพรวมร้านค้าของคุณ"
-        actions={
-          <Link href="/seller/deals/create">
-            <Button size="sm"><Plus className="h-4 w-4" /> สร้างดีลใหม่</Button>
-          </Link>
-        }
-      />
-      <div className="p-4 lg:p-6 space-y-6">
+      {/* TopNavBar */}
+      <div className="flex items-center justify-between h-12 px-4 border-b border-border bg-card shrink-0">
+        <h1 className="text-sm font-semibold text-foreground">แดชบอร์ด</h1>
+        <Link href="/seller/orders">
+          <Button size="sm"><Plus className="h-4 w-4" /> สร้างออเดอร์ใหม่</Button>
+        </Link>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
         {/* ── Stats ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard title="ออเดอร์ทั้งหมด" value={orders.length} icon={Package} />

@@ -104,18 +104,16 @@ export default function SellerOrdersPage() {
 
   return (
     <>
-      <Header
-        title="ออเดอร์"
-        description={`ทั้งหมด ${mockOrders.length} รายการ`}
-        actions={
-          <Button size="sm" onClick={() => setShowCreate(true)}>
-            <Plus className="h-4 w-4" /> สร้างออเดอร์ใหม่
-          </Button>
-        }
-      />
+      {/* ── TopNavBar ── */}
+      <div className="flex items-center justify-between h-12 px-4 border-b border-border bg-card shrink-0">
+        <h1 className="text-sm font-semibold text-foreground">ออเดอร์</h1>
+        <Button size="sm" onClick={() => setShowCreate(true)}>
+          <Plus className="h-4 w-4" /> สร้างออเดอร์ใหม่
+        </Button>
+      </div>
 
       {/* ── Split Panel ── */}
-      <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 7rem)' }}>
+      <div className="flex flex-1 overflow-hidden">
 
         {/* ── Left: Filter + List (30%) ── */}
         <div className="w-full lg:w-[35%] xl:w-[30%] border-r border-border flex flex-col shrink-0">
