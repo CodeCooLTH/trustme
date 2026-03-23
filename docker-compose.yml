@@ -1,4 +1,26 @@
 services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://safepay:${DB_PASSWORD:-changeme}@db:5432/safepay
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-secret-change-in-production}
+      FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID:-}
+      FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET:-}
+      NEXT_PUBLIC_APP_NAME: SafePay
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      UPLOAD_DIR: ./uploads
+      MAX_FILE_SIZE_MB: "5"
+    volumes:
+      - uploads:/app/uploads
+    profiles:
+      - production
+
   db:
     image: postgres:16-alpine
     ports:
@@ -13,6 +35,28 @@ services:
       test: ["CMD-SHELL", "pg_isready -U safepay"]
       interval: 5s
       retries: 5
+
+  migrate:
+    build: .
+    command: npx prisma migrate deploy
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://safepay:${DB_PASSWORD:-changeme}@db:5432/safepay
+    profiles:
+      - migrate
+
+  seed:
+    build: .
+    command: npx prisma db seed
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://safepay:${DB_PASSWORD:-changeme}@db:5432/safepay
+    profiles:
+      - seed
 
   db-test:
     image: postgres:16-alpine
@@ -29,3 +73,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:
