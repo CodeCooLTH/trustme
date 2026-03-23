@@ -2,8 +2,19 @@
 import { signIn } from 'next-auth/react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { useState } from 'react'
 
 export default function LoginPage() {
+  const [loading, setLoading] = useState<string | null>(null)
+
+  const handleDevLogin = async (facebookId: string) => {
+    setLoading(facebookId)
+    await signIn('dev-login', {
+      facebookId,
+      callbackUrl: facebookId === 'admin-system' ? '/admin/dashboard' : '/dashboard',
+    })
+  }
+
   return (
     <Card>
       <div className="text-center">
@@ -22,6 +33,54 @@ export default function LoginPage() {
           </svg>
           เข้าสู่ระบบด้วย Facebook
         </Button>
+      </div>
+
+      {/* Dev Login */}
+      <div className="mt-8 border-t pt-6">
+        <p className="text-center text-xs text-gray-400 mb-4">Demo Login (สำหรับทดสอบ)</p>
+        <div className="space-y-2">
+          <button
+            onClick={() => handleDevLogin('demo-seller')}
+            disabled={!!loading}
+            className="w-full rounded-lg border-2 border-gray-200 p-3 text-left hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-semibold text-gray-900">🏪 ผู้ขาย</span>
+                <span className="text-sm text-gray-500 ml-2">สมชาย ขายดี</span>
+              </div>
+              {loading === 'demo-seller' && <span className="text-xs text-gray-400">กำลังเข้าสู่ระบบ...</span>}
+            </div>
+          </button>
+
+          <button
+            onClick={() => handleDevLogin('demo-buyer')}
+            disabled={!!loading}
+            className="w-full rounded-lg border-2 border-gray-200 p-3 text-left hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-semibold text-gray-900">🛒 ผู้ซื้อ</span>
+                <span className="text-sm text-gray-500 ml-2">สมหญิง ซื้อเก่ง</span>
+              </div>
+              {loading === 'demo-buyer' && <span className="text-xs text-gray-400">กำลังเข้าสู่ระบบ...</span>}
+            </div>
+          </button>
+
+          <button
+            onClick={() => handleDevLogin('admin-system')}
+            disabled={!!loading}
+            className="w-full rounded-lg border-2 border-gray-200 p-3 text-left hover:border-purple-500 hover:bg-purple-50 transition-colors disabled:opacity-50"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-semibold text-gray-900">🛡️ แอดมิน</span>
+                <span className="text-sm text-gray-500 ml-2">System Admin</span>
+              </div>
+              {loading === 'admin-system' && <span className="text-xs text-gray-400">กำลังเข้าสู่ระบบ...</span>}
+            </div>
+          </button>
+        </div>
       </div>
 
       <p className="mt-6 text-center text-xs text-gray-400">

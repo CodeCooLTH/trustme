@@ -3,6 +3,7 @@ import { PrismaClient, UserRole } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
+  // 1. Admin user
   await prisma.user.upsert({
     where: { facebookId: 'admin-system' },
     update: {},
@@ -13,6 +14,46 @@ async function main() {
       role: UserRole.ADMIN,
     },
   })
+
+  // 2. Demo Seller
+  const seller = await prisma.user.upsert({
+    where: { facebookId: 'demo-seller' },
+    update: {},
+    create: {
+      facebookId: 'demo-seller',
+      name: 'สมชาย ขายดี',
+      email: 'seller@demo.com',
+      role: UserRole.SELLER,
+      points: 45,
+    },
+  })
+
+  // Seller bank account
+  await prisma.sellerBankAccount.upsert({
+    where: { userId: seller.id },
+    update: {},
+    create: {
+      userId: seller.id,
+      bankName: 'กสิกรไทย',
+      accountNo: '012-345-6789',
+      accountName: 'สมชาย ขายดี',
+    },
+  })
+
+  // 3. Demo Buyer
+  await prisma.user.upsert({
+    where: { facebookId: 'demo-buyer' },
+    update: {},
+    create: {
+      facebookId: 'demo-buyer',
+      name: 'สมหญิง ซื้อเก่ง',
+      email: 'buyer@demo.com',
+      role: UserRole.BUYER,
+      points: 20,
+    },
+  })
+
+  console.log('Demo users created: admin-system, demo-seller, demo-buyer')
 
   const settings = [
     {
