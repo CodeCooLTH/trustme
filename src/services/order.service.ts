@@ -111,4 +111,20 @@ export class OrderService {
 
     return { orders, total }
   }
+
+  static async confirmReceive(publicToken: string, buyerId: string, photos: string[]) {
+    const order = await prisma.order.findUnique({
+      where: { publicToken },
+      include: { deal: true },
+    })
+
+    if (!order) throw new NotFoundError('ออเดอร์')
+    if (order.buyerId !== buyerId) throw new ForbiddenError('คุณไม่ใช่ผู้ซื้อของออเดอร์นี้')
+    if (order.status !== OrderStatus.DELIVERED) {
+      throw new AppError('สามารถยืนยันรับได้เฉพาะเมื่อสถานะเป็น DELIVERED', 400)
+    }
+
+    const { EscrowService } = await import('./escrow.service')
+    return EscrowService.transition(order.id, OrderStatus.DELIVERED, OrderStatus.COMPLETED)
+  }
 }
