@@ -9,6 +9,7 @@ import type { SystemMode } from '@core/types'
 // Component Imports
 import HeroSection from './HeroSection'
 import UsefulFeature from './UsefulFeature'
+import CustomerReviews from './CustomerReviews'
 import ProductStat from './ProductStat'
 import Faqs from './Faqs'
 import GetStarted from './GetStarted'
@@ -30,6 +31,7 @@ const LandingPageWrapper = ({ mode }: { mode: SystemMode }) => {
     <div className='bg-backgroundPaper'>
       <HeroSection mode={mode} />
       <UsefulFeature />
+      <CustomerReviews />
       <ProductStat />
       <Faqs />
       <GetStarted mode={mode} />

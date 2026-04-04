@@ -6,6 +6,8 @@ const typography = (fontFamily: string): Theme['typography'] =>
     fontFamily:
       typeof fontFamily === 'undefined' || fontFamily === ''
         ? [
+            'var(--font-noto-sans-thai)',
+            '"Noto Sans Thai"',
             '"Public Sans"',
             'sans-serif',
             '-apple-system',
