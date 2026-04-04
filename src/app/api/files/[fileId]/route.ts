@@ -11,7 +11,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const result = await getFile(fileId);
   if (!result) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  return new NextResponse(result.buffer, {
+  return new NextResponse(new Uint8Array(result.buffer), {
     headers: {
       "Content-Type": MIME[result.ext] || "application/octet-stream",
       "Cache-Control": "public, max-age=86400",
