@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSubdomain } from "@/lib/subdomain";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const host = request.headers.get("host") || "localhost:3000";
   const subdomain = getSubdomain(host);
   const { pathname } = request.nextUrl;
