@@ -45,7 +45,8 @@ SafePay เป็นระบบสร้างความน่าเชื่
 **Rules (ABSOLUTE — NO EXCEPTIONS):**
 1. **ห้ามเขียน UI/page เองเด็ดขาด** — ทุกหน้าต้อง copy จาก `theme/vuexy/typescript-version/full-version/src/` แล้วปรับแก้ content เท่านั้น
 2. **วิธีสร้างหน้าใหม่:** หา page/view ที่ใกล้เคียงที่สุดจาก theme → copy มา → ปรับ content/logic ให้ตรง SafePay ห้ามเขียนจาก scratch
-3. **Auth pages** → ใช้ `theme/vuexy/.../src/views/pages/auth/LoginV1.tsx`, `RegisterV1.tsx` เป็น base
+3. **Auth pages** → Login ใช้ `LoginV1.tsx`, Register ใช้ `RegisterV2.tsx` (register-v2) เป็น base
+4. **Landing page** → ใช้ `theme/vuexy/.../src/app/front-pages/landing-page/` เป็น base
 4. **Dashboard pages** → ใช้ `theme/vuexy/.../src/views/dashboards/` เป็น base
 5. **Table/List pages** → ใช้ `theme/vuexy/.../src/views/apps/` (user-list, invoice, ecommerce) เป็น base
 6. **Form pages** → ใช้ `theme/vuexy/.../src/views/forms/` เป็น base
@@ -73,6 +74,7 @@ SafePay เป็นระบบสร้างความน่าเชื่
 
 - Language: TypeScript (strict mode)
 - UI ภาษาไทย
+- Font: Noto Sans Thai (Google Fonts)
 - Mobile-first responsive
 - Service layer แยกจาก API layer
 - Input validation ด้วย Valibot ทุก endpoint
