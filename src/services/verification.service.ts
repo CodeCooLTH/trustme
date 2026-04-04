@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { evaluateBadges } from "@/services/badge.service";
+import { recalculateTrustScore } from "@/services/trust-score.service";
 
 export async function submitVerification(userId: string, data: {
   type: string;
@@ -33,8 +35,11 @@ export async function reviewVerification(recordId: string, adminId: string, data
     },
   });
 
-  // Badge evaluation and trust score recalculation will be added in Tasks 7-8
-  // For now, just return the record
+  if (data.status === "APPROVED") {
+    await evaluateBadges(record.userId);
+    await recalculateTrustScore(record.userId);
+  }
+
   return record;
 }
 
