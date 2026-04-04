@@ -52,12 +52,14 @@ const ORDER_TYPE_OPTIONS: { value: ProductType; label: string }[] = [
   { value: 'SERVICE', label: 'บริการ (Service)' }
 ]
 
+let nextId = 1
+
 const CreateOrderView = () => {
   // States
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<OrderItem[]>([
-    { id: crypto.randomUUID(), name: '', price: 0, quantity: 1 }
+    { id: String(nextId++), name: '', price: 0, quantity: 1 }
   ])
   const [orderType, setOrderType] = useState<ProductType>('PHYSICAL')
   const [submitting, setSubmitting] = useState(false)
@@ -87,7 +89,7 @@ const CreateOrderView = () => {
   }, [])
 
   const addItem = () => {
-    setItems(prev => [...prev, { id: crypto.randomUUID(), name: '', price: 0, quantity: 1 }])
+    setItems(prev => [...prev, { id: String(nextId++), name: '', price: 0, quantity: 1 }])
   }
 
   const removeItem = (id: string) => {
@@ -180,7 +182,7 @@ const CreateOrderView = () => {
   const handleCreateNew = () => {
     setSuccessDialog(false)
     setCreatedToken('')
-    setItems([{ id: crypto.randomUUID(), name: '', price: 0, quantity: 1 }])
+    setItems([{ id: String(nextId++), name: '', price: 0, quantity: 1 }])
     setOrderType('PHYSICAL')
     setError('')
   }
