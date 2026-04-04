@@ -18,10 +18,27 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.phone || !credentials?.otp) return null;
-        const user = await prisma.user.findFirst({
+
+        // Verify OTP
+        const { verifyOtp } = await import("@/lib/otp");
+        if (!verifyOtp(credentials.phone, credentials.otp)) return null;
+
+        // Find or create user
+        let user = await prisma.user.findFirst({
           where: { phone: credentials.phone },
         });
-        if (!user) return null;
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              phone: credentials.phone,
+              displayName: `User_${credentials.phone.slice(-4)}`,
+              username: `user_${Date.now()}`,
+              authAccounts: {
+                create: { provider: "PHONE", providerAccountId: credentials.phone },
+              },
+            },
+          });
+        }
         return { id: user.id, name: user.displayName, email: user.email };
       },
     }),
