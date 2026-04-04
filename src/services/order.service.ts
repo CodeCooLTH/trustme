@@ -1,0 +1,99 @@
+import { prisma } from "@/lib/prisma";
+import { evaluateBadges } from "@/services/badge.service";
+import { recalculateTrustScore } from "@/services/trust-score.service";
+
+export const VALID_TRANSITIONS: Record<string, string[]> = {
+  CREATED: ["CONFIRMED", "CANCELLED"],
+  CONFIRMED: ["SHIPPED", "COMPLETED"],
+  SHIPPED: ["COMPLETED"],
+};
+
+function assertTransition(currentStatus: string, newStatus: string) {
+  const allowed = VALID_TRANSITIONS[currentStatus];
+  if (!allowed || !allowed.includes(newStatus)) {
+    throw new Error(`Invalid transition: ${currentStatus} → ${newStatus}`);
+  }
+}
+
+export async function createOrder(shopId: string, data: {
+  items: { productId?: string; name: string; description?: string; qty: number; price: number }[];
+  type: string;
+}) {
+  const totalAmount = data.items.reduce((sum, item) => sum + item.qty * item.price, 0);
+  return prisma.order.create({
+    data: {
+      shopId,
+      type: data.type,
+      totalAmount,
+      items: { create: data.items },
+    },
+    include: { items: true },
+  });
+}
+
+export async function confirmOrder(publicToken: string, buyerContact: string, buyerUserId?: string) {
+  const order = await prisma.order.findUnique({ where: { publicToken } });
+  if (!order) throw new Error("Order not found");
+  assertTransition(order.status, "CONFIRMED");
+  return prisma.order.update({
+    where: { publicToken },
+    data: { status: "CONFIRMED", buyerContact, buyerUserId },
+  });
+}
+
+export async function shipOrder(publicToken: string, data: { provider: string; trackingNo: string }) {
+  const order = await prisma.order.findUnique({ where: { publicToken } });
+  if (!order) throw new Error("Order not found");
+  assertTransition(order.status, "SHIPPED");
+  return prisma.$transaction(async (tx) => {
+    await tx.shipmentTracking.create({
+      data: { orderId: order.id, provider: data.provider, trackingNo: data.trackingNo },
+    });
+    return tx.order.update({ where: { publicToken }, data: { status: "SHIPPED" } });
+  });
+}
+
+export async function completeOrder(publicToken: string) {
+  const order = await prisma.order.findUnique({ where: { publicToken }, include: { shop: true } });
+  if (!order) throw new Error("Order not found");
+  assertTransition(order.status, "COMPLETED");
+  const updated = await prisma.order.update({ where: { publicToken }, data: { status: "COMPLETED" } });
+  await evaluateBadges(order.shop.userId);
+  await recalculateTrustScore(order.shop.userId);
+  return updated;
+}
+
+export async function cancelOrder(publicToken: string) {
+  const order = await prisma.order.findUnique({ where: { publicToken } });
+  if (!order) throw new Error("Order not found");
+  assertTransition(order.status, "CANCELLED");
+  return prisma.order.update({ where: { publicToken }, data: { status: "CANCELLED" } });
+}
+
+export async function getOrderByToken(publicToken: string) {
+  return prisma.order.findUnique({
+    where: { publicToken },
+    include: {
+      items: true,
+      shop: { include: { user: { select: { id: true, displayName: true, username: true, trustScore: true, userBadges: { include: { badge: true } } } } } },
+      shipmentTracking: true,
+      review: true,
+    },
+  });
+}
+
+export async function getOrdersByShop(shopId: string, status?: string) {
+  return prisma.order.findMany({
+    where: { shopId, ...(status ? { status } : {}) },
+    include: { items: true, shipmentTracking: true, review: true },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getOrdersByBuyer(userId: string) {
+  return prisma.order.findMany({
+    where: { buyerUserId: userId },
+    include: { items: true, shop: true, review: true },
+    orderBy: { createdAt: "desc" },
+  });
+}
