@@ -171,10 +171,21 @@ const CreateOrderView = () => {
     }
   }
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     const url = `${window.location.origin}/o/${createdToken}`
 
-    navigator.clipboard.writeText(url)
+    try {
+      await navigator.clipboard.writeText(url)
+    } catch {
+      const textarea = document.createElement('textarea')
+
+      textarea.value = url
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+    }
+
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
