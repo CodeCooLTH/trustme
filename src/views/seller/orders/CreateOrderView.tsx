@@ -172,7 +172,9 @@ const CreateOrderView = () => {
   }
 
   const handleCopyLink = async () => {
-    const url = `${window.location.origin}/o/${createdToken}`
+    const mainDomain = process.env.NEXT_PUBLIC_BUYER_URL || window.location.origin.replace('seller.', '')
+
+    const url = `${mainDomain}/o/${createdToken}`
 
     try {
       await navigator.clipboard.writeText(url)
@@ -198,7 +200,9 @@ const CreateOrderView = () => {
     setError('')
   }
 
-  const publicUrl = typeof window !== 'undefined' ? `${window.location.origin}/o/${createdToken}` : ''
+  const publicUrl = typeof window !== 'undefined'
+    ? `${process.env.NEXT_PUBLIC_BUYER_URL || window.location.origin.replace('seller.', '')}/o/${createdToken}`
+    : ''
 
   return (
     <>

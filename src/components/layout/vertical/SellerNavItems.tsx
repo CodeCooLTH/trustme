@@ -75,10 +75,7 @@ const SellerNavItems = ({ scrollMenu }: Props) => {
         <MenuItem href='/orders' icon={<i className='tabler-shopping-bag' />}>
           คำสั่งซื้อ
         </MenuItem>
-        <MenuItem href='/orders/create' icon={<i className='tabler-plus' />}>
-          สร้างคำสั่งซื้อ
-        </MenuItem>
-        <MenuItem href='/reviews' icon={<i className='tabler-star' />}>
+<MenuItem href='/reviews' icon={<i className='tabler-star' />}>
           รีวิว
         </MenuItem>
         <MenuSection label='ตั้งค่า'>
