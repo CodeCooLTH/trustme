@@ -1,100 +1,36 @@
-# SafePay — Escrow Marketplace
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-ระบบ Escrow สำหรับซื้อขายออนไลน์ C2C ในประเทศไทย
+## Getting Started
 
-## Quick Start (Development)
-
-### Prerequisites
-- Node.js 20+
-- PostgreSQL 16 (or Docker)
-- Facebook Developer App (for OAuth)
-
-### 1. Setup
+First, run the development server:
 
 ```bash
-# Install dependencies
-npm install
-
-# Copy env file
-cp .env.example .env
-# Edit .env with your credentials
-
-# Start PostgreSQL
-docker compose up db -d
-
-# Run migrations
-npx prisma migrate dev
-
-# Seed initial data
-npx prisma db seed
-```
-
-### 2. Run
-
-```bash
-# Development server
 npm run dev
-
-# Or with custom server (includes cron jobs)
-npm run dev:server
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Open http://localhost:3000
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### 3. Test
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```bash
-# Start test database
-docker compose --profile test up db-test -d
-DATABASE_URL="postgresql://safepay:changeme@localhost:5433/safepay_test" npx prisma db push
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-# Run tests
-npx vitest run
-```
+## Learn More
 
-## Production (Docker)
+To learn more about Next.js, take a look at the following resources:
 
-```bash
-# Build and start everything
-docker compose --profile production up -d
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-# Run migrations
-docker compose --profile migrate up
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-# Seed data
-docker compose --profile seed up
-```
+## Deploy on Vercel
 
-## Project Structure
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Login, Register
-│   ├── (public)/          # Public order link
-│   ├── (customer)/        # Customer dashboard
-│   ├── (admin)/           # Admin panel
-│   └── api/               # API routes (36 endpoints)
-├── components/            # UI components
-├── services/              # Business logic
-├── lib/                   # Utilities, auth, Prisma
-└── types/                 # TypeScript types
-```
-
-## Tech Stack
-
-- Next.js (App Router, TypeScript)
-- PostgreSQL 16 + Prisma ORM
-- NextAuth.js v4 (Facebook OAuth)
-- TailwindCSS
-- Docker + Docker Compose
-- Vitest (26 tests)
-
-## Escrow Flow
-
-1. Seller สร้างดีล → สร้างลิงก์ส่งให้ผู้ซื้อ
-2. Buyer เปิดลิงก์ → โอนเงินมาที่ SafePay → อัพโหลดสลิป
-3. Admin ตรวจสลิป → อนุมัติ
-4. Seller จัดส่งสินค้า → ใส่เลข tracking
-5. Buyer ยืนยันรับสินค้า → ระบบปล่อยเงินให้ Seller
-6. (ถ้ามีปัญหา) → เปิด Dispute → Admin ตัดสิน
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

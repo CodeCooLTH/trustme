@@ -1,21 +1,29 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
-  devIndicators: false,
-  allowedDevOrigins: [
-    'safepay.local',
-    'sellers.safepay.local',
-    'admin.safepay.local',
-  ],
-  images: {
-    remotePatterns: [
+  basePath: process.env.BASEPATH,
+  redirects: async () => {
+    return [
       {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
+        source: '/',
+        destination: '/en/dashboards/crm',
+        permanent: true,
+        locale: false
       },
-    ],
-  },
+      {
+        source: '/:lang(en|fr|ar)',
+        destination: '/:lang/dashboards/crm',
+        permanent: true,
+        locale: false
+      },
+      {
+        source: '/:path((?!en|fr|ar|front-pages|images|api|favicon.ico).*)*',
+        destination: '/en/:path*',
+        permanent: true,
+        locale: false
+      }
+    ]
+  }
 }
 
 export default nextConfig
