@@ -42,13 +42,24 @@ SafePay เป็นระบบสร้างความน่าเชื่
 - Has pre-built: auth pages, dashboards, forms, tables, dialogs, OTP input
 - i18n ready (en, fr, ar with RTL)
 
-**Rules:**
-1. ต้องใช้ components จาก Vuexy/MUI เท่านั้น — ห้ามเขียน custom UI components เอง
-2. ต้องใช้ layout system จาก `@layouts/` — ห้ามสร้าง layout เอง
-3. ต้องใช้ menu system จาก `@menu/` — ห้ามสร้าง navigation เอง
-4. ต้องใช้ theme/styling จาก `@core/theme/` — ห้ามกำหนด color/typography เอง
-5. ถ้าต้องการ pattern ใหม่ → ดูตัวอย่างจาก `theme/vuexy/src/views/` ก่อน แล้วทำตาม pattern เดียวกัน
-6. สร้างได้เฉพาะ domain-specific components (trust-score-badge, order-status-badge ฯลฯ) โดยต้อง compose จาก MUI components เท่านั้น
+**Rules (ABSOLUTE — NO EXCEPTIONS):**
+1. **ห้ามเขียน UI/page เองเด็ดขาด** — ทุกหน้าต้อง copy จาก `theme/vuexy/typescript-version/full-version/src/` แล้วปรับแก้ content เท่านั้น
+2. **วิธีสร้างหน้าใหม่:** หา page/view ที่ใกล้เคียงที่สุดจาก theme → copy มา → ปรับ content/logic ให้ตรง SafePay ห้ามเขียนจาก scratch
+3. **Auth pages** → ใช้ `theme/vuexy/.../src/views/pages/auth/LoginV1.tsx`, `RegisterV1.tsx` เป็น base
+4. **Dashboard pages** → ใช้ `theme/vuexy/.../src/views/dashboards/` เป็น base
+5. **Table/List pages** → ใช้ `theme/vuexy/.../src/views/apps/` (user-list, invoice, ecommerce) เป็น base
+6. **Form pages** → ใช้ `theme/vuexy/.../src/views/forms/` เป็น base
+7. **Wrapper/Layout** → ใช้ `AuthIllustrationWrapper`, `BlankLayout`, `VerticalLayout` จาก theme
+8. ต้องใช้ `CustomTextField` จาก `@core/components/mui/TextField` — ไม่ใช่ MUI TextField ตรง
+9. ต้องใช้ `Logo` จาก `@components/layout/shared/Logo`
+10. ต้องใช้ `themeConfig` จาก `@configs/themeConfig`
+11. สร้างได้เฉพาะ domain-specific components (trust-score-badge, order-status-badge ฯลฯ) โดยต้อง compose จาก MUI components ที่ theme ใช้เท่านั้น
+
+**Checklist ก่อนสร้างหน้าใหม่:**
+- [ ] ค้นหา page/view ที่ใกล้เคียงจาก `theme/vuexy/typescript-version/full-version/src/views/` แล้วหรือยัง?
+- [ ] Copy มาแล้วปรับ content หรือยัง? (ห้ามเขียนเองจาก scratch)
+- [ ] ใช้ Vuexy components (CustomTextField, Logo, AuthIllustrationWrapper ฯลฯ) ครบหรือยัง?
+- [ ] Style/color มาจาก theme ทั้งหมดหรือยัง? (ห้ามกำหนด color เอง)
 
 ## Core Systems
 
