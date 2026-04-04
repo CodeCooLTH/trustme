@@ -102,7 +102,7 @@ const SellerNavigation = (props: Props) => {
         })}
     >
       <NavHeader>
-        <Link href='/seller/dashboard'>
+        <Link href='/dashboard'>
           <Logo />
         </Link>
         {!(isCollapsed && !isHovered) && (

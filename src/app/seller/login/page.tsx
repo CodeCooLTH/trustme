@@ -84,7 +84,7 @@ export default function SellerLoginPage() {
         const shopRes = await fetch('/api/shops')
         const shopData = await shopRes.json()
         if (shopData && shopData.id) {
-          router.push('/seller/dashboard')
+          router.push('/dashboard')
         } else {
           setShowOpenShop(true)
           setStep('idle')
@@ -100,7 +100,7 @@ export default function SellerLoginPage() {
     setFbLoading(true)
     setError('')
     try {
-      await signIn('facebook', { callbackUrl: '/seller/dashboard' })
+      await signIn('facebook', { callbackUrl: '/dashboard' })
     } catch {
       setError('เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Facebook')
       setFbLoading(false)
@@ -124,7 +124,7 @@ export default function SellerLoginPage() {
         const data = await res.json()
         throw new Error(data.error || 'ไม่สามารถสร้างร้านค้าได้')
       }
-      router.push('/seller/dashboard')
+      router.push('/dashboard')
     } catch (err: any) {
       setShopError(err.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่')
     } finally {
