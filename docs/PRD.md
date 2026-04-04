@@ -344,14 +344,16 @@ Account เดียวกัน แต่ login แยก, session แยก, l
 
 | Component | Technology |
 |-----------|-----------|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript (strict) |
+| UI Theme | Vuexy (MUI v7 + TailwindCSS + Emotion.js) |
 | Database | PostgreSQL 16 |
 | ORM | Prisma |
 | Auth | NextAuth.js v4 (Facebook OAuth, JWT sessions) |
 | OTP | SMS Gateway (TBD) |
-| Validation | Zod |
-| Styling | TailwindCSS |
+| Validation | Valibot |
+| Form | React Hook Form |
+| Icons | Tabler Icons (Iconify) |
 | Container | Docker + Docker Compose |
 | Testing | Vitest |
 

@@ -6,39 +6,56 @@
 
 **Architecture:** Profile-Centric — Trust Profile is the center. Verification, OMS orders, reviews, and badges all feed into a calculated Trust Score. Three subdomains (buyer, seller, admin) share one database but have separate sessions and UIs.
 
-**Tech Stack:** Next.js 15 (App Router), TypeScript, PostgreSQL 16, Prisma, NextAuth.js v4, Zod, TailwindCSS, Vitest, Docker Compose
+**Tech Stack:** Next.js 16 (App Router), TypeScript (strict), PostgreSQL 16, Prisma, NextAuth.js v4, Valibot, MUI v7 + TailwindCSS (Vuexy theme), React Hook Form, Emotion.js, Vitest, Docker Compose
 
 **PRD:** `docs/PRD.md`
+**Theme:** `theme/vuexy/` — Vuexy Next.js template (MUI v7). Copy as project base, then customize.
 
 ---
 
 ## File Structure
 
+Based on Vuexy theme structure. Copy `theme/vuexy/` as project base, then add SafePay-specific files.
+
 ```
 safepay/
 ├── docker-compose.yml
 ├── Dockerfile
-├── package.json
-├── tsconfig.json
-├── next.config.ts
-├── tailwind.config.ts
-├── postcss.config.mjs
+├── package.json                               # From Vuexy + SafePay deps
+├── tsconfig.json                              # From Vuexy
+├── next.config.ts                             # From Vuexy, customize
+├── postcss.config.mjs                         # From Vuexy
 ├── .env.example
 ├── .env
 ├── vitest.config.ts
 ├── prisma/
-│   ├── schema.prisma
+│   ├── schema.prisma                          # SafePay models (replace Vuexy's)
 │   └── seed.ts
 ├── src/
-│   ├── middleware.ts
+│   ├── @core/                                 # From Vuexy — theme engine (DO NOT MODIFY)
+│   │   ├── components/
+│   │   ├── contexts/
+│   │   ├── hooks/
+│   │   ├── styles/
+│   │   ├── theme/                             # MUI theme config, color schemes, overrides
+│   │   ├── types.ts
+│   │   └── utils/
+│   ├── @layouts/                              # From Vuexy — layout system (DO NOT MODIFY)
+│   │   ├── VerticalLayout.tsx
+│   │   ├── HorizontalLayout.tsx
+│   │   ├── BlankLayout.tsx
+│   │   └── LayoutWrapper.tsx
+│   ├── @menu/                                 # From Vuexy — menu system (DO NOT MODIFY)
+│   ├── middleware.ts                           # SafePay subdomain routing
 │   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx                          # Landing
-│   │   ├── login/page.tsx                    # Buyer login
+│   │   ├── layout.tsx                         # Root layout with MUI ThemeProvider
+│   │   ├── globals.css                        # From Vuexy
+│   │   ├── page.tsx                           # Landing
+│   │   ├── login/page.tsx                     # Buyer login
 │   │   ├── register/page.tsx
-│   │   ├── u/[username]/page.tsx             # Public profile
-│   │   ├── o/[token]/page.tsx                # Public order link
-│   │   ├── (buyer)/                          # Buyer group (requires auth)
+│   │   ├── u/[username]/page.tsx              # Public profile
+│   │   ├── o/[token]/page.tsx                 # Public order link
+│   │   ├── (buyer)/                           # Buyer group (VerticalLayout)
 │   │   │   ├── layout.tsx
 │   │   │   ├── dashboard/page.tsx
 │   │   │   ├── orders/page.tsx
@@ -46,7 +63,7 @@ safepay/
 │   │   │   └── settings/
 │   │   │       ├── profile/page.tsx
 │   │   │       └── verification/page.tsx
-│   │   ├── seller/                           # Seller subdomain
+│   │   ├── seller/                            # Seller subdomain (VerticalLayout)
 │   │   │   ├── layout.tsx
 │   │   │   ├── login/page.tsx
 │   │   │   ├── dashboard/page.tsx
@@ -57,15 +74,15 @@ safepay/
 │   │   │   └── settings/
 │   │   │       ├── shop/page.tsx
 │   │   │       └── verification/page.tsx
-│   │   ├── admin/                            # Admin subdomain
+│   │   ├── admin/                             # Admin subdomain (VerticalLayout)
 │   │   │   ├── layout.tsx
 │   │   │   ├── login/page.tsx
-│   │   │   ├── page.tsx                      # Dashboard
+│   │   │   ├── page.tsx
 │   │   │   ├── users/page.tsx
 │   │   │   ├── verifications/page.tsx
 │   │   │   ├── orders/page.tsx
 │   │   │   └── badges/page.tsx
-│   │   └── api/
+│   │   └── api/                               # API routes (same as before)
 │   │       ├── auth/[...nextauth]/route.ts
 │   │       ├── otp/send/route.ts
 │   │       ├── otp/verify/route.ts
@@ -93,36 +110,29 @@ safepay/
 │   │           ├── verifications/[id]/route.ts
 │   │           ├── orders/route.ts
 │   │           └── badges/route.ts
-│   ├── components/
-│   │   ├── ui/
-│   │   │   ├── button.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── card.tsx
-│   │   │   ├── badge.tsx
-│   │   │   ├── dialog.tsx
-│   │   │   ├── table.tsx
-│   │   │   ├── select.tsx
-│   │   │   ├── textarea.tsx
-│   │   │   ├── loading.tsx
-│   │   │   └── empty-state.tsx
-│   │   ├── layouts/
-│   │   │   ├── sidebar.tsx
-│   │   │   ├── buyer-sidebar.tsx
-│   │   │   ├── seller-sidebar.tsx
-│   │   │   └── admin-sidebar.tsx
-│   │   ├── trust-score-badge.tsx
+│   ├── components/                            # SafePay domain components
+│   │   ├── layout/
+│   │   │   ├── vertical/                      # Customize Vuexy vertical nav for each subdomain
+│   │   │   │   ├── BuyerNavItems.tsx
+│   │   │   │   ├── SellerNavItems.tsx
+│   │   │   │   └── AdminNavItems.tsx
+│   │   │   └── shared/
+│   │   │       └── SubdomainSwitcher.tsx       # "ไปหน้าร้าน" / "กลับหน้าผู้ซื้อ"
+│   │   ├── trust-score-badge.tsx               # MUI Chip + custom styling
 │   │   ├── verification-badges.tsx
 │   │   ├── achievement-badges.tsx
 │   │   ├── review-list.tsx
 │   │   ├── order-status-badge.tsx
 │   │   └── star-rating.tsx
+│   ├── configs/
+│   │   └── themeConfig.ts                     # From Vuexy, customize SafePay settings
 │   ├── lib/
 │   │   ├── prisma.ts
 │   │   ├── auth.ts
 │   │   ├── otp.ts
 │   │   ├── upload.ts
 │   │   ├── subdomain.ts
-│   │   └── validations.ts
+│   │   └── validations.ts                     # Valibot schemas
 │   ├── services/
 │   │   ├── user.service.ts
 │   │   ├── shop.service.ts
@@ -133,6 +143,11 @@ safepay/
 │   │   ├── order.service.ts
 │   │   ├── review.service.ts
 │   │   └── history-linking.service.ts
+│   ├── views/                                 # Page content components (Vuexy pattern)
+│   │   ├── dashboard/
+│   │   ├── products/
+│   │   ├── orders/
+│   │   └── ...
 │   └── types/
 │       └── index.ts
 ├── tests/
@@ -150,34 +165,62 @@ safepay/
 
 ## Task 1: Project Setup & Docker
 
+**Approach:** Copy Vuexy theme as project base, then add SafePay-specific config.
+
 **Files:**
-- Create: `package.json`
-- Create: `tsconfig.json`
-- Create: `next.config.ts`
-- Create: `tailwind.config.ts`
-- Create: `postcss.config.mjs`
-- Create: `.env.example`
-- Create: `.env`
+- Copy: `theme/vuexy/` → project root (selective — see steps)
 - Create: `docker-compose.yml`
-- Create: `Dockerfile`
+- Create: `.env.example`, `.env`
 - Create: `vitest.config.ts`
+- Modify: `package.json` (add SafePay deps)
 - Modify: `.gitignore`
 
-- [ ] **Step 1: Initialize Next.js project**
+- [ ] **Step 1: Copy Vuexy theme as project base**
+
+Copy the Vuexy `src/` directory and config files into the project root. Preserve CLAUDE.md, AGENTS.md, and docs/.
 
 ```bash
 cd /Users/craftman/Projects/safepay
-npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --yes
+# Copy Vuexy source and config files
+cp -r theme/vuexy/src .
+cp theme/vuexy/package.json .
+cp theme/vuexy/tsconfig.json .
+cp theme/vuexy/next.config.ts .
+cp theme/vuexy/postcss.config.mjs .
+cp -r theme/vuexy/public .
 ```
 
-Note: If prompted about existing files, say yes to overwrite. CLAUDE.md, AGENTS.md, and docs/ will be preserved.
+Then clean up Vuexy demo content we don't need:
+- Remove `src/app/[lang]/` (we don't use i18n routing for MVP)
+- Remove `src/fake-db/` (we use real DB)
+- Remove `src/redux-store/` (we don't use Redux)
+- Remove demo views in `src/views/` (keep structure)
+- Remove demo app pages and API routes
+- Keep: `src/@core/`, `src/@layouts/`, `src/@menu/`, `src/components/`, `src/configs/`, `src/hocs/`, `src/libs/`
 
-- [ ] **Step 2: Install core dependencies**
+Restructure `src/app/` to match SafePay routing (buyer, seller, admin subdomains).
+
+- [ ] **Step 2: Install additional SafePay dependencies**
 
 ```bash
-npm install prisma @prisma/client next-auth@4 zod uuid clsx
-npm install -D vitest @types/uuid
+npm install @prisma/client next-auth@4 uuid
+npm install -D prisma vitest @types/uuid tsx
 ```
+
+Note: Vuexy already includes MUI, TailwindCSS, Emotion, Valibot, React Hook Form, Iconify, etc.
+
+- [ ] **Step 3: Update package.json**
+
+Add Prisma seed script:
+```json
+{
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  }
+}
+```
+
+Change datasource from SQLite to PostgreSQL in Prisma config (done in Task 2).
 
 - [ ] **Step 3: Create docker-compose.yml**
 
@@ -261,7 +304,7 @@ Expected: `db` service running, healthy.
 
 ```bash
 git add -A
-git commit -m "feat: initialize Next.js 15 project with Docker Compose"
+git commit -m "feat: initialize project from Vuexy theme with Docker Compose"
 ```
 
 ---
@@ -769,64 +812,77 @@ git commit -m "feat: add subdomain middleware and NextAuth config"
 - Create: `src/app/api/otp/verify/route.ts`
 - Create: `src/lib/validations.ts`
 
-- [ ] **Step 1: Create Zod validations**
+- [ ] **Step 1: Create Valibot validations**
 
 ```typescript
 // src/lib/validations.ts
-import { z } from "zod";
+import * as v from "valibot";
 
-export const sendOtpSchema = z.object({
-  contact: z.string().min(1),
-  type: z.enum(["phone", "email"]),
+export const SendOtpSchema = v.object({
+  contact: v.pipe(v.string(), v.minLength(1)),
+  type: v.picklist(["phone", "email"]),
 });
 
-export const verifyOtpSchema = z.object({
-  contact: z.string().min(1),
-  type: z.enum(["phone", "email"]),
-  otp: z.string().length(6),
+export const VerifyOtpSchema = v.object({
+  contact: v.pipe(v.string(), v.minLength(1)),
+  type: v.picklist(["phone", "email"]),
+  otp: v.pipe(v.string(), v.length(6)),
 });
 
-export const createShopSchema = z.object({
-  shopName: z.string().min(1).max(100),
-  description: z.string().max(500).optional(),
-  category: z.string().max(50).optional(),
-  address: z.string().max(200).optional(),
-  businessType: z.enum(["INDIVIDUAL", "COMPANY"]),
+export const CreateShopSchema = v.object({
+  shopName: v.pipe(v.string(), v.minLength(1), v.maxLength(100)),
+  description: v.optional(v.pipe(v.string(), v.maxLength(500))),
+  category: v.optional(v.pipe(v.string(), v.maxLength(50))),
+  address: v.optional(v.pipe(v.string(), v.maxLength(200))),
+  businessType: v.picklist(["INDIVIDUAL", "COMPANY"]),
 });
 
-export const createProductSchema = z.object({
-  name: z.string().min(1).max(200),
-  description: z.string().max(1000).optional(),
-  price: z.number().positive(),
-  type: z.enum(["PHYSICAL", "DIGITAL", "SERVICE"]),
+export const CreateProductSchema = v.object({
+  name: v.pipe(v.string(), v.minLength(1), v.maxLength(200)),
+  description: v.optional(v.pipe(v.string(), v.maxLength(1000))),
+  price: v.pipe(v.number(), v.minValue(0.01)),
+  type: v.picklist(["PHYSICAL", "DIGITAL", "SERVICE"]),
 });
 
-export const createOrderSchema = z.object({
-  items: z.array(z.object({
-    productId: z.string().uuid().optional(),
-    name: z.string().min(1),
-    description: z.string().optional(),
-    qty: z.number().int().positive(),
-    price: z.number().positive(),
-  })).min(1),
-  type: z.enum(["PHYSICAL", "DIGITAL", "SERVICE"]),
+export const CreateOrderSchema = v.object({
+  items: v.pipe(
+    v.array(v.object({
+      productId: v.optional(v.pipe(v.string(), v.uuid())),
+      name: v.pipe(v.string(), v.minLength(1)),
+      description: v.optional(v.string()),
+      qty: v.pipe(v.number(), v.integer(), v.minValue(1)),
+      price: v.pipe(v.number(), v.minValue(0.01)),
+    })),
+    v.minLength(1),
+  ),
+  type: v.picklist(["PHYSICAL", "DIGITAL", "SERVICE"]),
 });
 
-export const confirmOrderSchema = z.object({
-  contact: z.string().min(1),
-  contactType: z.enum(["phone", "email"]),
-  otp: z.string().length(6),
+export const ConfirmOrderSchema = v.object({
+  contact: v.pipe(v.string(), v.minLength(1)),
+  contactType: v.picklist(["phone", "email"]),
+  otp: v.pipe(v.string(), v.length(6)),
 });
 
-export const createReviewSchema = z.object({
-  rating: z.number().int().min(1).max(5),
-  comment: z.string().max(500).optional(),
+export const CreateReviewSchema = v.object({
+  rating: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(5)),
+  comment: v.optional(v.pipe(v.string(), v.maxLength(500))),
 });
 
-export const shipOrderSchema = z.object({
-  provider: z.string().min(1),
-  trackingNo: z.string().min(1),
+export const ShipOrderSchema = v.object({
+  provider: v.pipe(v.string(), v.minLength(1)),
+  trackingNo: v.pipe(v.string(), v.minLength(1)),
 });
+```
+
+**Usage pattern** (for all API routes):
+```typescript
+import * as v from "valibot";
+import { CreateShopSchema } from "@/lib/validations";
+
+const parsed = v.safeParse(CreateShopSchema, body);
+if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+// use parsed.output
 ```
 
 - [ ] **Step 2: Create OTP utility (in-memory for MVP)**
@@ -874,17 +930,18 @@ export function verifyOtp(contact: string, otp: string): boolean {
 ```typescript
 // src/app/api/otp/send/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { sendOtpSchema } from "@/lib/validations";
+import * as v from "valibot";
+import { SendOtpSchema } from "@/lib/validations";
 import { storeOtp } from "@/lib/otp";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const parsed = sendOtpSchema.safeParse(body);
+  const parsed = v.safeParse(SendOtpSchema, body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
 
-  const { contact, type } = parsed.data;
+  const { contact, type } = parsed.output;
   const otp = storeOtp(contact);
 
   // MVP: log OTP to console (replace with SMS/email gateway)
@@ -899,17 +956,18 @@ export async function POST(request: NextRequest) {
 ```typescript
 // src/app/api/otp/verify/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { verifyOtpSchema } from "@/lib/validations";
+import * as v from "valibot";
+import { VerifyOtpSchema } from "@/lib/validations";
 import { verifyOtp } from "@/lib/otp";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const parsed = verifyOtpSchema.safeParse(body);
+  const parsed = v.safeParse(VerifyOtpSchema, body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
 
-  const { contact, type, otp } = parsed.data;
+  const { contact, type, otp } = parsed.output;
   const valid = verifyOtp(contact, otp);
 
   if (!valid) {
@@ -924,7 +982,7 @@ export async function POST(request: NextRequest) {
 
 ```bash
 git add src/lib/otp.ts src/lib/validations.ts src/app/api/otp/
-git commit -m "feat: add OTP system and Zod validations"
+git commit -m "feat: add OTP system and Valibot validations"
 ```
 
 ---
@@ -1069,7 +1127,8 @@ export async function PATCH(request: NextRequest) {
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { createShopSchema } from "@/lib/validations";
+import * as v from "valibot";
+import { CreateShopSchema } from "@/lib/validations";
 import { createShop, getShopByUserId } from "@/services/shop.service";
 
 export async function GET() {
@@ -1085,10 +1144,10 @@ export async function POST(request: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const parsed = createShopSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  const parsed = v.safeParse(CreateShopSchema, body);
+  if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-  const shop = await createShop((session.user as any).id, parsed.data);
+  const shop = await createShop((session.user as any).id, parsed.output);
   return NextResponse.json(shop, { status: 201 });
 }
 ```
@@ -1841,7 +1900,8 @@ export async function getProductsByShop(shopId: string) {
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { createProductSchema } from "@/lib/validations";
+import * as v from "valibot";
+import { CreateProductSchema } from "@/lib/validations";
 import { createProduct, getProductsByShop } from "@/services/product.service";
 import { prisma } from "@/lib/prisma";
 
@@ -1864,10 +1924,10 @@ export async function POST(request: NextRequest) {
   if (!shop) return NextResponse.json({ error: "No shop" }, { status: 404 });
 
   const body = await request.json();
-  const parsed = createProductSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  const parsed = v.safeParse(CreateProductSchema, body);
+  if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-  const product = await createProduct(shop.id, parsed.data);
+  const product = await createProduct(shop.id, parsed.output);
   return NextResponse.json(product, { status: 201 });
 }
 ```
@@ -2153,7 +2213,8 @@ Expected: All PASS.
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { createOrderSchema } from "@/lib/validations";
+import * as v from "valibot";
+import { CreateOrderSchema } from "@/lib/validations";
 import { createOrder, getOrdersByShop, getOrdersByBuyer } from "@/services/order.service";
 import { prisma } from "@/lib/prisma";
 
@@ -2184,10 +2245,10 @@ export async function POST(request: NextRequest) {
   if (!shop) return NextResponse.json({ error: "No shop" }, { status: 404 });
 
   const body = await request.json();
-  const parsed = createOrderSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  const parsed = v.safeParse(CreateOrderSchema, body);
+  if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-  const order = await createOrder(shop.id, parsed.data);
+  const order = await createOrder(shop.id, parsed.output);
   return NextResponse.json(order, { status: 201 });
 }
 ```
@@ -2208,15 +2269,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 ```typescript
 // src/app/api/orders/[token]/confirm/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { confirmOrderSchema } from "@/lib/validations";
+import * as v from "valibot";
+import { ConfirmOrderSchema } from "@/lib/validations";
 import { verifyOtp } from "@/lib/otp";
 import { confirmOrder } from "@/services/order.service";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const body = await request.json();
-  const parsed = confirmOrderSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  const parsed = v.safeParse(ConfirmOrderSchema, body);
+  if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
   const { contact, otp } = parsed.data;
   if (!verifyOtp(contact, otp)) {
@@ -2233,7 +2295,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { shipOrderSchema } from "@/lib/validations";
+import * as v from "valibot";
+import { ShipOrderSchema } from "@/lib/validations";
 import { shipOrder } from "@/services/order.service";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
@@ -2242,10 +2305,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const { token } = await params;
   const body = await request.json();
-  const parsed = shipOrderSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  const parsed = v.safeParse(ShipOrderSchema, body);
+  if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-  const order = await shipOrder(token, parsed.data);
+  const order = await shipOrder(token, parsed.output);
   return NextResponse.json(order);
 }
 ```
@@ -2520,14 +2583,15 @@ Expected: All PASS.
 ```typescript
 // src/app/api/orders/[token]/review/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { createReviewSchema } from "@/lib/validations";
+import * as v from "valibot";
+import { CreateReviewSchema } from "@/lib/validations";
 import { createReview } from "@/services/review.service";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const body = await request.json();
-  const parsed = createReviewSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  const parsed = v.safeParse(CreateReviewSchema, body);
+  if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
   const review = await createReview(token, {
     ...parsed.data,
@@ -2874,93 +2938,107 @@ git commit -m "feat: add admin API routes (dashboard, users, verifications, orde
 
 ---
 
-## Task 14: UI Components Library
+## Task 14: SafePay Domain Components (using MUI)
+
+**Note:** Base UI components (Button, TextField, Card, Dialog, Table, Select, etc.) come from **MUI v7 via Vuexy theme** — no need to create custom ones. This task only creates SafePay-specific domain components.
 
 **Files:**
-- Create: `src/components/ui/button.tsx`
-- Create: `src/components/ui/input.tsx`
-- Create: `src/components/ui/card.tsx`
-- Create: `src/components/ui/badge.tsx`
-- Create: `src/components/ui/dialog.tsx`
-- Create: `src/components/ui/table.tsx`
-- Create: `src/components/ui/select.tsx`
-- Create: `src/components/ui/textarea.tsx`
-- Create: `src/components/ui/loading.tsx`
-- Create: `src/components/ui/empty-state.tsx`
 - Create: `src/components/trust-score-badge.tsx`
+- Create: `src/components/verification-badges.tsx`
+- Create: `src/components/achievement-badges.tsx`
 - Create: `src/components/star-rating.tsx`
 - Create: `src/components/order-status-badge.tsx`
+- Create: `src/components/review-list.tsx`
+- Create: `src/components/layout/shared/SubdomainSwitcher.tsx`
 
-- [ ] **Step 1: Create base UI components**
+- [ ] **Step 1: Create trust score badge**
 
-Build reusable, styled components using TailwindCSS. Each component should be a simple, focused file:
+`trust-score-badge.tsx` — MUI `Chip` + custom styling. Displays score number + level (A+/A/B+/B/C/D) with correct color from theme. Props: `score: number`.
 
-- `button.tsx` — variants: primary, secondary, outline, ghost, danger. Sizes: sm, md, lg.
-- `input.tsx` — label, error state, disabled state.
-- `card.tsx` — container with optional header/footer.
-- `badge.tsx` — colored label, variants by color.
-- `dialog.tsx` — modal dialog with overlay.
-- `table.tsx` — responsive table with header/body.
-- `select.tsx` — dropdown with label.
-- `textarea.tsx` — multiline input.
-- `loading.tsx` — spinner component.
-- `empty-state.tsx` — placeholder when no data.
+Color mapping: A+ = success.main, A = success.light, B+ = warning.light, B = warning.main, C = info.main, D = error.main.
 
-- [ ] **Step 2: Create domain-specific components**
+- [ ] **Step 2: Create badge display components**
 
-- `trust-score-badge.tsx` — displays score + level (A+/A/B+/B/C/D) with correct color
-- `star-rating.tsx` — displays 1-5 star rating (read-only and interactive modes)
-- `order-status-badge.tsx` — colored badge for CREATED/CONFIRMED/SHIPPED/COMPLETED/CANCELLED
+- `verification-badges.tsx` — List of MUI `Chip` components for verification badges (icon + label)
+- `achievement-badges.tsx` — Grid of achievement badges with emoji icon + name
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Create star rating**
+
+`star-rating.tsx` — MUI `Rating` component wrapper with read-only and interactive modes. Uses Tabler star icons.
+
+- [ ] **Step 4: Create order status badge**
+
+`order-status-badge.tsx` — MUI `Chip` with color variant per status:
+- CREATED = default, CONFIRMED = info, SHIPPED = warning, COMPLETED = success, CANCELLED = error
+
+- [ ] **Step 5: Create review list and subdomain switcher**
+
+- `review-list.tsx` — Displays list of reviews using MUI `Card`, `Rating`, `Typography`
+- `SubdomainSwitcher.tsx` — MUI `Button` that links to seller/buyer subdomain ("ไปหน้าร้าน" / "กลับหน้าผู้ซื้อ")
+
+- [ ] **Step 6: Commit**
 
 ```bash
 git add src/components/
-git commit -m "feat: add UI component library and domain components"
+git commit -m "feat: add SafePay domain components (trust score, badges, rating, reviews)"
 ```
 
 ---
 
-## Task 15: Layout Components (Sidebar for Buyer/Seller/Admin)
+## Task 15: Layouts (Vuexy VerticalLayout for Buyer/Seller/Admin)
+
+**Approach:** Use Vuexy's `@layouts/VerticalLayout` as base. Create separate nav item configs and menu definitions for each subdomain. Each layout wraps pages with the correct sidebar menu.
 
 **Files:**
-- Create: `src/components/layouts/sidebar.tsx`
-- Create: `src/components/layouts/buyer-sidebar.tsx`
-- Create: `src/components/layouts/seller-sidebar.tsx`
-- Create: `src/components/layouts/admin-sidebar.tsx`
+- Create: `src/components/layout/vertical/BuyerNavItems.tsx`
+- Create: `src/components/layout/vertical/SellerNavItems.tsx`
+- Create: `src/components/layout/vertical/AdminNavItems.tsx`
 - Create: `src/app/(buyer)/layout.tsx`
 - Create: `src/app/seller/layout.tsx`
 - Create: `src/app/admin/layout.tsx`
 - Modify: `src/app/layout.tsx`
 
-- [ ] **Step 1: Create base sidebar component**
+- [ ] **Step 1: Create buyer nav items**
 
-A reusable sidebar that accepts menu items and renders a responsive sidebar (desktop) / drawer (mobile). Props: `items: { label, href, icon }[]`, `header`, `footer`.
+Define menu items using Vuexy's `@menu` system:
+- Dashboard (`/dashboard`, icon: `tabler-layout-dashboard`)
+- My Orders (`/orders`, icon: `tabler-shopping-bag`)
+- My Reviews (`/reviews`, icon: `tabler-star`)
+- Settings section: Verification (`/settings/verification`), Profile (`/settings/profile`)
+- Footer: SubdomainSwitcher → "เปิดร้านค้า" / "ไปหน้าร้าน"
 
-- [ ] **Step 2: Create buyer sidebar**
+- [ ] **Step 2: Create seller nav items**
 
-Menu items: Dashboard, My Orders, My Reviews, Verification, Profile. Footer: "เปิดร้านค้า" / "ไปหน้าร้าน" button.
+- Dashboard (`/dashboard`, icon: `tabler-layout-dashboard`)
+- Products (`/products`, icon: `tabler-package`)
+- Orders (`/orders`, icon: `tabler-shopping-bag`)
+- Create Order (`/orders/create`, icon: `tabler-plus`)
+- Reviews (`/reviews`, icon: `tabler-star`)
+- Settings section: Shop (`/settings/shop`), Verification (`/settings/verification`)
+- Footer: SubdomainSwitcher → "กลับหน้าผู้ซื้อ"
 
-- [ ] **Step 3: Create seller sidebar**
+- [ ] **Step 3: Create admin nav items**
 
-Menu items: Dashboard, Products, Orders, Create Order, Reviews, Shop Settings, Verification. Footer: "กลับหน้าผู้ซื้อ" button.
+- Dashboard (`/`, icon: `tabler-layout-dashboard`)
+- Users (`/users`, icon: `tabler-users`)
+- Verifications (`/verifications`, icon: `tabler-shield-check`)
+- Orders (`/orders`, icon: `tabler-shopping-bag`)
+- Badges (`/badges`, icon: `tabler-award`)
 
-- [ ] **Step 4: Create admin sidebar**
+- [ ] **Step 4: Create layout files**
 
-Menu items: Dashboard, Users, Verifications, Orders, Badges.
+- `src/app/layout.tsx` — root layout with Vuexy `Providers` (MUI ThemeProvider, Emotion cache, NextAuth SessionProvider), `globals.css`
+- `src/app/(buyer)/layout.tsx` — Vuexy `VerticalLayout` with BuyerNavItems, auth guard
+- `src/app/seller/layout.tsx` — Vuexy `VerticalLayout` with SellerNavItems, auth guard + isShop check
+- `src/app/admin/layout.tsx` — Vuexy `VerticalLayout` with AdminNavItems, auth guard + isAdmin check
 
-- [ ] **Step 5: Create layout files**
+Reference Vuexy's existing layout patterns in `theme/vuexy/src/app/[lang]/(dashboard)/layout.tsx`.
 
-- `src/app/layout.tsx` — root layout with `<html>`, `<body>`, TailwindCSS globals, SessionProvider
-- `src/app/(buyer)/layout.tsx` — buyer sidebar layout (requires auth)
-- `src/app/seller/layout.tsx` — seller sidebar layout (requires auth + isShop)
-- `src/app/admin/layout.tsx` — admin sidebar layout (requires auth + isAdmin)
-
-- [ ] **Step 6: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
-git add src/components/layouts/ src/app/layout.tsx src/app/\(buyer\)/layout.tsx src/app/seller/layout.tsx src/app/admin/layout.tsx
-git commit -m "feat: add sidebar layouts for buyer, seller, and admin"
+git add src/components/layout/ src/app/layout.tsx src/app/\(buyer\)/layout.tsx src/app/seller/layout.tsx src/app/admin/layout.tsx
+git commit -m "feat: add Vuexy VerticalLayout for buyer, seller, and admin"
 ```
 
 ---
@@ -2976,15 +3054,17 @@ git commit -m "feat: add sidebar layouts for buyer, seller, and admin"
 
 - [ ] **Step 1: Landing page**
 
-Thai-language landing page with:
-- Hero section explaining SafePay trust platform
-- How it works (3 steps: สมัคร → Verify → สะสม Trust)
-- CTA buttons: สมัครสมาชิก / เข้าสู่ระบบ
+Use Vuexy `BlankLayout`. Thai-language landing page with MUI components:
+- Hero section: MUI `Container`, `Typography`, `Box` — explaining SafePay trust platform
+- How it works: MUI `Card` grid (3 steps: สมัคร → Verify → สะสม Trust)
+- CTA buttons: MUI `Button` — สมัครสมาชิก / เข้าสู่ระบบ
+- Reference: `theme/vuexy/src/views/front-pages/landing-page/` for layout patterns
 
 - [ ] **Step 2: Login page**
 
-- Facebook login button
-- Phone OTP login (input phone → send OTP → verify OTP → redirect)
+Use Vuexy `BlankLayout`. Reference Vuexy's auth page patterns (`theme/vuexy/src/app/[lang]/(blank-layout-pages)/(guest-only)/login/`):
+- Facebook login button (MUI `Button` with FB icon)
+- Phone OTP login: MUI `TextField` for phone + Vuexy's `input-otp` component for OTP code
 - Link to register
 
 - [ ] **Step 3: Register page**
