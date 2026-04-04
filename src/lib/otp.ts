@@ -15,7 +15,14 @@ export function storeOtp(contact: string): string {
   return otp;
 }
 
+// Test bypass — remove in production
+const TEST_ACCOUNTS: Record<string, string> = {
+  '0920791649': '000000',
+};
+
 export function verifyOtp(contact: string, otp: string): boolean {
+  if (TEST_ACCOUNTS[contact] && otp === TEST_ACCOUNTS[contact]) return true;
+
   const stored = otpStore.get(contact);
   if (!stored) return false;
   if (Date.now() > stored.expiresAt) {
