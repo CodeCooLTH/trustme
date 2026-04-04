@@ -2,12 +2,12 @@ import * as v from "valibot";
 
 export const SendOtpSchema = v.object({
   contact: v.pipe(v.string(), v.minLength(1)),
-  type: v.picklist(["phone", "email"]),
+  type: v.picklist(["phone", "email", "PHONE", "EMAIL"]),
 });
 
 export const VerifyOtpSchema = v.object({
   contact: v.pipe(v.string(), v.minLength(1)),
-  type: v.picklist(["phone", "email"]),
+  type: v.picklist(["phone", "email", "PHONE", "EMAIL"]),
   otp: v.pipe(v.string(), v.length(6)),
 });
 
@@ -42,7 +42,7 @@ export const CreateOrderSchema = v.object({
 
 export const ConfirmOrderSchema = v.object({
   contact: v.pipe(v.string(), v.minLength(1)),
-  contactType: v.picklist(["phone", "email"]),
+  contactType: v.picklist(["phone", "email", "PHONE", "EMAIL"]),
   otp: v.pipe(v.string(), v.length(6)),
 });
 
