@@ -84,7 +84,7 @@ const Faqs = () => {
     <section id='faq' ref={ref} className={classnames('plb-[100px] bg-backgroundDefault', styles.sectionStartRadius)}>
       <div className={classnames('flex flex-col gap-16', frontCommonStyles.layoutSpacing)}>
         <div className='flex flex-col gap-y-4 items-center justify-center'>
-          <Chip size='small' variant='tonal' color='primary' label='คำถามที่พบบ่อย' />
+          <Chip size='small' variant='tonal' color='primary' label='FAQ' />
           <div className='flex flex-col items-center gap-y-1 justify-center flex-wrap'>
             <div className='flex items-center gap-x-2'>
               <Typography color='text.primary' variant='h4'>
@@ -99,7 +99,9 @@ const Faqs = () => {
                 </span>
               </Typography>
             </div>
-            <Typography className='text-center'>คำตอบสำหรับคำถามที่มักถูกถามเกี่ยวกับ SafePay</Typography>
+            <Typography className='text-center'>
+              คำตอบสำหรับคำถามที่มักถูกถามเกี่ยวกับ SafePay
+            </Typography>
           </div>
         </div>
         <div>

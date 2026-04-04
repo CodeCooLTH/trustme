@@ -20,6 +20,7 @@ type StatData = {
   value: string
   svg: ReactNode
   color: string
+  isHover: boolean
 }
 
 // Data
@@ -28,25 +29,29 @@ const statData: StatData[] = [
     title: 'ธุรกรรมสำเร็จ',
     value: '10k+',
     svg: <LaptopCharging color='var(--mui-palette-primary-main)' />,
-    color: 'var(--mui-palette-primary-darkerOpacity)'
+    color: 'var(--mui-palette-primary-darkerOpacity)',
+    isHover: false
   },
   {
     title: 'ผู้ใช้งาน',
     value: '50k+',
     svg: <User color='var(--mui-palette-success-main)' />,
-    color: 'var(--mui-palette-success-darkerOpacity)'
+    color: 'var(--mui-palette-success-darkerOpacity)',
+    isHover: false
   },
   {
     title: 'คะแนนความพึงพอใจ',
     value: '4.9/5',
     svg: <Diamond color='var(--mui-palette-info-main)' />,
-    color: 'var(--mui-palette-info-darkerOpacity)'
+    color: 'var(--mui-palette-info-darkerOpacity)',
+    isHover: false
   },
   {
     title: 'รับประกันเงินคืน',
     value: '100%',
     svg: <Check color='var(--mui-palette-warning-main)' />,
-    color: 'var(--mui-palette-warning-darkerOpacity)'
+    color: 'var(--mui-palette-warning-darkerOpacity)',
+    isHover: false
   }
 ]
 

@@ -51,6 +51,18 @@
   }
 }
 
+.teamCard {
+  border-start-start-radius: 90px;
+  border-start-end-radius: 20px;
+}
+
+.contactRadius {
+  border-start-start-radius: 3.75rem;
+  border-start-end-radius: var(--mui-shape-borderRadius);
+  border-end-end-radius: var(--mui-shape-borderRadius);
+  border-end-start-radius: var(--mui-shape-borderRadius);
+}
+
 .sectionStartRadius {
   border-start-start-radius: 3.75rem;
   border-start-end-radius: 3.75rem;

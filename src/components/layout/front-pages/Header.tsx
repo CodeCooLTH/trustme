@@ -53,14 +53,14 @@ const Header = ({ mode }: { mode: Mode }) => {
               <IconButton onClick={() => setIsDrawerOpen(true)} className='-mis-2'>
                 <i className='tabler-menu-2 text-textPrimary' />
               </IconButton>
-              <Link href='/front-pages/landing-page'>
+              <Link href='/'>
                 <Logo />
               </Link>
               <FrontMenu mode={mode} isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen} />
             </div>
           ) : (
             <div className='flex items-center gap-10'>
-              <Link href='/front-pages/landing-page'>
+              <Link href='/'>
                 <Logo />
               </Link>
               <FrontMenu mode={mode} isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen} />
@@ -72,22 +72,20 @@ const Header = ({ mode }: { mode: Mode }) => {
               <CustomIconButton
                 component={Link}
                 variant='contained'
-                href='https://1.envato.market/vuexy_admin'
+                href='/login'
                 color='primary'
-                target='_blank'
               >
-                <i className='tabler-shopping-cart text-xl' />
+                <i className='tabler-login text-xl' />
               </CustomIconButton>
             ) : (
               <Button
                 component={Link}
                 variant='contained'
-                href='https://1.envato.market/vuexy_admin'
-                startIcon={<i className='tabler-shopping-cart text-xl' />}
+                href='/login'
+                startIcon={<i className='tabler-login text-xl' />}
                 className='whitespace-nowrap'
-                target='_blank'
               >
-                Purchase Now
+                เข้าสู่ระบบ
               </Button>
             )}
           </div>

@@ -13,12 +13,12 @@ import classnames from 'classnames'
 import { useIntersection } from '@/hooks/useIntersection'
 
 // SVG Imports
+import Paper from '@assets/svg/front-pages/landing-page/Paper'
 import Check from '@assets/svg/front-pages/landing-page/Check'
 import User from '@assets/svg/front-pages/landing-page/User'
 import LaptopCharging from '@assets/svg/front-pages/landing-page/LaptopCharging'
 import Rocket from '@assets/svg/front-pages/landing-page/Rocket'
 import Document from '@assets/svg/front-pages/landing-page/Document'
-import Diamond from '@assets/svg/front-pages/landing-page/Diamond'
 
 // Styles Imports
 import frontCommonStyles from '@views/front-pages/styles.module.css'
@@ -26,17 +26,17 @@ import frontCommonStyles from '@views/front-pages/styles.module.css'
 // Data
 const feature = [
   {
-    icon: <User color='var(--mui-palette-primary-main)' />,
+    icon: <LaptopCharging color='var(--mui-palette-primary-main)' />,
     title: 'ยืนยันตัวตน',
     description: 'ยืนยันตัวตนด้วยเบอร์โทรศัพท์หรือ Facebook เพื่อสร้างความน่าเชื่อถือในการทำธุรกรรม'
   },
   {
-    icon: <Diamond color='var(--mui-palette-primary-main)' />,
+    icon: <Rocket color='var(--mui-palette-primary-main)' />,
     title: 'สะสม Trust Score',
     description: 'สะสมคะแนนความน่าเชื่อถือจากการทำธุรกรรมที่สำเร็จ รีวิวจากผู้ซื้อ และการยืนยันต่างๆ'
   },
   {
-    icon: <Rocket color='var(--mui-palette-primary-main)' />,
+    icon: <Paper color='var(--mui-palette-primary-main)' />,
     title: 'แสดง Badge',
     description: 'รับ Badge พิเศษที่แสดงให้ผู้อื่นเห็นว่าคุณเป็นผู้ขายที่น่าเชื่อถือและมีประสบการณ์สูง'
   },
@@ -46,7 +46,7 @@ const feature = [
     description: 'ระบบ Escrow ช่วยให้ทุกธุรกรรมปลอดภัย เงินจะถูกส่งให้ผู้ขายเมื่อผู้ซื้อยืนยันรับสินค้าแล้ว'
   },
   {
-    icon: <LaptopCharging color='var(--mui-palette-primary-main)' />,
+    icon: <User color='var(--mui-palette-primary-main)' />,
     title: 'ใช้งานง่าย',
     description: 'สร้าง Deal Link แชร์ให้ลูกค้าได้ทันที ไม่ต้องติดตั้งแอปเพิ่ม ทำงานบนเว็บเบราว์เซอร์ได้เลย'
   },
@@ -92,17 +92,18 @@ const UsefulFeature = () => {
             <div className='flex items-center gap-x-2'>
               <Typography color='text.primary' variant='h4' className='text-center'>
                 <span className='relative z-[1] font-extrabold'>
-                  ทำไมต้องใช้ SafePay?
+                  ทุกสิ่งที่คุณต้องการ
                   <img
                     src='/images/front-pages/landing-page/bg-shape.png'
                     alt='bg-shape'
                     className='absolute block-end-0 z-[1] bs-[40%] is-[125%] sm:is-[132%] -inline-start-[13%] sm:inline-start-[-19%] block-start-[17px]'
                   />
-                </span>
+                </span>{' '}
+                สำหรับการซื้อขายออนไลน์
               </Typography>
             </div>
             <Typography className='text-center'>
-              เราช่วยให้การซื้อขายออนไลน์ของคุณปลอดภัยและน่าเชื่อถือมากยิ่งขึ้น
+              ไม่ใช่แค่เครื่องมือ แต่เป็นระบบครบวงจรที่ช่วยให้การซื้อขายออนไลน์ของคุณปลอดภัยและน่าเชื่อถือ
             </Typography>
           </div>
         </div>

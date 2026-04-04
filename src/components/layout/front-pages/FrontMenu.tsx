@@ -23,9 +23,6 @@ import type { Mode } from '@core/types'
 // Hook Imports
 import { useIntersection } from '@/hooks/useIntersection'
 
-// Component Imports
-import DropdownMenu from './DropdownMenu'
-
 type Props = {
   mode: Mode
   isDrawerOpen: boolean
@@ -72,7 +69,7 @@ const Wrapper = (props: WrapperProps) => {
 
 const FrontMenu = (props: Props) => {
   // Props
-  const { isDrawerOpen, setIsDrawerOpen, mode } = props
+  const { isDrawerOpen, setIsDrawerOpen } = props
 
   // Hooks
   const pathname = usePathname()
@@ -91,72 +88,57 @@ const FrontMenu = (props: Props) => {
       <Typography
         color='text.primary'
         component={Link}
-        href='/front-pages/landing-page'
+        href='/'
         className={classnames('font-medium plb-3 pli-1.5 hover:text-primary', {
           'text-primary':
             !intersections.features &&
             !intersections.team &&
             !intersections.faq &&
             !intersections['contact-us'] &&
-            pathname === '/front-pages/landing-page'
+            pathname === '/'
         })}
       >
-        Home
+        หน้าแรก
       </Typography>
       <Typography
         color='text.primary'
         component={Link}
-        href='/front-pages/landing-page#features'
+        href='/#features'
         className={classnames('font-medium plb-3 pli-1.5 hover:text-primary', {
           'text-primary': intersections.features
         })}
       >
-        Features
+        ฟีเจอร์
       </Typography>
       <Typography
         color='text.primary'
         component={Link}
-        href='/front-pages/landing-page#team'
+        href='/#team'
         className={classnames('font-medium plb-3 pli-1.5 hover:text-primary', {
           'text-primary': intersections.team
         })}
       >
-        Team
+        ทีมงาน
       </Typography>
       <Typography
         color='text.primary'
         component={Link}
-        href='/front-pages/landing-page#faq'
+        href='/#faq'
         className={classnames('font-medium plb-3 pli-1.5 hover:text-primary', {
           'text-primary': intersections.faq
         })}
       >
-        FAQ
+        คำถามที่พบบ่อย
       </Typography>
       <Typography
         color='text.primary'
         component={Link}
-        href='/front-pages/landing-page#contact-us'
+        href='/#contact-us'
         className={classnames('font-medium plb-3 pli-1.5 hover:text-primary', {
           'text-primary': intersections['contact-us']
         })}
       >
-        Contact us
-      </Typography>
-      <DropdownMenu
-        mode={mode}
-        isBelowLgScreen={isBelowLgScreen}
-        isDrawerOpen={isDrawerOpen}
-        setIsDrawerOpen={setIsDrawerOpen}
-      />
-      <Typography
-        component={Link}
-        color='text.primary'
-        href='/'
-        target='_blank'
-        className='font-medium plb-3 pli-1.5 hover:text-primary'
-      >
-        Admin
+        ติดต่อเรา
       </Typography>
     </Wrapper>
   )

@@ -44,19 +44,18 @@ const Footer = ({ mode }: { mode: Mode }) => {
           <Grid container rowSpacing={10} columnSpacing={12}>
             <Grid size={{ xs: 12, lg: 5 }}>
               <div className='flex flex-col items-start gap-6'>
-                <Link href='/front-pages/landing-page'>
+                <Link href='/'>
                   <Logo color='var(--mui-palette-common-white)' />
                 </Link>
                 <Typography color='white' className='md:max-is-[390px] opacity-[0.78]'>
-                  Most Powerful & Comprehensive 🤩 React NextJS Admin Template with Elegant Material Design & Unique
-                  Layouts.
+                  SafePay - ระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ช่วยให้ทุกธุรกรรมปลอดภัยและโปร่งใส
                 </Typography>
                 <div className='flex items-end'>
                   <CustomTextField
                     size='small'
                     className={styles.inputBorder}
-                    label='Subscribe to newsletter'
-                    placeholder='Your email'
+                    label='สมัครรับข่าวสาร'
+                    placeholder='อีเมลของคุณ'
                     sx={{
                       '& .MuiInputBase-root': {
                         borderStartEndRadius: '0 !important',
@@ -78,60 +77,52 @@ const Footer = ({ mode }: { mode: Mode }) => {
                       borderEndStartRadius: 0
                     }}
                   >
-                    Subscribe
+                    สมัคร
                   </Button>
                 </div>
               </div>
             </Grid>
             <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
               <Typography color='white' className='font-medium mbe-6 opacity-[0.92]'>
-                Pages
+                หน้าเว็บ
               </Typography>
               <div className='flex flex-col gap-4'>
-                <Typography component={Link} href='/front-pages/pricing' color='white' className='opacity-[0.78]'>
-                  Pricing
+                <Typography component={Link} href='/#features' color='white' className='opacity-[0.78]'>
+                  ฟีเจอร์
                 </Typography>
-                <Link href='/front-pages/payment' className='flex items-center gap-[10px]'>
-                  <Typography color='white' className='opacity-[0.78]'>
-                    Payment
-                  </Typography>
-                  <Chip label='New' color='primary' size='small' />
-                </Link>
-                <Typography
-                  component={Link}
-                  href='/pages/misc/under-maintenance'
-                  color='white'
-                  className='opacity-[0.78]'
-                >
-                  Maintenance
+                <Typography component={Link} href='/#faq' color='white' className='opacity-[0.78]'>
+                  คำถามที่พบบ่อย
                 </Typography>
-                <Typography component={Link} href='/pages/misc/coming-soon' color='white' className='opacity-[0.78]'>
-                  Coming Soon
+                <Typography component={Link} href='/#contact-us' color='white' className='opacity-[0.78]'>
+                  ติดต่อเรา
+                </Typography>
+                <Typography component={Link} href='/login' color='white' className='opacity-[0.78]'>
+                  เข้าสู่ระบบ
                 </Typography>
               </div>
             </Grid>
             <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
               <Typography color='white' className='font-medium mbe-6 opacity-[0.92]'>
-                Products
+                บริการ
               </Typography>
               <div className='flex flex-col gap-4'>
-                <Typography component={Link} href='/front-pages/landing-page' color='white' className='opacity-[0.78]'>
-                  Page builder
+                <Typography component={Link} href='/' color='white' className='opacity-[0.78]'>
+                  ยืนยันตัวตน
                 </Typography>
-                <Typography component={Link} href='/front-pages/landing-page' color='white' className='opacity-[0.78]'>
-                  Admin Dashboards
+                <Typography component={Link} href='/' color='white' className='opacity-[0.78]'>
+                  Trust Score
                 </Typography>
-                <Typography component={Link} href='/front-pages/landing-page' color='white' className='opacity-[0.78]'>
-                  UI Kits
+                <Typography component={Link} href='/' color='white' className='opacity-[0.78]'>
+                  Deal Link
                 </Typography>
-                <Typography component={Link} href='/front-pages/landing-page' color='white' className='opacity-[0.78]'>
-                  Illustrations
+                <Typography component={Link} href='/' color='white' className='opacity-[0.78]'>
+                  Escrow
                 </Typography>
               </div>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
               <Typography color='white' className='font-medium mbe-6 opacity-[0.92]'>
-                Download our App
+                ดาวน์โหลดแอป
               </Typography>
               <div className='flex flex-col gap-4'>
                 <Link className='bg-[#282C3E] bs-[56px] is-[211px] rounded'>
@@ -139,7 +130,7 @@ const Footer = ({ mode }: { mode: Mode }) => {
                     <img src='/images/front-pages/apple-icon.png' alt='apple store' className='bs-[34px]' />
                     <div className='flex flex-col items-start'>
                       <Typography variant='body2' color='white' className='opacity-75'>
-                        Download on the
+                        ดาวน์โหลดบน
                       </Typography>
                       <Typography color='white' className='font-medium opacity-[0.92]'>
                         App Store
@@ -152,7 +143,7 @@ const Footer = ({ mode }: { mode: Mode }) => {
                     <img src='/images/front-pages/google-play-icon.png' alt='Google play' className='bs-[34px]' />
                     <div className='flex flex-col items-start'>
                       <Typography variant='body2' color='white' className='opacity-75'>
-                        Download on the
+                        ดาวน์โหลดบน
                       </Typography>
                       <Typography color='white' className='font-medium opacity-[0.92]'>
                         Google Play
@@ -173,30 +164,14 @@ const Footer = ({ mode }: { mode: Mode }) => {
           )}
         >
           <Typography className='text-white' variant='body2'>
-            <span>{`© ${new Date().getFullYear()}, Made with `}</span>
-            <span>{`❤️`}</span>
-            <span>{` by `}</span>
-            <Link href='https://pixinvent.com/' target='_blank' className='font-medium text-white'>
-              Pixinvent
-            </Link>
+            <span>{`\u00A9 ${new Date().getFullYear()} SafePay. All rights reserved.`}</span>
           </Typography>
           <div className='flex gap-1.5 items-center'>
-            <IconButton component={Link} size='small' href='https://github.com/pixinvent' target='_blank'>
-              <i className='tabler-brand-github-filled text-white text-lg' />
-            </IconButton>
-            <IconButton component={Link} size='small' href='https://www.facebook.com/pixinvents/' target='_blank'>
+            <IconButton component={Link} size='small' href='https://facebook.com' target='_blank'>
               <i className='tabler-brand-facebook-filled text-white text-lg' />
             </IconButton>
-            <IconButton component={Link} size='small' href='https://x.com/pixinvents' target='_blank'>
+            <IconButton component={Link} size='small' href='https://x.com' target='_blank'>
               <i className='tabler-brand-twitter-filled text-white text-lg' />
-            </IconButton>
-            <IconButton
-              component={Link}
-              size='small'
-              href='https://www.youtube.com/channel/UClOcB3o1goJ293ri_Hxpklg'
-              target='_blank'
-            >
-              <i className='tabler-brand-youtube-filled text-white text-lg' />
             </IconButton>
           </div>
         </div>

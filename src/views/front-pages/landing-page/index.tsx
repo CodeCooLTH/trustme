@@ -10,9 +10,12 @@ import type { SystemMode } from '@core/types'
 import HeroSection from './HeroSection'
 import UsefulFeature from './UsefulFeature'
 import CustomerReviews from './CustomerReviews'
+import OurTeam from './OurTeam'
+import Pricing from './Pricing'
 import ProductStat from './ProductStat'
 import Faqs from './Faqs'
 import GetStarted from './GetStarted'
+import ContactUs from './ContactUs'
 import { useSettings } from '@core/hooks/useSettings'
 
 const LandingPageWrapper = ({ mode }: { mode: SystemMode }) => {
@@ -32,9 +35,12 @@ const LandingPageWrapper = ({ mode }: { mode: SystemMode }) => {
       <HeroSection mode={mode} />
       <UsefulFeature />
       <CustomerReviews />
+      <OurTeam />
+      <Pricing />
       <ProductStat />
       <Faqs />
       <GetStarted mode={mode} />
+      <ContactUs />
     </div>
   )
 }

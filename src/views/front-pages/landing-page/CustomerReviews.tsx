@@ -17,6 +17,14 @@ import CustomAvatar from '@core/components/mui/Avatar'
 // Styled Component Imports
 import AppKeenSlider from '@/libs/styles/AppKeenSlider'
 
+// SVG Imports
+import HubSpot from '@assets/svg/front-pages/landing-page/HubSpot'
+import Pinterest from '@assets/svg/front-pages/landing-page/Pinterest'
+import Dribbble from '@assets/svg/front-pages/landing-page/Dribbble'
+import Airbnb from '@assets/svg/front-pages/landing-page/Airbnb'
+import Coinbase from '@assets/svg/front-pages/landing-page/Coinbase'
+import Netflix from '@assets/svg/front-pages/landing-page/Netflix'
+
 // Styles Imports
 import frontCommonStyles from '@views/front-pages/styles.module.css'
 import styles from './styles.module.css'
@@ -25,6 +33,7 @@ import styles from './styles.module.css'
 const data = [
   {
     desc: 'SafePay ช่วยให้ลูกค้ามั่นใจในการซื้อสินค้าจากร้านเรามากขึ้น ยอดขายเพิ่มขึ้นอย่างเห็นได้ชัดหลังจากใช้ระบบ Trust Score',
+    svg: <Pinterest color='#ee7676' />,
     rating: 5,
     name: 'สมชาย พาณิชย์',
     position: 'เจ้าของร้านค้าออนไลน์',
@@ -32,6 +41,7 @@ const data = [
   },
   {
     desc: 'ระบบ Escrow ของ SafePay ทำให้ไม่ต้องกังวลเรื่องโดนโกงอีกต่อไป ทุกธุรกรรมปลอดภัยและโปร่งใส',
+    svg: <Netflix color='#d34c4d' />,
     rating: 5,
     name: 'วิภา ทรัพย์มาก',
     position: 'นักช้อปออนไลน์',
@@ -39,6 +49,7 @@ const data = [
   },
   {
     desc: 'Deal Link ใช้ง่ายมาก แค่ส่งลิงก์ให้ลูกค้า ลูกค้าก็เห็นข้อมูลครบ ไม่ต้องอธิบายอะไรเพิ่ม ประหยัดเวลาได้เยอะ',
+    svg: <Airbnb color='#FF5A60' />,
     rating: 5,
     name: 'ธนา ออนไลน์',
     position: 'พ่อค้าออนไลน์',
@@ -46,6 +57,7 @@ const data = [
   },
   {
     desc: 'Badge ที่ได้รับจาก SafePay ช่วยสร้างความน่าเชื่อถือให้ร้านเรามากขึ้น ลูกค้าใหม่กล้าซื้อมากขึ้น',
+    svg: <Coinbase color='#0199ff' />,
     rating: 4,
     name: 'มานี สุขใจ',
     position: 'เจ้าของร้านเสื้อผ้า',
@@ -53,6 +65,7 @@ const data = [
   },
   {
     desc: 'สมัครง่าย ใช้งานง่าย ไม่ต้องติดตั้งอะไรเพิ่ม ทำงานบนเว็บได้เลย แนะนำเลยสำหรับคนขายของออนไลน์',
+    svg: <Dribbble color='#ea4c89' />,
     rating: 5,
     name: 'ปรีชา ค้าขาย',
     position: 'ผู้ขายใน Facebook',
@@ -60,10 +73,43 @@ const data = [
   },
   {
     desc: 'Trust Score ช่วยให้เราดูได้ว่าผู้ขายคนไหนน่าเชื่อถือ ซื้อของออนไลน์ได้อย่างสบายใจมากขึ้น',
+    svg: <Pinterest color='#ee7676' />,
     rating: 5,
     name: 'รัตนา ช้อปปิ้ง',
     position: 'นักช้อปออนไลน์',
     avatarSrc: '/images/avatars/6.png'
+  },
+  {
+    desc: 'ระบบรีวิวที่ตรวจสอบได้จริงช่วยให้ร้านเราดูน่าเชื่อถือ ลูกค้าเชื่อมั่นมากขึ้นเยอะเลย',
+    svg: <HubSpot color='#FF5C35' />,
+    rating: 5,
+    name: 'ณัฐพล ขายดี',
+    position: 'เจ้าของร้านใน Shopee',
+    avatarSrc: '/images/avatars/7.png'
+  },
+  {
+    desc: 'SafePay ทำให้เรามั่นใจในการซื้อของจากคนแปลกหน้า ดู Trust Score แล้วรู้เลยว่าน่าเชื่อถือแค่ไหน',
+    svg: <Airbnb color='#FF5A60' />,
+    rating: 4,
+    name: 'พิมพ์ใจ ช้อปเก่ง',
+    position: 'นักช้อปตัวยง',
+    avatarSrc: '/images/avatars/8.png'
+  },
+  {
+    desc: 'ใช้ SafePay มาครึ่งปี ธุรกรรมราบรื่นทุกครั้ง ไม่เคยมีปัญหาเรื่องโกงเลย',
+    svg: <Coinbase color='#0199ff' />,
+    rating: 5,
+    name: 'อภิชาติ ค้าออนไลน์',
+    position: 'พ่อค้าออนไลน์อาชีพ',
+    avatarSrc: '/images/avatars/9.png'
+  },
+  {
+    desc: 'แนะนำ SafePay ให้เพื่อนๆ ที่ขายของออนไลน์ทุกคน ช่วยสร้างความมั่นใจให้ลูกค้าได้จริง',
+    svg: <Dribbble color='#ea4c89' />,
+    rating: 5,
+    name: 'สุดา รีวิวจริง',
+    position: 'เจ้าของร้านเครื่องสำอาง',
+    avatarSrc: '/images/avatars/10.png'
   }
 ]
 
@@ -161,6 +207,7 @@ const CustomerReviews = () => {
                   <Card elevation={8} className='flex items-start'>
                     <CardContent className='p-8 items-center mlb-auto'>
                       <div className='flex flex-col gap-4 items-start'>
+                        {item.svg}
                         <Typography>{item.desc}</Typography>
                         <Rating value={item.rating} readOnly />
                         <div className='flex items-center gap-x-3'>
@@ -184,6 +231,13 @@ const CustomerReviews = () => {
         </div>
       </div>
       <Divider />
+      <div className='flex flex-wrap items-center justify-center gap-x-16 gap-y-6 mli-3'>
+        <Airbnb color='var(--mui-palette-text-secondary)' />
+        <Netflix color='var(--mui-palette-text-secondary)' />
+        <Dribbble color='var(--mui-palette-text-secondary)' />
+        <Coinbase color='var(--mui-palette-text-secondary)' />
+        <Pinterest color='var(--mui-palette-text-secondary)' />
+      </div>
     </section>
   )
 }
