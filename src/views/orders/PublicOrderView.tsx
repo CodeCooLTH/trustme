@@ -20,6 +20,7 @@ import Rating from '@mui/material/Rating'
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 import TrustScoreBadge from '@/components/trust-score-badge'
+import OrderConfirmGate from '@/views/orders/OrderConfirmGate'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -261,6 +262,27 @@ const PublicOrderView = () => {
 
   const seller = order.shop?.user
 
+  // ===== FULL-PAGE OTP CONFIRM BLOCKER (TwoStepsV1 style) =====
+  if (canConfirm) {
+    return (
+      <OrderConfirmGate
+        order={{
+          shopName: order.shop.shopName,
+          sellerUsername: seller?.username || '',
+          sellerTrustScore: seller?.trustScore || 0,
+          items: order.items.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+          totalAmount: order.totalAmount,
+          token: order.publicToken,
+        }}
+        onConfirmed={() => {
+          setOtpStep('confirmed')
+          fetchOrder()
+        }}
+      />
+    )
+  }
+
+  // ===== ORDER DETAIL (shown after confirm) =====
   return (
     <div className='min-bs-[100vh] bg-backgroundDefault'>
       {/* Header */}
@@ -273,8 +295,15 @@ const PublicOrderView = () => {
       {/* Content — based on PreviewCard.tsx layout */}
       <div className='flex justify-center p-6'>
         <Grid container spacing={6} className='max-is-[900px]'>
+          {/* Confirmed Success Banner */}
+          {otpStep === 'confirmed' && (
+            <Grid size={{ xs: 12 }}>
+              <Alert severity='success'>ยืนยันคำสั่งซื้อสำเร็จแล้ว ขอบคุณที่ใช้บริการ SafePay!</Alert>
+            </Grid>
+          )}
+
           {/* Main Card */}
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid size={{ xs: 12, md: canReview || order.review ? 8 : 12 }}>
             <Card className='previewCard'>
               <CardContent className='sm:!p-12'>
                 <Grid container spacing={6}>
@@ -431,105 +460,10 @@ const PublicOrderView = () => {
             </Card>
           </Grid>
 
-          {/* Sidebar — based on PreviewActions.tsx */}
+          {/* Sidebar — Review or Status */}
+          {(canReview || order.review || (!canConfirm && !canReview && !order.review)) && (
           <Grid size={{ xs: 12, md: 4 }}>
             <Grid container spacing={6}>
-              {/* OTP Confirm Section */}
-              {canConfirm && (
-                <Grid size={{ xs: 12 }}>
-                  <Card>
-                    <CardContent className='flex flex-col gap-4'>
-                      <Typography className='font-medium' color='text.primary'>
-                        ยืนยันคำสั่งซื้อ
-                      </Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        กรุณายืนยันตัวตนด้วยเบอร์โทรศัพท์
-                      </Typography>
-
-                      {otpError && <Alert severity='error'>{otpError}</Alert>}
-
-                      <CustomTextField
-                        fullWidth
-                        label='เบอร์โทรศัพท์ผู้ซื้อ'
-                        placeholder='เช่น 0812345678'
-                        value={phone}
-                        onChange={e => setPhone(e.target.value)}
-                        disabled={otpStep === 'otp-sent' || isOtpLoading}
-                        type='tel'
-                        slotProps={{ input: { inputProps: { maxLength: 10 } } }}
-                      />
-
-                      {otpStep !== 'otp-sent' && (
-                        <Button
-                          fullWidth
-                          variant='contained'
-                          onClick={handleSendOtp}
-                          disabled={isOtpLoading || !phone.trim()}
-                          startIcon={
-                            isOtpLoading ? (
-                              <CircularProgress size={18} color='inherit' />
-                            ) : (
-                              <i className='tabler-send' />
-                            )
-                          }
-                        >
-                          {isOtpLoading ? 'กำลังส่ง OTP...' : 'ส่ง OTP'}
-                        </Button>
-                      )}
-
-                      {otpStep === 'otp-sent' && (
-                        <>
-                          <Alert severity='info'>ส่ง OTP ไปที่ {phone} แล้ว</Alert>
-                          <CustomTextField
-                            fullWidth
-                            label='รหัส OTP'
-                            placeholder='กรอกรหัส OTP 6 หลัก'
-                            value={otp}
-                            onChange={e => setOtp(e.target.value)}
-                            type='number'
-                            slotProps={{ input: { inputProps: { maxLength: 6 } } }}
-                          />
-                          <Button
-                            fullWidth
-                            variant='contained'
-                            color='success'
-                            onClick={handleConfirmOrder}
-                            disabled={isOtpLoading || !otp.trim()}
-                            startIcon={
-                              isOtpLoading ? (
-                                <CircularProgress size={18} color='inherit' />
-                              ) : (
-                                <i className='tabler-circle-check' />
-                              )
-                            }
-                          >
-                            {isOtpLoading ? 'กำลังยืนยัน...' : 'ยืนยันรับสินค้า'}
-                          </Button>
-                          <Button
-                            fullWidth
-                            variant='tonal'
-                            color='secondary'
-                            onClick={() => {
-                              setOtpStep('idle')
-                              setOtp('')
-                            }}
-                          >
-                            เปลี่ยนเบอร์
-                          </Button>
-                        </>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              )}
-
-              {/* Confirmed Success */}
-              {otpStep === 'confirmed' && (
-                <Grid size={{ xs: 12 }}>
-                  <Alert severity='success'>ยืนยันคำสั่งซื้อสำเร็จแล้ว ขอบคุณที่ใช้บริการ SafePay!</Alert>
-                </Grid>
-              )}
-
               {/* Review Section */}
               {canReview && (
                 <Grid size={{ xs: 12 }}>
@@ -608,6 +542,7 @@ const PublicOrderView = () => {
               )}
             </Grid>
           </Grid>
+          )}
         </Grid>
       </div>
     </div>
