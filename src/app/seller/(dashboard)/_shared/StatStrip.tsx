@@ -9,7 +9,7 @@ export type StatStripItem = {
   value: number
   prefix?: string
   suffix?: string
-  change: number          // % — 0 hides the "Since last month" footer
+  change: number          // % vs. previous month (0 when no history)
   icon: string            // tabler
   iconClass: string       // e.g. 'bg-primary/15 text-primary'
   sinceLabel?: string     // defaults to "เทียบเดือนก่อน"
@@ -37,7 +37,7 @@ export default function StatStrip({ items }: { items: StatStripItem[] }) {
                 : '',
             )}
           >
-            <div className="p-5">
+            <div className="p-5 text-center">
               <h5 className="text-default-400 mb-2 text-xs uppercase">{item.title}</h5>
               <div className="flex items-center justify-center gap-2.5 my-5">
                 <span
@@ -59,20 +59,30 @@ export default function StatStrip({ items }: { items: StatStripItem[] }) {
                   />
                 </h3>
               </div>
-              {item.change !== 0 && (
-                <p className="text-default-400 flex justify-center">
-                  <span
-                    className={cn(
-                      item.change >= 0 ? 'text-success' : 'text-danger',
-                      'me-2.5 flex items-center',
-                    )}
-                  >
-                    {item.change >= 0 ? <Icon icon="chevron-up" /> : <Icon icon="chevron-down" />}
-                    {Math.abs(item.change)}%
-                  </span>
-                  <span className="text-nowrap">{item.sinceLabel ?? 'เทียบเดือนก่อน'}</span>
-                </p>
-              )}
+              <p className="text-default-400 flex justify-center">
+                <span
+                  className={cn(
+                    item.change > 0
+                      ? 'text-success'
+                      : item.change < 0
+                        ? 'text-danger'
+                        : 'text-default-400',
+                    'me-2.5 flex items-center',
+                  )}
+                >
+                  <Icon
+                    icon={
+                      item.change > 0
+                        ? 'chevron-up'
+                        : item.change < 0
+                          ? 'chevron-down'
+                          : 'minus'
+                    }
+                  />
+                  {Math.abs(item.change)}%
+                </span>
+                <span className="text-nowrap">{item.sinceLabel ?? 'เทียบเดือนก่อน'}</span>
+              </p>
             </div>
           </div>
         ))}
