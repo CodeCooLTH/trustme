@@ -56,6 +56,7 @@ export default async function NewOrderPage() {
       description: p.description ?? null,
       price: Number(p.price),
       type: p.type,
+      image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
     }))
   } catch {
     catalog = []

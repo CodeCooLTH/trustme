@@ -8,6 +8,7 @@ import { toast } from 'react-toastify'
 import * as Yup from 'yup'
 import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
 import Icon from '@/components/wrappers/Icon'
+import ProductPickerModal from './ProductPickerModal'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -17,6 +18,7 @@ export interface CatalogProduct {
   description?: string | null
   price: number
   type: string
+  image?: string | null
 }
 
 interface Props {
@@ -106,12 +108,6 @@ interface FormValues {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const TYPE_OPTIONS = [
-  { value: 'PHYSICAL', label: 'สินค้าจับต้องได้ (Physical)' },
-  { value: 'DIGITAL', label: 'ดิจิทัล (Digital)' },
-  { value: 'SERVICE', label: 'บริการ (Service)' },
-]
-
 const CHANNEL_OPTIONS = [
   { value: 'STOREFRONT', label: 'หน้าร้าน' },
   { value: 'FACEBOOK', label: 'Facebook' },
@@ -134,8 +130,8 @@ const PAYMENT_OPTIONS = [
 export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Props) {
   const router = useRouter()
 
-  // Search query for catalog filter
-  const [search, setSearch] = useState('')
+  // Product picker modal state
+  const [isPickerOpen, setIsPickerOpen] = useState(false)
 
   const {
     register,
@@ -222,13 +218,6 @@ export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Pr
     append({ productId: undefined, name: '', description: '', qty: 1, price: 0 })
   }
 
-  // Filtered catalog rows
-  const filteredCatalog = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    if (!q) return catalog
-    return catalog.filter((p) => p.name.toLowerCase().includes(q))
-  }, [catalog, search])
-
   // ── Submit ────────────────────────────────────────────────────────────────
 
   const onSubmit = async (values: FormValues) => {
@@ -286,7 +275,7 @@ export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Pr
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[20%_60%_20%] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[30%_40%_30%] gap-6">
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* COLUMN 1 — ข้อมูลลูกค้า                                           */}
@@ -426,187 +415,231 @@ export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Pr
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        {/* COLUMN 2 — เลือกสินค้า (quick-pick list)                          */}
+        {/* COLUMN 2 — รายการสั่งซื้อ (cart-style)                            */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         <div className="card rounded-xl flex flex-col overflow-hidden">
-          <div className="p-4 border-b border-default-100">
-            <h2 className="text-base font-semibold text-dark mb-3">เลือกสินค้า</h2>
-            {/* Search */}
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-default-400">
-                <Icon icon="search" width={16} height={16} />
-              </span>
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="ค้นหาสินค้า"
-                className="form-input pl-9 text-sm"
-              />
-            </div>
+          {/* Card header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-default-100">
+            <h2 className="text-base font-semibold text-dark">รายการสั่งซื้อ</h2>
+            <button
+              type="button"
+              onClick={() => setIsPickerOpen(true)}
+              className="btn btn-sm bg-primary text-white hover:bg-primary-hover inline-flex items-center gap-1 px-3 py-1.5"
+            >
+              <Icon icon="plus" width={14} height={14} />
+              เลือกสินค้า
+            </button>
           </div>
 
-          {/* Catalog rows */}
+          {/* Cart list */}
           <div className="flex-1 overflow-y-auto divide-y divide-default-100">
-            {catalog.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 text-center text-default-400 gap-2 px-4">
-                <Icon icon="package" width={36} height={36} className="opacity-40" />
-                <p className="text-sm">ยังไม่มีสินค้าในแคตตาล็อก</p>
-                <p className="text-xs">เพิ่มสินค้าก่อน แล้วกลับมาสร้างออเดอร์</p>
+            {/* Empty state */}
+            {watchedItems.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-14 gap-3 text-default-400 px-4 text-center">
+                <Icon icon="shopping-cart" width={40} height={40} className="opacity-40" />
+                <p className="text-sm font-medium">ยังไม่มีรายการ</p>
+                <button
+                  type="button"
+                  onClick={() => setIsPickerOpen(true)}
+                  className="text-sm text-primary hover:underline"
+                >
+                  เลือกสินค้า
+                </button>
               </div>
-            ) : filteredCatalog.length === 0 ? (
-              <div className="py-8 text-center text-default-400 text-sm px-4">
-                ไม่พบสินค้าที่ตรงกับ &ldquo;{search}&rdquo;
-              </div>
-            ) : (
-              filteredCatalog.map((product) => {
-                const qty = qtyByProduct(product.id)
-                return (
-                  <div
-                    key={product.id}
-                    className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-default-50 transition-colors"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-dark truncate">{product.name}</p>
-                      <p className="text-xs text-default-400">{formatThb(product.price)}</p>
-                    </div>
-                    {/* Qty stepper */}
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => dec(product.id)}
-                        disabled={qty === 0}
-                        className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-100 disabled:opacity-30 w-7 h-7"
-                        aria-label="ลด"
-                      >
-                        <Icon icon="minus" width={12} height={12} />
-                      </button>
-                      <span className="text-sm font-semibold text-dark w-6 text-center tabular-nums">
-                        {qty}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => inc(product)}
-                        className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-100 w-7 h-7"
-                        aria-label="เพิ่ม"
-                      >
-                        <Icon icon="plus" width={12} height={12} />
-                      </button>
-                    </div>
-                  </div>
-                )
-              })
             )}
 
-            {/* Custom items section */}
-            <div className="px-4 py-2 bg-default-50">
-              <p className="text-xs font-semibold text-default-500 uppercase tracking-wide">กำหนดเอง</p>
-            </div>
-
-            {customItems.map(({ item, idx }) => {
+            {/* Catalog cart rows */}
+            {watchedItems.map((item, idx) => {
+              if (!item.productId) return null // custom items rendered below
+              const product = catalog.find((p) => p.id === item.productId)
+              const shortId = item.productId.slice(0, 8)
               const itemErrors = (errors.items as any)?.[idx]
               return (
                 <div
-                  key={idx}
-                  className="px-4 py-3 border-l-2 border-primary bg-primary/5 flex flex-col gap-2"
+                  key={`catalog-${item.productId}`}
+                  className="flex gap-3 px-4 py-3 border-b border-default-100 last:border-b-0"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                      กำหนดเอง
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => remove(idx)}
-                      className="ml-auto btn btn-icon btn-sm border border-default-200 text-default-400 hover:text-danger hover:border-danger w-6 h-6"
-                      aria-label="ลบรายการ"
-                    >
-                      <Icon icon="x" width={12} height={12} />
-                    </button>
+                  {/* Image / icon */}
+                  <div className="size-12 rounded bg-default-100 flex items-center justify-center shrink-0 overflow-hidden">
+                    {product?.image ? (
+                      <img
+                        src={product.image}
+                        alt={item.name}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <Icon icon="package" className="size-6 text-default-400" />
+                    )}
                   </div>
 
-                  <input
-                    type="text"
-                    placeholder="ชื่อสินค้า"
-                    className="form-input text-sm py-1.5"
-                    {...register(`items.${idx}.name`)}
-                  />
-                  {itemErrors?.name && (
-                    <p className="text-danger text-xs">{itemErrors.name.message}</p>
-                  )}
-
-                  <div className="flex items-center gap-2">
-                    {/* Price */}
-                    <div className="relative flex-1">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 text-default-400 text-xs pointer-events-none">฿</span>
-                      <input
-                        type="number"
-                        inputMode="decimal"
-                        min={0.01}
-                        step={0.01}
-                        placeholder="0.00"
-                        className="form-input text-sm py-1.5 pl-6"
-                        {...register(`items.${idx}.price`, { valueAsNumber: true })}
-                      />
-                    </div>
-                    {/* Qty stepper */}
-                    <div className="flex items-center gap-1 shrink-0">
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-dark truncate">{item.name}</p>
+                        <p className="text-xs text-default-400 mt-0.5">SKU: {shortId}</p>
+                      </div>
                       <button
                         type="button"
-                        onClick={() => {
-                          const cur = Number(item?.qty) || 1
-                          if (cur > 1) update(idx, { ...item, qty: cur - 1 })
-                          else remove(idx)
-                        }}
-                        className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-100 w-7 h-7"
-                        aria-label="ลด"
+                        onClick={() => remove(idx)}
+                        aria-label="ลบ"
+                        className="text-default-400 hover:text-danger shrink-0"
                       >
-                        <Icon icon="minus" width={12} height={12} />
-                      </button>
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        min={1}
-                        step={1}
-                        className="form-input text-sm text-center py-1 w-12"
-                        {...register(`items.${idx}.qty`, { valueAsNumber: true })}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const cur = Number(item?.qty) || 1
-                          update(idx, { ...item, qty: cur + 1 })
-                        }}
-                        className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-100 w-7 h-7"
-                        aria-label="เพิ่ม"
-                      >
-                        <Icon icon="plus" width={12} height={12} />
+                        <Icon icon="x" className="size-4" />
                       </button>
                     </div>
+                    <div className="flex justify-end mt-2">
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => dec(item.productId!)}
+                          className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-100 w-7 h-7"
+                          aria-label="ลด"
+                        >
+                          <Icon icon="minus" width={12} height={12} />
+                        </button>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={1}
+                          step={1}
+                          className="form-input text-sm text-center py-1 w-12"
+                          {...register(`items.${idx}.qty`, { valueAsNumber: true })}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => inc(catalog.find((p) => p.id === item.productId)!)}
+                          className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-100 w-7 h-7"
+                          aria-label="เพิ่ม"
+                        >
+                          <Icon icon="plus" width={12} height={12} />
+                        </button>
+                      </div>
+                    </div>
+                    {itemErrors?.qty && (
+                      <p className="text-danger text-xs mt-1">{itemErrors.qty.message}</p>
+                    )}
                   </div>
-
-                  {itemErrors?.price && (
-                    <p className="text-danger text-xs">{itemErrors.price.message}</p>
-                  )}
-                  {itemErrors?.qty && (
-                    <p className="text-danger text-xs">{itemErrors.qty.message}</p>
-                  )}
-
-                  {/* hidden productId — ensures productId stays undefined */}
-                  <input type="hidden" {...register(`items.${idx}.productId`)} />
                 </div>
               )
             })}
 
-            <div className="px-4 py-3">
-              <button
-                type="button"
-                onClick={addCustomItem}
-                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-              >
-                <Icon icon="plus" width={14} height={14} />
-                เพิ่มรายการกำหนดเอง
-              </button>
-            </div>
+            {/* Custom item rows */}
+            {customItems.map(({ item, idx }) => {
+              const itemErrors = (errors.items as any)?.[idx]
+              return (
+                <div
+                  key={`custom-${idx}`}
+                  className="flex gap-3 px-4 py-3 border-b border-default-100 last:border-b-0"
+                >
+                  {/* Icon placeholder */}
+                  <div className="size-12 rounded bg-default-100 flex items-center justify-center shrink-0">
+                    <Icon icon="edit" className="size-6 text-default-400" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-xs font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                            กำหนดเอง
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="ชื่อสินค้า"
+                          className="form-input text-sm py-1 w-full"
+                          {...register(`items.${idx}.name`)}
+                        />
+                        {itemErrors?.name && (
+                          <p className="text-danger text-xs mt-0.5">{itemErrors.name.message}</p>
+                        )}
+                        {/* Price input */}
+                        <div className="relative mt-1.5">
+                          <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 text-default-400 text-xs pointer-events-none">฿</span>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min={0.01}
+                            step={0.01}
+                            placeholder="0.00"
+                            className="form-input text-sm py-1 pl-6 w-full"
+                            {...register(`items.${idx}.price`, { valueAsNumber: true })}
+                          />
+                        </div>
+                        {itemErrors?.price && (
+                          <p className="text-danger text-xs mt-0.5">{itemErrors.price.message}</p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => remove(idx)}
+                        aria-label="ลบ"
+                        className="text-default-400 hover:text-danger shrink-0"
+                      >
+                        <Icon icon="x" className="size-4" />
+                      </button>
+                    </div>
+
+                    {/* Qty stepper */}
+                    <div className="flex justify-end mt-2">
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cur = Number(item?.qty) || 1
+                            if (cur > 1) update(idx, { ...item, qty: cur - 1 })
+                            else remove(idx)
+                          }}
+                          className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-100 w-7 h-7"
+                          aria-label="ลด"
+                        >
+                          <Icon icon="minus" width={12} height={12} />
+                        </button>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={1}
+                          step={1}
+                          className="form-input text-sm text-center py-1 w-12"
+                          {...register(`items.${idx}.qty`, { valueAsNumber: true })}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cur = Number(item?.qty) || 1
+                            update(idx, { ...item, qty: cur + 1 })
+                          }}
+                          className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-100 w-7 h-7"
+                          aria-label="เพิ่ม"
+                        >
+                          <Icon icon="plus" width={12} height={12} />
+                        </button>
+                      </div>
+                    </div>
+                    {itemErrors?.qty && (
+                      <p className="text-danger text-xs mt-1">{itemErrors.qty.message}</p>
+                    )}
+
+                    {/* hidden productId */}
+                    <input type="hidden" {...register(`items.${idx}.productId`)} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Add custom item link */}
+          <div className="px-4 py-3 border-t border-default-100">
+            <button
+              type="button"
+              onClick={addCustomItem}
+              className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+            >
+              <Icon icon="plus" width={14} height={14} />
+              เพิ่มรายการกำหนดเอง
+            </button>
           </div>
 
           {/* Validation error for items array */}
@@ -616,12 +649,22 @@ export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Pr
             </div>
           )}
 
-          {/* Total footer — sticky bottom within the card */}
+          {/* Total footer */}
           <div className="px-4 py-3 border-t border-default-200 bg-card flex items-center justify-between">
             <span className="text-sm text-default-500">รวม</span>
             <span className="text-xl font-bold text-dark">{formatThb(total)}</span>
           </div>
         </div>
+
+        {/* Product picker modal (rendered outside form columns, full-screen overlay) */}
+        <ProductPickerModal
+          open={isPickerOpen}
+          onClose={() => setIsPickerOpen(false)}
+          catalog={catalog}
+          qtyByProduct={qtyByProduct}
+          inc={inc}
+          dec={dec}
+        />
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* COLUMN 3 — ข้อมูลอื่น ๆ                                            */}
