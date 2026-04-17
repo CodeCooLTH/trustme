@@ -35,6 +35,7 @@ type FormValues = {
 
 interface ProductFormProps {
   shopId: string
+  formId?: string
   product?: {
     id: string
     name: string
@@ -44,7 +45,7 @@ interface ProductFormProps {
   }
 }
 
-export default function ProductForm({ shopId, product }: ProductFormProps) {
+export default function ProductForm({ shopId, product, formId }: ProductFormProps) {
   const router = useRouter()
   const isEdit = !!product
 
@@ -52,7 +53,7 @@ export default function ProductForm({ shopId, product }: ProductFormProps) {
     register,
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormValues>({
     resolver: yupResolver(schema) as any,
     defaultValues: {
@@ -106,149 +107,122 @@ export default function ProductForm({ shopId, product }: ProductFormProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Main info */}
-      <div className="lg:col-span-2">
-        <div className="card rounded-xl">
-          <div className="card-header p-5 border-b border-default-100">
-            <h4 className="card-title text-base font-semibold text-dark">ข้อมูลสินค้า</h4>
-            <p className="text-default-400 text-sm mt-0.5">กรอกรายละเอียดสินค้าของคุณ</p>
-          </div>
-          <div className="card-body p-5 space-y-5">
-            {/* Name */}
-            <div>
-              <label htmlFor="name" className="form-label">
-                ชื่อสินค้า<span className="text-danger">*</span>
-              </label>
-              <input
-                id="name"
-                type="text"
-                className="form-input"
-                placeholder="เช่น กระเป๋าผ้าสะพายข้าง"
-                {...register('name')}
-              />
-              {errors.name && <p className="text-danger mt-1 text-sm">{errors.name.message}</p>}
+    <form id={formId} onSubmit={handleSubmit(onSubmit)} noValidate>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main info */}
+        <div className="lg:col-span-2">
+          <div className="card rounded-xl">
+            <div className="card-header p-5 border-b border-default-100">
+              <h4 className="card-title text-base font-semibold text-dark">ข้อมูลสินค้า</h4>
+              <p className="text-default-400 text-sm mt-0.5">กรอกรายละเอียดสินค้าของคุณ</p>
             </div>
-
-            {/* Description */}
-            <div>
-              <label htmlFor="description" className="form-label">
-                คำอธิบายสินค้า{' '}
-                <span className="text-default-400">(ไม่บังคับ)</span>
-              </label>
-              <textarea
-                id="description"
-                rows={5}
-                className="form-textarea"
-                placeholder="อธิบายรายละเอียดสินค้า วัสดุ ขนาด ฯลฯ"
-                {...register('description')}
-              />
-              {errors.description && (
-                <p className="text-danger mt-1 text-sm">{errors.description.message}</p>
-              )}
-            </div>
-
-            {/* Image upload — TODO */}
-            <div className="rounded-lg border border-dashed border-default-300 p-6 text-center text-default-400 text-sm">
-              <Icon icon="mdi:image-plus-outline" width={32} height={32} className="mx-auto mb-2 opacity-50" />
-              <p>อัปโหลดรูปภาพ — ยังไม่รองรับในเวอร์ชันนี้</p>
-              <p className="text-xs mt-1 text-default-300">
-                {/* TODO: implement image upload (S3 or local storage) */}
-                (TODO: image upload)
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sidebar: price + type + actions */}
-      <div className="space-y-5">
-        {/* Pricing */}
-        <div className="card rounded-xl">
-          <div className="card-header p-5 border-b border-default-100">
-            <h4 className="card-title text-base font-semibold text-dark">ราคา</h4>
-          </div>
-          <div className="card-body p-5">
-            <label htmlFor="price" className="form-label">
-              ราคา (บาท)<span className="text-danger">*</span>
-            </label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-default-400 text-sm pointer-events-none">
-                ฿
-              </span>
-              <input
-                id="price"
-                type="number"
-                step="0.01"
-                min="0.01"
-                className="form-input pl-7"
-                placeholder="0.00"
-                {...register('price', { valueAsNumber: true })}
-              />
-            </div>
-            {errors.price && <p className="text-danger mt-1 text-sm">{errors.price.message}</p>}
-          </div>
-        </div>
-
-        {/* Type */}
-        <div className="card rounded-xl">
-          <div className="card-header p-5 border-b border-default-100">
-            <h4 className="card-title text-base font-semibold text-dark">ประเภทสินค้า</h4>
-          </div>
-          <div className="card-body p-5">
-            <label htmlFor="type" className="form-label">
-              ประเภท<span className="text-danger">*</span>
-            </label>
-            <Controller
-              control={control}
-              name="type"
-              render={({ field }) => (
-                <ChoiceSelect
-                  id="type"
-                  options={[
-                    { value: 'PHYSICAL', label: 'สินค้าจับต้องได้' },
-                    { value: 'DIGITAL', label: 'ดิจิทัล' },
-                    { value: 'SERVICE', label: 'บริการ' },
-                  ]}
-                  value={field.value}
-                  onChange={(v) => field.onChange(v)}
-                  search={false}
+            <div className="card-body p-5 space-y-5">
+              {/* Name */}
+              <div>
+                <label htmlFor="name" className="form-label">
+                  ชื่อสินค้า<span className="text-danger">*</span>
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  className="form-input"
+                  placeholder="เช่น กระเป๋าผ้าสะพายข้าง"
+                  {...register('name')}
                 />
-              )}
-            />
-            {errors.type && <p className="text-danger mt-1 text-sm">{errors.type.message}</p>}
+                {errors.name && <p className="text-danger mt-1 text-sm">{errors.name.message}</p>}
+              </div>
+
+              {/* Description */}
+              <div>
+                <label htmlFor="description" className="form-label">
+                  คำอธิบายสินค้า{' '}
+                  <span className="text-default-400">(ไม่บังคับ)</span>
+                </label>
+                <textarea
+                  id="description"
+                  rows={5}
+                  className="form-textarea"
+                  placeholder="อธิบายรายละเอียดสินค้า วัสดุ ขนาด ฯลฯ"
+                  {...register('description')}
+                />
+                {errors.description && (
+                  <p className="text-danger mt-1 text-sm">{errors.description.message}</p>
+                )}
+              </div>
+
+              {/* Image upload — TODO */}
+              <div className="rounded-lg border border-dashed border-default-300 p-6 text-center text-default-400 text-sm">
+                <Icon icon="mdi:image-plus-outline" width={32} height={32} className="mx-auto mb-2 opacity-50" />
+                <p>อัปโหลดรูปภาพ — ยังไม่รองรับในเวอร์ชันนี้</p>
+                <p className="text-xs mt-1 text-default-300">
+                  {/* TODO: implement image upload (S3 or local storage) */}
+                  (TODO: image upload)
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-            className="btn bg-primary text-white hover:bg-primary-hover w-full py-2.5 font-semibold disabled:opacity-60 inline-flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? (
-              <>
-                <Icon icon="mdi:loading" width={18} height={18} className="animate-spin" />
-                กำลังบันทึก...
-              </>
-            ) : (
-              <>
-                <Icon icon="mdi:content-save-outline" width={18} height={18} />
-                บันทึกสินค้า
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push('/products')}
-            className="btn border border-default-300 bg-card hover:bg-default-50 text-default-700 w-full py-2.5"
-          >
-            ยกเลิก
-          </button>
+        {/* Sidebar: price + type */}
+        <div className="space-y-5">
+          {/* Pricing */}
+          <div className="card rounded-xl">
+            <div className="card-header p-5 border-b border-default-100">
+              <h4 className="card-title text-base font-semibold text-dark">ราคา</h4>
+            </div>
+            <div className="card-body p-5">
+              <label htmlFor="price" className="form-label">
+                ราคา (บาท)<span className="text-danger">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-default-400 text-sm pointer-events-none">
+                  ฿
+                </span>
+                <input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  className="form-input pl-7"
+                  placeholder="0.00"
+                  {...register('price', { valueAsNumber: true })}
+                />
+              </div>
+              {errors.price && <p className="text-danger mt-1 text-sm">{errors.price.message}</p>}
+            </div>
+          </div>
+
+          {/* Type */}
+          <div className="card rounded-xl">
+            <div className="card-header p-5 border-b border-default-100">
+              <h4 className="card-title text-base font-semibold text-dark">ประเภทสินค้า</h4>
+            </div>
+            <div className="card-body p-5">
+              <label htmlFor="type" className="form-label">
+                ประเภท<span className="text-danger">*</span>
+              </label>
+              <Controller
+                control={control}
+                name="type"
+                render={({ field }) => (
+                  <ChoiceSelect
+                    id="type"
+                    options={[
+                      { value: 'PHYSICAL', label: 'สินค้าจับต้องได้' },
+                      { value: 'DIGITAL', label: 'ดิจิทัล' },
+                      { value: 'SERVICE', label: 'บริการ' },
+                    ]}
+                    value={field.value}
+                    onChange={(v) => field.onChange(v)}
+                    search={false}
+                  />
+                )}
+              />
+              {errors.type && <p className="text-danger mt-1 text-sm">{errors.type.message}</p>}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </form>
   )
 }

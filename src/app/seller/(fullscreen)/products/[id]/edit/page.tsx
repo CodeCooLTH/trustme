@@ -7,8 +7,11 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
 import ProductForm from '@/app/seller/(dashboard)/products/components/ProductForm'
+import FullscreenPageHeader from '@/app/seller/(fullscreen)/_shared/FullscreenPageHeader'
 
 export const metadata: Metadata = { title: 'แก้ไขสินค้า' }
+
+const FORM_ID = 'product-form'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -54,12 +57,13 @@ export default async function EditProductPage({ params }: PageProps) {
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-dark">แก้ไขสินค้า</h1>
-        <p className="text-default-400 mt-0.5">{product.name}</p>
-      </div>
-
-      <ProductForm shopId={shop.id} product={product} />
+      <FullscreenPageHeader
+        title="แก้ไขสินค้า"
+        subtitle={product.name}
+        cancelHref="/products"
+        saveFormId={FORM_ID}
+      />
+      <ProductForm shopId={shop.id} product={product} formId={FORM_ID} />
     </>
   )
 }

@@ -6,8 +6,11 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
 import ProductForm from '@/app/seller/(dashboard)/products/components/ProductForm'
+import FullscreenPageHeader from '@/app/seller/(fullscreen)/_shared/FullscreenPageHeader'
 
 export const metadata: Metadata = { title: 'เพิ่มสินค้า' }
+
+const FORM_ID = 'product-form'
 
 export default async function NewProductPage() {
   const session = await getServerSession(authOptions)
@@ -40,12 +43,13 @@ export default async function NewProductPage() {
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-dark">เพิ่มสินค้า</h1>
-        <p className="text-default-400 mt-0.5">กรอกข้อมูลสินค้าใหม่</p>
-      </div>
-
-      <ProductForm shopId={shop.id} />
+      <FullscreenPageHeader
+        title="เพิ่มสินค้า"
+        subtitle="กรอกข้อมูลสินค้าใหม่"
+        cancelHref="/products"
+        saveFormId={FORM_ID}
+      />
+      <ProductForm shopId={shop.id} formId={FORM_ID} />
     </>
   )
 }
