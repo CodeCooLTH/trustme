@@ -1,5 +1,5 @@
 import Icon from '@/components/wrappers/Icon'
-import { menuItems } from '@/layouts/components/data'
+import { menuItems as defaultMenuItems } from '@/layouts/components/data'
 import type { MenuItemType } from '@/types'
 import { cn } from '@/utils/helpers'
 import { scrollToElement } from '@/utils/layout'
@@ -89,7 +89,7 @@ const MenuItem = ({ item, level = 0 }: { item: MenuItemType; level?: number }) =
   )
 }
 
-const AppMenu = () => {
+const AppMenu = ({ items = defaultMenuItems }: { items?: MenuItemType[] }) => {
   const [openMenuKey, setOpenMenuKey] = useState<string | null>(null)
   const scrollToActiveLink = () => {
     const activeItem: HTMLAnchorElement | null = document.querySelector('.menu-link.active')
@@ -107,7 +107,7 @@ const AppMenu = () => {
 
   return (
     <ul className="side-nav hs-accordion-group px-2.5 pb-16.5">
-      {menuItems.map((item, idx) => (
+      {items.map((item, idx) => (
         <Fragment key={idx}>
           {item.isTitle && (
             <li className="menu-title mt-0!">

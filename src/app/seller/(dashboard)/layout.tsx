@@ -1,9 +1,9 @@
-import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import VerticalLayout from '@/layouts/VerticalLayout'
+import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
-import SellerSidebar from './components/SellerSidebar'
-import SellerTopBar from './components/SellerTopBar'
+import { sellerMenuItems } from './_seller-menu'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions)
@@ -38,15 +38,5 @@ export default async function DashboardLayout({ children }: { children: React.Re
     })
   }
 
-  return (
-    <div className="min-h-screen bg-default-50">
-      <SellerTopBar displayName={user.displayName} />
-      <div className="flex">
-        <SellerSidebar />
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
-          <div className="container mx-auto max-w-7xl">{children}</div>
-        </main>
-      </div>
-    </div>
-  )
+  return <VerticalLayout menuItems={sellerMenuItems}>{children}</VerticalLayout>
 }

@@ -1,12 +1,13 @@
 import AppLogo from '@/components/AppLogo'
 import { SimpleBar } from '@/components/wrappers/SimpleBar'
+import type { MenuItemType } from '@/types'
 import Link from 'next/link'
 import AppMenu from './components/AppMenu'
 import OnHoverToggle from './components/OnHoverToggle'
 
 import UserProfileSettings from './components/UserProfileSettings'
 
-const Sidenav = () => {
+const Sidenav = ({ items }: { items?: MenuItemType[] }) => {
   return (
     <aside id="app-menu" className="app-menu">
       <Link href="/" className="logo-box min-h-(--topbar-height) sticky top-0 flex items-center justify-start px-6 backdrop-blur-xs">
@@ -20,7 +21,7 @@ const Sidenav = () => {
           <UserProfileSettings />
 
           <div>
-            <AppMenu />
+            <AppMenu items={items} />
           </div>
         </SimpleBar>
       </div>
