@@ -1,0 +1,34 @@
+/* SafePay — theme overrides */
+/* Force "Prompt" (Thai-supported) as the primary font across every skin. */
+
+html {
+    --font-body: "Prompt", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-secondary: "Prompt", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+html[data-skin="default"],
+html[data-skin="saas"],
+html[data-skin="modern"],
+html[data-skin="minimal"],
+html[data-skin="silver"],
+html[data-skin="luxe"],
+html[data-skin="pixel"],
+html[data-skin="flat"],
+html[data-skin="crystal"],
+html[data-skin="zen"],
+html[data-skin="galaxy"],
+html[data-skin="retro"],
+html[data-skin="neon"],
+html[data-skin="soft"],
+html[data-skin="mono"],
+html[data-skin="neo"],
+html[data-skin="prism"],
+html[data-skin="nova"],
+html[data-skin="elegant"],
+html[data-skin="aurora"],
+html[data-skin="xenon"],
+html[data-skin="matrix"],
+html[data-skin="orbit"] {
+    --font-body: "Prompt", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-secondary: "Prompt", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
