@@ -15,9 +15,18 @@ export function storeOtp(contact: string): string {
   return otp;
 }
 
-// Test bypass — remove in production
+// Test account bypass — remove in production.
+// Used to log in without DB/SMS for smoke-testing the UI flow.
+export const TEST_ACCOUNT = {
+  phone: '0920791649',
+  otp: '123456',
+  id: 'test-user-0920791649',
+  displayName: 'ผู้ใช้ทดสอบ',
+  username: 'testuser',
+} as const;
+
 const TEST_ACCOUNTS: Record<string, string> = {
-  '0920791649': '000000',
+  [TEST_ACCOUNT.phone]: TEST_ACCOUNT.otp,
 };
 
 export function verifyOtp(contact: string, otp: string): boolean {
