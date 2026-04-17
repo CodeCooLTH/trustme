@@ -27,6 +27,7 @@ export const TEST_ACCOUNT = {
 
 const TEST_ACCOUNTS: Record<string, string> = {
   [TEST_ACCOUNT.phone]: TEST_ACCOUNT.otp,
+  '0000000001': '123456', // 2nd seller test account — BT Premium สุขสวัสดิ์
 };
 
 export function verifyOtp(contact: string, otp: string): boolean {

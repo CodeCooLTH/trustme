@@ -80,7 +80,24 @@ async function main() {
   });
   console.log(`Seeded test user: ${testUser.id}`);
 
-  // Seed mock data for the test user — skip if already seeded (idempotent)
+  // Seed 2nd seller test account — phone 0000000001 / OTP 123456.
+  // Separate shop + data, for parallel browser sessions or data-isolation demos.
+  const testUser2 = await prisma.user.upsert({
+    where: { username: "btpremium_suksawat" },
+    update: {},
+    create: {
+      phone: "0000000001",
+      displayName: "BT Premium สุขสวัสดิ์",
+      username: "btpremium_suksawat",
+      trustScore: 65,
+      authAccounts: {
+        create: { provider: "PHONE", providerAccountId: "0000000001" },
+      },
+    },
+  });
+  console.log(`Seeded test user 2: ${testUser2.id}`);
+
+  // Seed mock data for the primary test user — skip if already seeded (idempotent)
   const existingShop = await prisma.shop.findUnique({
     where: { userId: testUser.id },
   });
@@ -116,37 +133,52 @@ async function main() {
 
     const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000);
 
+    type OrderLine = { idx: number; qty: number };
     const orderRecipes: Array<{
       status: string;
       type: string;
       buyerContact: string;
-      productIdx: number;
-      qty: number;
+      lines: OrderLine[];
       createdDaysAgo: number;
       addr?: Addr;
       tracking?: { provider: string; trackingNo: string };
       review?: { rating: number; comment: string; reviewerContact: string };
     }> = [
-      { status: "CREATED", type: "PHYSICAL", buyerContact: "0812345678", productIdx: 0, qty: 1, createdDaysAgo: 0, addr: BKK_ADDR },
-      { status: "CREATED", type: "SERVICE", buyerContact: "0823456789", productIdx: 7, qty: 1, createdDaysAgo: 1 },
-      { status: "CONFIRMED", type: "PHYSICAL", buyerContact: "0834567890", productIdx: 1, qty: 1, createdDaysAgo: 2, addr: SUBURB_ADDR },
-      { status: "CONFIRMED", type: "SERVICE", buyerContact: "0845678901", productIdx: 6, qty: 1, createdDaysAgo: 3 },
+      // ── Single-item PHYSICAL ──────────────────────────────────────────────────
+      { status: "CREATED", type: "PHYSICAL", buyerContact: "0812345678", lines: [{ idx: 0, qty: 1 }], createdDaysAgo: 0, addr: BKK_ADDR },
+      // ── Single-item SERVICE ───────────────────────────────────────────────────
+      { status: "CREATED", type: "SERVICE", buyerContact: "0823456789", lines: [{ idx: 7, qty: 1 }], createdDaysAgo: 1 },
+      // ── Combo: product + installation service ────────────────────────────────
+      {
+        status: "CONFIRMED",
+        type: "PHYSICAL",
+        buyerContact: "0834567890",
+        lines: [
+          { idx: 1, qty: 1 }, // ชุด LED Headlight H4/H7 (คู่)
+          { idx: 5, qty: 1 }, // บริการติดตั้งไฟซีนอน
+        ],
+        createdDaysAgo: 2,
+        addr: SUBURB_ADDR,
+      },
+      { status: "CONFIRMED", type: "SERVICE", buyerContact: "0845678901", lines: [{ idx: 6, qty: 1 }], createdDaysAgo: 3 },
       {
         status: "SHIPPED",
         type: "PHYSICAL",
         buyerContact: "0856789012",
-        productIdx: 2,
-        qty: 1,
+        lines: [{ idx: 2, qty: 1 }],
         createdDaysAgo: 4,
         addr: UPCOUNTRY_ADDR,
         tracking: { provider: "Kerry Express", trackingNo: "KEX123456789TH" },
       },
+      // ── Combo: projector headlight + custom-fitting service ──────────────────
       {
         status: "SHIPPED",
         type: "PHYSICAL",
         buyerContact: "0867890123",
-        productIdx: 4,
-        qty: 1,
+        lines: [
+          { idx: 4, qty: 1 }, // โคมไฟหน้า Projector Bi-Xenon
+          { idx: 6, qty: 1 }, // บริการโมไฟหน้ารถ Projector
+        ],
         createdDaysAgo: 5,
         addr: BKK_ADDR,
         tracking: { provider: "Flash Express", trackingNo: "FL987654321TH" },
@@ -155,39 +187,49 @@ async function main() {
         status: "COMPLETED",
         type: "PHYSICAL",
         buyerContact: "0878901234",
-        productIdx: 1,
-        qty: 1,
+        lines: [{ idx: 1, qty: 1 }],
         createdDaysAgo: 7,
         addr: SUBURB_ADDR,
         tracking: { provider: "Thailand Post", trackingNo: "EY112233445TH" },
         review: { rating: 5, comment: "ไฟสว่างมาก ติดตั้งง่าย ร้านบริการดี!", reviewerContact: "0878901234" },
       },
+      // ── Combo: completed physical + install, both invoiced together ─────────
       {
         status: "COMPLETED",
-        type: "SERVICE",
+        type: "PHYSICAL",
         buyerContact: "0889012345",
-        productIdx: 5,
-        qty: 1,
+        lines: [
+          { idx: 0, qty: 1 }, // หลอด HID
+          { idx: 5, qty: 1 }, // บริการติดตั้ง
+        ],
         createdDaysAgo: 9,
+        addr: BKK_ADDR,
+        tracking: { provider: "Kerry Express", trackingNo: "KEX555666777TH" },
         review: { rating: 5, comment: "ทีมช่างชำนาญ ติดตั้งเร็ว แนะนำเลย", reviewerContact: "0889012345" },
       },
       {
         status: "COMPLETED",
         type: "SERVICE",
         buyerContact: "0892345678",
-        productIdx: 7,
-        qty: 1,
+        lines: [{ idx: 7, qty: 1 }],
         createdDaysAgo: 10,
         review: { rating: 4, comment: "โคมใสขึ้นเยอะ รอดูว่าจะอยู่ได้นานแค่ไหน", reviewerContact: "0892345678" },
       },
-      { status: "CANCELLED", type: "PHYSICAL", buyerContact: "0890123456", productIdx: 3, qty: 2, createdDaysAgo: 1, addr: UPCOUNTRY_ADDR },
+      { status: "CANCELLED", type: "PHYSICAL", buyerContact: "0890123456", lines: [{ idx: 3, qty: 2 }], createdDaysAgo: 1, addr: UPCOUNTRY_ADDR },
     ];
 
     let orderCount = 0;
     for (const r of orderRecipes) {
-      const product = products[r.productIdx];
-      const total = Number(product.price) * r.qty;
       const created = daysAgo(r.createdDaysAgo);
+      const lineData = r.lines.map((ln) => {
+        const product = products[ln.idx];
+        return {
+          product,
+          qty: ln.qty,
+          subtotal: Number(product.price) * ln.qty,
+        };
+      });
+      const total = lineData.reduce((s, l) => s + l.subtotal, 0);
       const order = await prisma.order.create({
         data: {
           shopId: shop.id,
@@ -199,13 +241,13 @@ async function main() {
           createdAt: created,
           updatedAt: created,
           items: {
-            create: {
-              productId: product.id,
-              name: product.name,
-              description: product.description,
-              qty: r.qty,
-              price: product.price,
-            },
+            create: lineData.map((l) => ({
+              productId: l.product.id,
+              name: l.product.name,
+              description: l.product.description,
+              qty: l.qty,
+              price: l.product.price,
+            })),
           },
         },
       });
@@ -236,6 +278,132 @@ async function main() {
     );
   } else {
     console.log(`Mock data already present for test user — skipping`);
+  }
+
+  // ── 2nd seller test account's shop ───────────────────────────────────────
+  // Skip if already seeded — separate id-space from primary testuser shop.
+  const existingShop2 = await prisma.shop.findUnique({
+    where: { userId: testUser2.id },
+  });
+  if (!existingShop2) {
+    const shop2 = await prisma.shop.create({
+      data: {
+        userId: testUser2.id,
+        shopName: "BT premium auto xenon สาขา สุขสวัสดิ์",
+        description:
+          "สาขาสุขสวัสดิ์ — ทำไฟหน้ารถทุกยี่ห้อ โปรเจคเตอร์ ซีนอน LED Daylight ติดตั้งหน้าร้าน",
+        category: "ยานยนต์",
+        address: "ถนนสุขสวัสดิ์ เขตราษฎร์บูรณะ กรุงเทพมหานคร",
+        businessType: "COMPANY",
+      },
+    });
+
+    const products2 = await Promise.all(
+      [
+        { name: "ชุดไฟหน้า LED Premium (คู่)", price: 4500, type: "PHYSICAL", description: "LED ความสว่าง 8000lm ใช้ได้ทุกรุ่น รับประกัน 2 ปี" },
+        { name: "ไฟซีนอน HID Slim Kit", price: 2800, type: "PHYSICAL", description: "หลอดซีนอน + บัลลาส slim 35W รับประกัน 1 ปี" },
+        { name: "ไฟ Daylight Signature", price: 2400, type: "PHYSICAL", description: "DRL พร้อมไฟเลี้ยววิ่ง รับประกัน 1 ปี" },
+        { name: "บริการติดตั้งไฟหน้า", price: 900, type: "SERVICE", description: "ติดตั้งไฟหน้าทุกประเภท ใช้เวลา 30-60 นาที" },
+        { name: "บริการโมไฟหน้า Full Custom", price: 4500, type: "SERVICE", description: "โมโคมไฟหน้าตามแบบ พร้อมติดตั้ง ใช้เวลา 2-3 วัน" },
+      ].map((p) =>
+        prisma.product.create({
+          data: { shopId: shop2.id, ...p },
+        }),
+      ),
+    );
+
+    // A small set of orders for the second shop — includes one product+service combo.
+    const daysAgo2 = (n: number) => new Date(Date.now() - n * 86_400_000);
+    const recipes2: Array<{
+      status: string;
+      type: string;
+      buyerContact: string;
+      lines: { idx: number; qty: number }[];
+      createdDaysAgo: number;
+      addr?: Addr;
+      tracking?: { provider: string; trackingNo: string };
+    }> = [
+      { status: "CREATED", type: "PHYSICAL", buyerContact: "0901234567", lines: [{ idx: 0, qty: 1 }], createdDaysAgo: 0, addr: BKK_ADDR },
+      {
+        status: "CONFIRMED",
+        type: "PHYSICAL",
+        buyerContact: "0912345678",
+        lines: [
+          { idx: 1, qty: 1 }, // ซีนอน HID
+          { idx: 3, qty: 1 }, // บริการติดตั้ง
+        ],
+        createdDaysAgo: 2,
+        addr: SUBURB_ADDR,
+      },
+      {
+        status: "SHIPPED",
+        type: "PHYSICAL",
+        buyerContact: "0923456789",
+        lines: [{ idx: 2, qty: 1 }],
+        createdDaysAgo: 4,
+        addr: UPCOUNTRY_ADDR,
+        tracking: { provider: "Kerry Express", trackingNo: "KEX998877665TH" },
+      },
+      {
+        status: "COMPLETED",
+        type: "PHYSICAL",
+        buyerContact: "0934567890",
+        lines: [
+          { idx: 0, qty: 1 }, // LED Premium
+          { idx: 3, qty: 1 }, // บริการติดตั้ง
+        ],
+        createdDaysAgo: 7,
+        addr: BKK_ADDR,
+        tracking: { provider: "Flash Express", trackingNo: "FL111222333TH" },
+      },
+    ];
+
+    let orderCount2 = 0;
+    for (const r of recipes2) {
+      const created = daysAgo2(r.createdDaysAgo);
+      const lineData = r.lines.map((ln) => {
+        const product = products2[ln.idx];
+        return { product, qty: ln.qty, subtotal: Number(product.price) * ln.qty };
+      });
+      const total = lineData.reduce((s, l) => s + l.subtotal, 0);
+      const order = await prisma.order.create({
+        data: {
+          shopId: shop2.id,
+          type: r.type,
+          status: r.status,
+          buyerContact: r.buyerContact,
+          totalAmount: total,
+          shippingAddress: r.type === 'PHYSICAL' && r.addr ? (r.addr as object) : undefined,
+          createdAt: created,
+          updatedAt: created,
+          items: {
+            create: lineData.map((l) => ({
+              productId: l.product.id,
+              name: l.product.name,
+              description: l.product.description,
+              qty: l.qty,
+              price: l.product.price,
+            })),
+          },
+        },
+      });
+      if (r.tracking) {
+        await prisma.shipmentTracking.create({
+          data: {
+            orderId: order.id,
+            provider: r.tracking.provider,
+            trackingNo: r.tracking.trackingNo,
+            status: r.status === "SHIPPED" ? "SHIPPED" : "DELIVERED",
+          },
+        });
+      }
+      orderCount2++;
+    }
+    console.log(
+      `Seeded shop 2: "${shop2.shopName}" + ${products2.length} products + ${orderCount2} orders`,
+    );
+  } else {
+    console.log(`Mock data already present for test user 2 — skipping`);
   }
 }
 
