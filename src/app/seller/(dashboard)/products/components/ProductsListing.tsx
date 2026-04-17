@@ -53,7 +53,6 @@ const ProductsListing = ({ products }: Props) => {
   const [sorting, setSorting] = useState<any[]>([])
   const [columnFilters, setColumnFilters] = useState<any[]>([])
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
-  const [selectedRowIds, setSelectedRowIds] = useState<Record<string, boolean>>({})
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<string>('all')
 
@@ -63,29 +62,6 @@ const ProductsListing = ({ products }: Props) => {
   }
 
   const columns = [
-    {
-      id: 'select',
-      maxSize: 45,
-      size: 45,
-      header: ({ table }: any) => (
-        <input
-          type="checkbox"
-          className="form-checkbox form-checkbox-light size-4.5"
-          checked={table.getIsAllRowsSelected()}
-          onChange={table.getToggleAllRowsSelectedHandler()}
-        />
-      ),
-      cell: ({ row }: any) => (
-        <input
-          type="checkbox"
-          className="form-checkbox form-checkbox-light size-4.5"
-          checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
-        />
-      ),
-      enableSorting: false,
-      enableColumnFilter: false,
-    },
     columnHelper.accessor('name', {
       header: 'สินค้า',
       cell: ({ row }) => (
@@ -181,9 +157,7 @@ const ProductsListing = ({ products }: Props) => {
             type="button"
             className="btn btn-icon size-7.75 border border-default-300 text-default-800 hover:border-default-400"
             onClick={() => {
-              'use no memo'
               setDeletingId(row.original.id)
-              setSelectedRowIds({ [row.id]: true })
             }}
             data-hs-overlay="#confirm-delete-modal"
             suppressHydrationWarning
@@ -203,13 +177,11 @@ const ProductsListing = ({ products }: Props) => {
       globalFilter,
       columnFilters,
       pagination,
-      rowSelection: selectedRowIds,
     },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
-    onRowSelectionChange: setSelectedRowIds,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -232,7 +204,6 @@ const ProductsListing = ({ products }: Props) => {
       const res = await fetch(`/api/products/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('ลบไม่สำเร็จ')
       setData((prev) => prev.filter((p) => p.id !== id))
-      setSelectedRowIds({})
       setDeletingId(null)
       setPagination({ ...pagination, pageIndex: 0 })
       toast.success('ลบสินค้าเรียบร้อย')
@@ -294,13 +265,6 @@ const ProductsListing = ({ products }: Props) => {
               placeholder="ค้นหาชื่อสินค้า..."
             />
           </div>
-          <button
-            className={cn('btn bg-danger text-white hover:bg-danger-hover', !(Object.keys(selectedRowIds).length > 0) && 'hidden')}
-            type="button"
-            data-hs-overlay="#confirm-delete-modal"
-          >
-            ลบ
-          </button>
         </div>
         <div className="flex flex-wrap items-center gap-2.5 md:flex-nowrap">
           <div className="items-center gap-3 md:flex">
@@ -371,7 +335,7 @@ const ProductsListing = ({ products }: Props) => {
 
       <DeleteConfirmationModal
         onConfirm={handleDelete}
-        selectedCount={Object.keys(selectedRowIds).length}
+        selectedCount={deletingId ? 1 : 0}
         itemName="สินค้า"
         modalTitle="ยืนยันการลบ"
         confirmButtonText="ลบ"
