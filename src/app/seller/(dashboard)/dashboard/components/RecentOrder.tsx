@@ -2,23 +2,15 @@
 import DataTable from '@/components/table/DataTable'
 import TablePagination from '@/components/table/TablePagination'
 import Icon from '@/components/wrappers/Icon'
-import { cn } from '@/utils/helpers'
+import { cn, toPascalCase } from '@/utils/helpers'
 import { createColumnHelper, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable } from '@tanstack/react-table'
-import Link from 'next/link'
 import { useState } from 'react'
-import { OrderType } from './data'
+import { orderData, OrderType } from './data'
 
 const columnHelper = createColumnHelper<OrderType>()
 
-const statusConfig: Record<OrderType['status'], { label: string; cls: string }> = {
-  CREATED:   { label: 'รอยืนยัน',   cls: 'bg-warning/10 text-warning' },
-  CONFIRMED: { label: 'ยืนยันแล้ว', cls: 'bg-info/10 text-info' },
-  SHIPPED:   { label: 'จัดส่งแล้ว', cls: 'bg-primary/10 text-primary' },
-  COMPLETED: { label: 'สำเร็จ',      cls: 'bg-success/10 text-success' },
-  CANCELLED: { label: 'ยกเลิก',      cls: 'bg-danger/10 text-danger' },
-}
-
-const RecentOrder = ({ orders }: { orders: OrderType[] }) => {
+const RecentOrder = ({ orders }: { orders?: OrderType[] }) => {
+  const [data] = useState<OrderType[]>(orders ?? orderData)
   const [sorting, setSorting] = useState<SortingState>([])
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -27,46 +19,43 @@ const RecentOrder = ({ orders }: { orders: OrderType[] }) => {
 
   const columns = [
     columnHelper.accessor('id', {
-      header: 'ออเดอร์',
-      cell: ({ row }) => (
-        <Link href={`/orders/${row.original.publicToken}`} className="text-primary font-semibold hover:underline">
-          #{row.original.id}
-        </Link>
-      ),
+      header: '#ID',
     }),
 
     columnHelper.accessor('customer', {
-      header: 'ลูกค้า',
+      header: 'Customer',
       cell: ({ row }) => (
         <>
-          <h5 className="font-semibold">{row.original.customer.name || '—'}</h5>
-          <span className="text-default-400 text-xs">{row.original.customer.contact}</span>
+          <h5 className="font-semibold">{row.original.customer.name}</h5>
+          <span className="text-default-400 text-xs">{row.original.customer.email}</span>
         </>
       ),
     }),
 
-    columnHelper.accessor('product', {
-      header: 'สินค้า',
-    }),
-
     columnHelper.accessor('date', {
-      header: 'วันที่',
+      header: 'Date',
     }),
 
-    columnHelper.accessor('total', {
-      header: 'รวม',
-      cell: ({ row }) => (
-        <span>฿{row.original.total.toLocaleString('th-TH')}</span>
-      ),
+    columnHelper.accessor('amount', {
+      header: 'Amount',
+    }),
+
+    columnHelper.accessor('payment', {
+      header: 'Payment',
     }),
 
     columnHelper.accessor('status', {
-      header: 'สถานะ',
+      header: 'Status',
       cell: ({ row }) => {
-        const cfg = statusConfig[row.original.status] ?? { label: row.original.status, cls: 'bg-default-100 text-default-700' }
         return (
-          <span className={cn('badge', cfg.cls)}>
-            {cfg.label}
+          <span
+            className={cn('badge', {
+              'bg-success/15 text-success': row.original.status === 'completed',
+              'bg-warning/15 text-warning': row.original.status === 'pending',
+              'bg-danger/15 text-danger': row.original.status === 'cancelled',
+            })}
+          >
+            {toPascalCase(row.original.status)}
           </span>
         )
       },
@@ -74,7 +63,7 @@ const RecentOrder = ({ orders }: { orders: OrderType[] }) => {
   ]
 
   const table = useReactTable({
-    data: orders,
+    data,
     columns,
     state: { sorting, pagination },
     onSortingChange: setSorting,
@@ -96,24 +85,26 @@ const RecentOrder = ({ orders }: { orders: OrderType[] }) => {
     <div className="card h-full">
       <div className="card-header">
         <h4 className="card-title">
-          ออเดอร์ล่าสุด{' '}
-          <span className="text-default-400 text-sm font-normal ms-1">({totalItems} รายการ)</span>
+          Recent Orders <span className="text-default-400 text-sm font-normal ms-1">(186.25k Transactions)</span>
         </h4>
         <div>
-          <Link href="/orders" className="btn btn-sm bg-light hover:text-primary font-semibold">
-            <Icon icon="list" /> ดูทั้งหมด
-          </Link>
+          <button className="btn btn-sm border-default-300 hover:border-default-400 font-semibold me-1">
+            <Icon icon="cloud-upload" /> Export
+          </button>
+          <button className="btn btn-sm bg-light hover:text-primary font-semibold">
+            <Icon icon="download" /> Import
+          </button>
         </div>
       </div>
       <div className="card-body p-0">
-        <DataTable<OrderType> table={table} emptyMessage="ยังไม่มีออเดอร์" className="table-centered table-hover" />
+        <DataTable<OrderType> table={table} emptyMessage="No orders found" className="table-centered table-hover" />
       </div>
       <div className="card-footer">
         <TablePagination
           totalItems={totalItems}
           start={start}
           end={end}
-          itemsName="ออเดอร์"
+          itemsName="orders"
           showInfo
           previousPage={table.previousPage}
           canPreviousPage={table.getCanPreviousPage()}
