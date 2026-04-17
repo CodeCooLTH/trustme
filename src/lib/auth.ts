@@ -65,6 +65,22 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
+    // Multi-subdomain redirect: NextAuth's default redirect prefixes relative
+    // URLs with NEXTAUTH_URL which doesn't fit our setup (deepth.local +
+    // seller.deepth.local + admin.deepth.local share the auth config but live
+    // on different origins in both dev and prod). Keep relative URLs as-is so
+    // the browser resolves them against the current origin; same-origin
+    // absolute URLs pass through; cross-origin URLs fall back to baseUrl to
+    // prevent open-redirect abuse.
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return url;
+      try {
+        if (new URL(url).origin === new URL(baseUrl).origin) return url;
+      } catch {
+        /* invalid URL — fall through */
+      }
+      return baseUrl;
+    },
     async jwt({ token, user, account }) {
       if (user) {
         token.userId = user.id;
