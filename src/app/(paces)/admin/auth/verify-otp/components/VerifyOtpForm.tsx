@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, type FormEvent } from 'react'
+import { toast } from 'react-toastify'
 
 export default function VerifyOtpForm() {
   const router = useRouter()
@@ -16,6 +17,7 @@ export default function VerifyOtpForm() {
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [resending, setResending] = useState(false)
 
   // Redirect if no phone context
   useEffect(() => {
@@ -68,6 +70,29 @@ export default function VerifyOtpForm() {
     }
   }
 
+  const onResend = async () => {
+    if (!phone) return
+    setResending(true)
+    try {
+      const res = await fetch('/api/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contact: phone, type: 'PHONE' }),
+      })
+      if (res.ok) {
+        toast.success('ส่งรหัสใหม่แล้ว')
+        setDigits(['', '', '', '', '', ''])
+        setErrorMsg(null)
+      } else {
+        toast.error('ส่งรหัสใหม่ไม่สำเร็จ')
+      }
+    } catch {
+      toast.error('ส่งรหัสใหม่ไม่สำเร็จ')
+    } finally {
+      setResending(false)
+    }
+  }
+
   if (!phone) return null
 
   return (
@@ -116,6 +141,17 @@ export default function VerifyOtpForm() {
         </button>
       </form>
 
+      <p className="text-default-400 mt-6 text-center text-sm">
+        หากไม่ได้รับ SMS{' '}
+        <button
+          type="button"
+          onClick={onResend}
+          disabled={resending}
+          className="text-primary hover:text-primary-hover font-semibold underline underline-offset-3 disabled:opacity-60"
+        >
+          {resending ? 'กำลังส่ง...' : 'ส่งอีกครั้ง'}
+        </button>
+      </p>
     </>
   )
 }

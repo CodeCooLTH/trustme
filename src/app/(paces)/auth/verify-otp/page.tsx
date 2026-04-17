@@ -4,6 +4,7 @@ import AuthLogo from '@/components/AuthLogo'
 import { currentYear, META_DATA } from '@/config/constants'
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Suspense } from 'react'
 import VerifyOtpForm from './components/VerifyOtpForm'
 
@@ -25,6 +26,14 @@ export default function VerifyOtpPage() {
             <div className="card rounded-2xl">
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 <div className="card-body relative p-12.5">
+                  <Link
+                    href="/auth/sign-in"
+                    aria-label="กลับไปหน้าเข้าสู่ระบบ"
+                    className="text-default-400 hover:text-primary absolute start-6 top-6 inline-flex items-center gap-1 text-sm font-medium transition"
+                  >
+                    <i className="tabler-arrow-left text-lg" />
+                    <span>กลับ</span>
+                  </Link>
                   <div className="mb-7.5 flex flex-col items-center justify-center text-center">
                     <AuthLogo />
                     <h4 className="mt-5 mb-2 text-base font-bold">ยืนยันรหัส OTP</h4>
