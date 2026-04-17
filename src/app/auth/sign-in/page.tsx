@@ -4,7 +4,9 @@ import { currentYear, META_DATA } from '@/config/constants'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import FacebookButton from './components/FacebookButton'
+import OAuthErrorToast from './components/OAuthErrorToast'
 import SignInForm from './components/SignInForm'
 
 export const metadata: Metadata = { title: 'เข้าสู่ระบบ' }
@@ -12,6 +14,9 @@ export const metadata: Metadata = { title: 'เข้าสู่ระบบ' }
 export default function SignInPage() {
   return (
     <div className="flex min-h-screen items-center p-12.5">
+      <Suspense fallback={null}>
+        <OAuthErrorToast />
+      </Suspense>
       <div className="container">
         <div className="flex justify-center px-2.5">
           <div className="2xl:w-4/10 md:w-1/2 sm:w-2/3 w-full">
