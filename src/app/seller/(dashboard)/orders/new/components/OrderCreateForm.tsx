@@ -1,13 +1,13 @@
 'use client'
 
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Icon } from '@iconify/react'
 import { useRouter } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
 import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
+import Icon from '@/components/wrappers/Icon'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,6 +22,8 @@ export interface CatalogProduct {
 interface Props {
   shopId: string
   catalog: CatalogProduct[]
+  /** HTML id assigned to the <form> element so an external submit button can use form="…" */
+  formId?: string
 }
 
 // ─── Validation schema ────────────────────────────────────────────────────────
@@ -42,6 +44,7 @@ const itemSchema = Yup.object({
 })
 
 const schema = Yup.object({
+  // ── Persisted fields ───────────────────────────────────────────────────────
   type: Yup.string()
     .oneOf(['PHYSICAL', 'DIGITAL', 'SERVICE'], 'กรุณาเลือกประเภทออเดอร์')
     .required('กรุณาเลือกประเภทออเดอร์'),
@@ -54,10 +57,29 @@ const schema = Yup.object({
       return phoneOk || emailOk
     }),
   items: Yup.array(itemSchema).min(1, 'ต้องมีสินค้าอย่างน้อย 1 รายการ').required(),
+
+  // ── UI-only fields (collected but NOT sent to API yet) ─────────────────────
+  buyerName: Yup.string().required('กรุณากรอกชื่อลูกค้า'),
+  shippingAddress: Yup.object({
+    line1: Yup.string().optional(),
+    district: Yup.string().optional(),
+    amphoe: Yup.string().optional(),
+    province: Yup.string().optional(),
+    postalCode: Yup.string().optional(),
+    note: Yup.string().optional(),
+  }).optional(),
+  channel: Yup.string()
+    .oneOf(['STOREFRONT', 'FACEBOOK', 'LINE', 'TIKTOK', 'OTHER'])
+    .optional(),
+  paymentMethod: Yup.string()
+    .oneOf(['CASH', 'TRANSFER', 'PROMPTPAY', 'CARD', 'COD', 'OTHER'])
+    .optional(),
+  note: Yup.string().optional(),
 })
 
 // Explicit interface — avoids Yup inference vs. react-hook-form generic mismatch
 interface FormValues {
+  // Persisted
   type: 'PHYSICAL' | 'DIGITAL' | 'SERVICE'
   buyerContact?: string | undefined
   items: {
@@ -67,8 +89,22 @@ interface FormValues {
     qty: number
     price: number
   }[]
+  // UI-only
+  buyerName: string
+  shippingAddress?: {
+    line1?: string
+    district?: string
+    amphoe?: string
+    province?: string
+    postalCode?: string
+    note?: string
+  }
+  channel?: 'STOREFRONT' | 'FACEBOOK' | 'LINE' | 'TIKTOK' | 'OTHER'
+  paymentMethod?: 'CASH' | 'TRANSFER' | 'PROMPTPAY' | 'CARD' | 'COD' | 'OTHER'
+  note?: string
 }
 
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const DEFAULT_ITEM: FormValues['items'][number] = {
   productId: '',
@@ -78,18 +114,36 @@ const DEFAULT_ITEM: FormValues['items'][number] = {
   price: 0,
 }
 
-const TYPE_OPTIONS: { value: string; label: string }[] = [
+const TYPE_OPTIONS = [
   { value: 'PHYSICAL', label: 'สินค้าจับต้องได้ (Physical)' },
   { value: 'DIGITAL', label: 'ดิจิทัล (Digital)' },
   { value: 'SERVICE', label: 'บริการ (Service)' },
 ]
 
-const ONOFF_VALUE = '__onoff__'
+const CHANNEL_OPTIONS = [
+  { value: 'STOREFRONT', label: 'หน้าร้าน' },
+  { value: 'FACEBOOK', label: 'Facebook' },
+  { value: 'LINE', label: 'Line' },
+  { value: 'TIKTOK', label: 'TikTok / TikTok Shop' },
+  { value: 'OTHER', label: 'อื่นๆ' },
+]
+
+const PAYMENT_OPTIONS = [
+  { value: 'CASH', label: 'เงินสด' },
+  { value: 'TRANSFER', label: 'โอนเงิน' },
+  { value: 'PROMPTPAY', label: 'พร้อมเพย์' },
+  { value: 'CARD', label: 'บัตรเครดิต/เดบิต' },
+  { value: 'COD', label: 'เก็บปลายทาง' },
+  { value: 'OTHER', label: 'อื่นๆ' },
+]
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function OrderCreateForm({ shopId, catalog }: Props) {
+export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Props) {
   const router = useRouter()
+
+  // Selected catalog item for the picker row at the top of the middle column
+  const [pickerProductId, setPickerProductId] = useState<string>('')
 
   const {
     register,
@@ -103,12 +157,26 @@ export default function OrderCreateForm({ shopId, catalog }: Props) {
     defaultValues: {
       type: 'PHYSICAL',
       buyerContact: '',
+      buyerName: '',
       items: [{ ...DEFAULT_ITEM }],
+      shippingAddress: {
+        line1: '',
+        district: '',
+        amphoe: '',
+        province: '',
+        postalCode: '',
+        note: '',
+      },
+      channel: undefined,
+      paymentMethod: undefined,
+      note: '',
     },
   })
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
   const watchedItems = useWatch({ control, name: 'items' })
+  const watchedType = useWatch({ control, name: 'type' })
+  const isPhysical = watchedType === 'PHYSICAL'
 
   // ── Computed total ────────────────────────────────────────────────────────
 
@@ -124,32 +192,29 @@ export default function OrderCreateForm({ shopId, catalog }: Props) {
   const formatThb = (n: number) =>
     new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(n)
 
-  // ── Catalog pick handler ──────────────────────────────────────────────────
+  // ── Catalog pick handler (top-of-picker row "เพิ่ม" button) ──────────────
 
-  const handleProductPick = useCallback(
-    (index: number, productId: string) => {
-      if (productId === ONOFF_VALUE || productId === '') {
-        // One-off mode — clear auto-fill but keep what user typed
-        setValue(`items.${index}.productId`, '', { shouldValidate: false })
-      } else {
-        const product = catalog.find((p) => p.id === productId)
-        if (!product) return
-        setValue(`items.${index}.productId`, product.id, { shouldValidate: false })
-        setValue(`items.${index}.name`, product.name, { shouldValidate: true })
-        setValue(`items.${index}.price`, Number(product.price), { shouldValidate: true })
-        if (product.description) {
-          setValue(`items.${index}.description`, product.description, { shouldValidate: false })
-        }
-      }
-    },
-    [catalog, setValue],
-  )
+  const handleAddFromCatalog = useCallback(() => {
+    if (!pickerProductId) return
+    const product = catalog.find((p) => p.id === pickerProductId)
+    if (!product) return
+    append({
+      productId: product.id,
+      name: product.name,
+      description: product.description ?? '',
+      qty: 1,
+      price: Number(product.price),
+    })
+    setPickerProductId('')
+  }, [pickerProductId, catalog, append])
 
   // ── Submit ────────────────────────────────────────────────────────────────
 
   const onSubmit = async (values: FormValues) => {
+    // TODO: persist buyerName/shippingAddress/channel/paymentMethod/note when order schema extends
     const body = {
       type: values.type,
+      ...(values.buyerContact ? { buyerContact: values.buyerContact } : {}),
       items: values.items.map((item) => ({
         ...(item.productId ? { productId: item.productId } : {}),
         name: item.name,
@@ -185,16 +250,30 @@ export default function OrderCreateForm({ shopId, catalog }: Props) {
     }
   }
 
-  // ─── Render ───────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      {/* ── Top fields ─────────────────────────────────────────────────────── */}
-      <div className="card rounded-xl p-6 mb-6">
-        <h2 className="text-base font-semibold text-dark mb-5">ข้อมูลออเดอร์</h2>
+    <form
+      id={formId}
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+    >
+      {isSubmitting && (
+        <div className="mb-4 flex items-center gap-2 text-sm text-default-500">
+          <Icon icon="loader-2" className="animate-spin" width={16} height={16} />
+          กำลังสร้างออเดอร์...
+        </div>
+      )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Type */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* COLUMN 1 — ข้อมูลลูกค้า                                           */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <div className="card rounded-xl p-6 flex flex-col gap-5">
+          <h2 className="text-base font-semibold text-dark">ข้อมูลลูกค้า</h2>
+
+          {/* Order type */}
           <div>
             <label htmlFor="order-type" className="form-label">
               ประเภทออเดอร์<span className="text-danger">*</span>
@@ -217,6 +296,23 @@ export default function OrderCreateForm({ shopId, catalog }: Props) {
             )}
           </div>
 
+          {/* Buyer name — UI-only */}
+          <div>
+            <label htmlFor="buyer-name" className="form-label">
+              ชื่อ-นามสกุลลูกค้า<span className="text-danger">*</span>
+            </label>
+            <input
+              id="buyer-name"
+              type="text"
+              placeholder="เช่น สมชาย ใจดี"
+              className="form-input"
+              {...register('buyerName')}
+            />
+            {errors.buyerName && (
+              <p className="text-danger mt-1 text-sm">{errors.buyerName.message}</p>
+            )}
+          </div>
+
           {/* Buyer contact */}
           <div>
             <label htmlFor="buyer-contact" className="form-label">
@@ -233,180 +329,343 @@ export default function OrderCreateForm({ shopId, catalog }: Props) {
               <p className="text-danger mt-1 text-sm">{errors.buyerContact.message}</p>
             ) : (
               <p className="text-default-400 mt-1 text-xs">
-                กรอกเพื่อแจ้งลิงก์ให้ผู้ซื้อ (ไม่บังคับ)
+                เบอร์หรือ email สำหรับแจ้งลิงก์ให้ผู้ซื้อ
               </p>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* ── Items ──────────────────────────────────────────────────────────── */}
-      <div className="card rounded-xl p-6 mb-6">
-        <h2 className="text-base font-semibold text-dark mb-5">รายการสินค้า</h2>
+          {/* Shipping address — visible only for PHYSICAL orders */}
+          {isPhysical && (
+            <fieldset className="border border-default-200 rounded-lg p-4 flex flex-col gap-3">
+              <legend className="text-xs font-semibold text-default-500 px-1">
+                ที่อยู่จัดส่ง
+              </legend>
 
-        <div className="flex flex-col gap-6">
-          {fields.map((field, index) => {
-            const currentProductId = watchedItems?.[index]?.productId ?? ''
-            const isOnOff = !currentProductId || currentProductId === ONOFF_VALUE
-            const itemErrors = (errors.items as any)?.[index]
+              <div>
+                <label htmlFor="addr-line1" className="form-label">
+                  ที่อยู่ / บ้านเลขที่ + ถนน
+                </label>
+                <input
+                  id="addr-line1"
+                  type="text"
+                  placeholder="123 ถนนสุขุมวิท"
+                  className="form-input"
+                  {...register('shippingAddress.line1')}
+                />
+              </div>
 
-            return (
-              <div
-                key={field.id}
-                className="border border-default-200 rounded-xl p-5 relative"
-              >
-                {/* Remove button */}
-                <button
-                  type="button"
-                  disabled={fields.length === 1}
-                  onClick={() => remove(index)}
-                  className="absolute top-3 right-3 btn btn-icon btn-sm border border-default-200 text-default-500 hover:text-danger hover:border-danger disabled:opacity-30 disabled:pointer-events-none"
-                  aria-label="ลบรายการ"
-                >
-                  <Icon icon="mdi:close" width={16} height={16} />
-                </button>
-
-                <div className="text-xs font-semibold text-default-400 uppercase tracking-wider mb-4">
-                  สินค้า #{index + 1}
-                </div>
-
-                {/* Row 1: catalog picker */}
-                <div className="mb-4">
-                  <label className="form-label">เลือกจากคลัง / กำหนดเอง</label>
-                  <ChoiceSelect
-                    options={[
-                      { value: ONOFF_VALUE, label: 'กำหนดเอง (one-off)' },
-                      ...catalog.map((p) => ({
-                        value: p.id,
-                        label: `${p.name} — ${formatThb(p.price)}`,
-                      })),
-                    ]}
-                    value={currentProductId || ONOFF_VALUE}
-                    onChange={(v) => handleProductPick(index, v as string)}
-                    search={catalog.length > 5}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="addr-district" className="form-label">
+                    ตำบล/แขวง
+                  </label>
+                  <input
+                    id="addr-district"
+                    type="text"
+                    placeholder="คลองเตย"
+                    className="form-input"
+                    {...register('shippingAddress.district')}
                   />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Name */}
-                  <div>
-                    <label className="form-label">
-                      ชื่อสินค้า<span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="ชื่อสินค้า"
-                      className="form-input"
-                      readOnly={!isOnOff}
-                      {...register(`items.${index}.name`)}
-                    />
-                    {itemErrors?.name && (
-                      <p className="text-danger mt-1 text-sm">{itemErrors.name.message}</p>
-                    )}
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <label className="form-label">รายละเอียด</label>
-                    <input
-                      type="text"
-                      placeholder="รายละเอียดเพิ่มเติม (ไม่บังคับ)"
-                      className="form-input"
-                      {...register(`items.${index}.description`)}
-                    />
-                  </div>
-
-                  {/* Qty */}
-                  <div>
-                    <label className="form-label">
-                      จำนวน<span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min={1}
-                      step={1}
-                      placeholder="1"
-                      className="form-input"
-                      {...register(`items.${index}.qty`, { valueAsNumber: true })}
-                    />
-                    {itemErrors?.qty && (
-                      <p className="text-danger mt-1 text-sm">{itemErrors.qty.message}</p>
-                    )}
-                  </div>
-
-                  {/* Price */}
-                  <div>
-                    <label className="form-label">
-                      ราคา (บาท)<span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      inputMode="decimal"
-                      min={0.01}
-                      step={0.01}
-                      placeholder="0.00"
-                      className="form-input"
-                      readOnly={!isOnOff}
-                      {...register(`items.${index}.price`, { valueAsNumber: true })}
-                    />
-                    {itemErrors?.price && (
-                      <p className="text-danger mt-1 text-sm">{itemErrors.price.message}</p>
-                    )}
-                  </div>
+                <div>
+                  <label htmlFor="addr-amphoe" className="form-label">
+                    อำเภอ/เขต
+                  </label>
+                  <input
+                    id="addr-amphoe"
+                    type="text"
+                    placeholder="คลองเตย"
+                    className="form-input"
+                    {...register('shippingAddress.amphoe')}
+                  />
                 </div>
-
-                {/* hidden productId */}
-                <input type="hidden" {...register(`items.${index}.productId`)} />
               </div>
-            )
-          })}
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="addr-province" className="form-label">
+                    จังหวัด
+                  </label>
+                  <input
+                    id="addr-province"
+                    type="text"
+                    placeholder="กรุงเทพมหานคร"
+                    className="form-input"
+                    {...register('shippingAddress.province')}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="addr-postal" className="form-label">
+                    รหัสไปรษณีย์
+                  </label>
+                  <input
+                    id="addr-postal"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="10110"
+                    className="form-input"
+                    {...register('shippingAddress.postalCode')}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="addr-note" className="form-label">
+                  หมายเหตุถึงผู้ส่ง
+                </label>
+                <input
+                  id="addr-note"
+                  type="text"
+                  placeholder="เช่น ฝากไว้ที่รปภ."
+                  className="form-input"
+                  {...register('shippingAddress.note')}
+                />
+              </div>
+            </fieldset>
+          )}
         </div>
 
-        {/* Add item */}
-        <button
-          type="button"
-          onClick={() => append({ ...DEFAULT_ITEM })}
-          className="mt-5 btn border border-default-300 bg-card hover:bg-default-50 text-default-700 inline-flex items-center gap-2 px-4 py-2 text-sm"
-        >
-          <Icon icon="mdi:plus" width={16} height={16} />
-          เพิ่มสินค้า
-        </button>
-      </div>
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* COLUMN 2 — เลือกสินค้า                                             */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <div className="card rounded-xl p-6 flex flex-col">
+          <h2 className="text-base font-semibold text-dark mb-5">เลือกสินค้า</h2>
 
-      {/* ── Total + actions ─────────────────────────────────────────────────── */}
-      <div className="card rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="text-default-400 text-sm mb-0.5">ยอดรวมทั้งหมด</div>
-          <div className="text-2xl font-bold text-dark">{formatThb(total)}</div>
-        </div>
+          {/* Top picker row */}
+          {catalog.length > 0 && (
+            <div className="flex gap-2 mb-4">
+              <div className="flex-1 min-w-0">
+                <ChoiceSelect
+                  options={[
+                    { value: '', label: 'เลือกสินค้าจากแคตตาล็อก' },
+                    ...catalog.map((p) => ({
+                      value: p.id,
+                      label: `${p.name} — ${formatThb(p.price)}`,
+                    })),
+                  ]}
+                  value={pickerProductId}
+                  onChange={(v) => setPickerProductId(v as string)}
+                  search={catalog.length > 5}
+                  placeholder="เลือกสินค้าจากแคตตาล็อก"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleAddFromCatalog}
+                disabled={!pickerProductId}
+                className="btn bg-primary text-white hover:bg-primary-hover disabled:opacity-40 disabled:pointer-events-none px-3 py-2 inline-flex items-center gap-1 text-sm shrink-0"
+              >
+                <Icon icon="plus" width={16} height={16} />
+                เพิ่ม
+              </button>
+            </div>
+          )}
 
-        <div className="flex gap-3 w-full sm:w-auto">
+          {/* Items list */}
+          <div className="flex flex-col gap-3 flex-1">
+            {fields.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-default-400 gap-2">
+                <Icon icon="package" width={40} height={40} className="opacity-40" />
+                <p className="text-sm">ยังไม่มีรายการ</p>
+                <p className="text-xs">เลือกสินค้าจากแคตตาล็อกหรือเพิ่มรายการกำหนดเอง</p>
+              </div>
+            ) : (
+              fields.map((field, index) => {
+                const item = watchedItems?.[index]
+                const itemErrors = (errors.items as any)?.[index]
+                const isFromCatalog = !!item?.productId
+
+                return (
+                  <div
+                    key={field.id}
+                    className="border border-default-200 rounded-lg p-3 flex flex-col gap-2"
+                  >
+                    {/* Row: name + remove */}
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        {isFromCatalog ? (
+                          <p className="text-sm font-medium text-dark truncate">
+                            {item?.name}
+                          </p>
+                        ) : (
+                          <input
+                            type="text"
+                            placeholder="ชื่อสินค้า"
+                            className="form-input text-sm py-1.5"
+                            {...register(`items.${index}.name`)}
+                          />
+                        )}
+                        {itemErrors?.name && (
+                          <p className="text-danger text-xs mt-0.5">{itemErrors.name.message}</p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => remove(index)}
+                        className="btn btn-icon btn-sm border border-default-200 text-default-400 hover:text-danger hover:border-danger shrink-0 mt-0.5"
+                        aria-label="ลบรายการ"
+                      >
+                        <Icon icon="x" width={14} height={14} />
+                      </button>
+                    </div>
+
+                    {/* Row: qty stepper + price */}
+                    <div className="flex items-center gap-3">
+                      {/* Qty stepper */}
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cur = Number(item?.qty) || 1
+                            if (cur > 1) setValue(`items.${index}.qty`, cur - 1, { shouldValidate: true })
+                          }}
+                          className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-50 w-7 h-7"
+                        >
+                          <Icon icon="minus" width={12} height={12} />
+                        </button>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={1}
+                          step={1}
+                          className="form-input text-sm text-center py-1 w-12"
+                          {...register(`items.${index}.qty`, { valueAsNumber: true })}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cur = Number(item?.qty) || 1
+                            setValue(`items.${index}.qty`, cur + 1, { shouldValidate: true })
+                          }}
+                          className="btn btn-icon btn-sm border border-default-200 text-default-600 hover:bg-default-50 w-7 h-7"
+                        >
+                          <Icon icon="plus" width={12} height={12} />
+                        </button>
+                      </div>
+
+                      {/* Price */}
+                      <div className="flex-1 flex items-center gap-1.5">
+                        <span className="text-xs text-default-400 shrink-0">฿</span>
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          min={0.01}
+                          step={0.01}
+                          placeholder="0.00"
+                          className="form-input text-sm py-1.5 flex-1"
+                          readOnly={isFromCatalog}
+                          {...register(`items.${index}.price`, { valueAsNumber: true })}
+                        />
+                      </div>
+
+                      {/* Row subtotal */}
+                      <span className="text-xs text-default-500 shrink-0 min-w-[60px] text-right">
+                        {formatThb((Number(item?.qty) || 0) * (Number(item?.price) || 0))}
+                      </span>
+                    </div>
+
+                    {itemErrors?.price && (
+                      <p className="text-danger text-xs">{itemErrors.price.message}</p>
+                    )}
+                    {itemErrors?.qty && (
+                      <p className="text-danger text-xs">{itemErrors.qty.message}</p>
+                    )}
+
+                    {/* hidden productId */}
+                    <input type="hidden" {...register(`items.${index}.productId`)} />
+                  </div>
+                )
+              })
+            )}
+          </div>
+
+          {/* Add custom item */}
           <button
             type="button"
-            onClick={() => router.back()}
-            className="btn border border-default-300 bg-card hover:bg-default-50 text-default-700 flex-1 sm:flex-none px-5 py-2.5 text-sm font-medium"
+            onClick={() => append({ ...DEFAULT_ITEM })}
+            className="mt-4 text-sm text-primary hover:underline inline-flex items-center gap-1 self-start"
           >
-            ยกเลิก
+            <Icon icon="plus" width={14} height={14} />
+            เพิ่มรายการกำหนดเอง
           </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="btn bg-primary text-white hover:bg-primary-hover flex-1 sm:flex-none px-6 py-2.5 text-sm font-semibold disabled:opacity-60 inline-flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? (
-              <>
-                <Icon icon="mdi:loading" width={16} height={16} className="animate-spin" />
-                กำลังสร้าง...
-              </>
-            ) : (
-              <>
-                <Icon icon="mdi:receipt-text-plus-outline" width={16} height={16} />
-                สร้างออเดอร์
-              </>
-            )}
-          </button>
+
+          {errors.items && typeof errors.items.message === 'string' && (
+            <p className="text-danger text-sm mt-2">{errors.items.message}</p>
+          )}
+
+          {/* Total footer */}
+          <div className="mt-5 pt-4 border-t border-default-200 flex items-center justify-between">
+            <span className="text-sm text-default-500">รวม</span>
+            <span className="text-xl font-bold text-dark">{formatThb(total)}</span>
+          </div>
         </div>
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* COLUMN 3 — ข้อมูลอื่น ๆ                                            */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <div className="card rounded-xl p-6 flex flex-col gap-5">
+          <h2 className="text-base font-semibold text-dark">ข้อมูลอื่น ๆ</h2>
+
+          {/* Channel — UI-only */}
+          <div>
+            <label htmlFor="order-channel" className="form-label">
+              ช่องทางการขาย
+            </label>
+            <Controller
+              control={control}
+              name="channel"
+              render={({ field }) => (
+                <ChoiceSelect
+                  id="order-channel"
+                  options={CHANNEL_OPTIONS}
+                  value={field.value ?? ''}
+                  onChange={(v) => field.onChange(v || undefined)}
+                  search={false}
+                  placeholder="เลือกช่องทาง"
+                />
+              )}
+            />
+          </div>
+
+          {/* Payment method — UI-only */}
+          <div>
+            <label htmlFor="order-payment" className="form-label">
+              วิธีชำระเงิน
+            </label>
+            <Controller
+              control={control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <ChoiceSelect
+                  id="order-payment"
+                  options={PAYMENT_OPTIONS}
+                  value={field.value ?? ''}
+                  onChange={(v) => field.onChange(v || undefined)}
+                  search={false}
+                  placeholder="เลือกวิธีชำระเงิน"
+                />
+              )}
+            />
+          </div>
+
+          {/* Note — UI-only */}
+          <div>
+            <label htmlFor="order-note" className="form-label">
+              หมายเหตุภายใน
+            </label>
+            <textarea
+              id="order-note"
+              rows={3}
+              placeholder="บันทึกส่วนตัวเกี่ยวกับออเดอร์นี้"
+              className="form-input resize-none"
+              {...register('note')}
+            />
+            <p className="text-default-400 mt-1 text-xs">
+              มองเห็นเฉพาะร้านค้า ไม่แสดงให้ผู้ซื้อเห็น
+            </p>
+          </div>
+        </div>
+
       </div>
     </form>
   )
