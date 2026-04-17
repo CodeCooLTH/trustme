@@ -39,13 +39,19 @@ Safety checkpoint: `git checkout pre-paces-wipe` restores the pre-wipe state (in
 - **Testing:** Vitest
 - **Container:** Docker + Docker Compose
 
+## Marketing Route Exception
+
+The `src/app/(marketing)/` route group is the ONLY place in the app where MUI + Emotion + Vuexy components are permitted. It is isolated via Next.js multiple root layouts — the `(marketing)` layout has its own `<html>` tag with Anuphan font and MUI theme, and does NOT load `@/assets/css/app.css`. All other routes (paces) remain strictly Tailwind/Preline-only per the rules below.
+
+If you touch `src/app/(marketing)/**`, `src/views/front-pages/**`, `src/components/layout/front-pages/**`, `src/@core/**` (Vuexy core), or `src/@layouts/BlankLayout.tsx`, the paces rules do NOT apply. For any other path, the paces rules are absolute.
+
 ## Theme: Paces (MANDATORY)
 
 **ห้ามสร้าง UI component เองเด็ดขาด** — ต้องใช้จาก paces theme หรือ compose จาก Preline + Tailwind เท่านั้น
 
 - Paces source: `theme/paces/Admin/TS/src/` (reference only — do not import from here)
 - Project scaffold in `src/{components,layouts,hooks,utils,context,assets,config,types}/` — copied from paces
-- CSS entry: `src/assets/css/app.css` (imported by `src/app/layout.tsx`)
+- CSS entry: `src/assets/css/app.css` (imported by `src/app/(paces)/layout.tsx`)
 - Preline init: `src/utils/preline.ts` (called from `AppProvidersWrapper`)
 
 ### Rules (ABSOLUTE — NO EXCEPTIONS)
