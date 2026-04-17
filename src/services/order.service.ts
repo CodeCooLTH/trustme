@@ -4,7 +4,7 @@ import { recalculateTrustScore } from "@/services/trust-score.service";
 
 export const VALID_TRANSITIONS: Record<string, string[]> = {
   CREATED: ["CONFIRMED", "CANCELLED"],
-  CONFIRMED: ["SHIPPED", "COMPLETED"],
+  CONFIRMED: ["SHIPPED", "COMPLETED", "CANCELLED"],
   SHIPPED: ["COMPLETED"],
 };
 
