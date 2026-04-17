@@ -47,9 +47,14 @@ const GetStarted = ({ mode }: { mode: SystemMode }) => {
               สมัครฟรีวันนี้ ทดลองใช้ฟีเจอร์ระดับธุรกิจ 14 วัน
             </Typography>
           </div>
-          <Button component={Link} href='#contact-us' variant='contained'>
-            เริ่มใช้งานฟรี
-          </Button>
+          <div className='flex gap-3 flex-wrap'>
+            <Button component={Link} href='/auth/sign-up' variant='contained'>
+              สมัครใช้งาน
+            </Button>
+            <Button component={Link} href='/auth/sign-in' variant='outlined'>
+              เข้าสู่ระบบ
+            </Button>
+          </div>
         </div>
         <div className='flex pbs-4 lg:pbs-[60px] md:pie-4 z-1'>
           <img

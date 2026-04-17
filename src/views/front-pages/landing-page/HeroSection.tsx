@@ -89,15 +89,26 @@ const HeroSection = ({ mode }: { mode: SystemMode }) => {
               <Typography className='font-medium'>เข้าร่วมกับเรา</Typography>
               <img src='/images/front-pages/landing-page/join-community-arrow.png' alt='arrow' height='48' width='60' />
             </div>
-            <Button
-              component={Link}
-              size='large'
-              href='#pricing-plans'
-              variant='contained'
-              color='primary'
-            >
-              เริ่มใช้งานฟรี
-            </Button>
+            <div className='flex gap-3 flex-wrap justify-center'>
+              <Button
+                component={Link}
+                size='large'
+                href='/auth/sign-up'
+                variant='contained'
+                color='primary'
+              >
+                สมัครใช้งาน
+              </Button>
+              <Button
+                component={Link}
+                size='large'
+                href='/auth/sign-in'
+                variant='outlined'
+                color='primary'
+              >
+                เข้าสู่ระบบ
+              </Button>
+            </div>
           </div>
         </div>
       </div>

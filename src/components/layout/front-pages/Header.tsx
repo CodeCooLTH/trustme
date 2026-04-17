@@ -72,21 +72,31 @@ const Header = ({ mode }: { mode: Mode }) => {
               <CustomIconButton
                 component={Link}
                 variant='contained'
-                href='#contact-us'
+                href='/auth/sign-up'
                 color='primary'
               >
                 <i className='tabler-user-plus text-xl' />
               </CustomIconButton>
             ) : (
-              <Button
-                component={Link}
-                variant='contained'
-                href='#contact-us'
-                startIcon={<i className='tabler-user-plus text-xl' />}
-                className='whitespace-nowrap'
-              >
-                เริ่มใช้งานฟรี
-              </Button>
+              <div className='flex gap-2'>
+                <Button
+                  component={Link}
+                  variant='outlined'
+                  href='/auth/sign-in'
+                  className='whitespace-nowrap'
+                >
+                  เข้าสู่ระบบ
+                </Button>
+                <Button
+                  component={Link}
+                  variant='contained'
+                  href='/auth/sign-up'
+                  startIcon={<i className='tabler-user-plus text-xl' />}
+                  className='whitespace-nowrap'
+                >
+                  สมัครใช้งาน
+                </Button>
+              </div>
             )}
           </div>
         </div>

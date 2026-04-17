@@ -25,9 +25,14 @@ const FreeTrial = () => {
                 </Typography>
                 <Typography>รับสิทธิ์ใช้งานฟีเจอร์ครบถ้วนสำหรับแพ็กเริ่มต้น ฟรีตลอดชีพ ไม่ต้องใส่บัตรเครดิต</Typography>
               </div>
-              <Button component={Link} href='/auth/sign-up' variant='contained'>
-                เริ่มใช้งานฟรี
-              </Button>
+              <div className='flex gap-3 flex-wrap'>
+                <Button component={Link} href='/auth/sign-up' variant='contained'>
+                  สมัครใช้งาน
+                </Button>
+                <Button component={Link} href='/auth/sign-in' variant='outlined'>
+                  เข้าสู่ระบบ
+                </Button>
+              </div>
             </div>
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
