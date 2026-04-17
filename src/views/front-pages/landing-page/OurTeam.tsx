@@ -86,7 +86,7 @@ const OurTeam = () => {
     <section id='team' className='plb-[100px] bg-backgroundPaper' ref={ref}>
       <div className={frontCommonStyles.layoutSpacing}>
         <div className='flex flex-col gap-y-4 items-center justify-center'>
-          <Chip size='small' variant='tonal' color='primary' label='ทีม SafePay' />
+          <Chip size='small' variant='tonal' color='primary' label='ทีม Deep' />
           <div className='flex flex-col items-center gap-y-1 justify-center flex-wrap'>
             <div className='flex items-center gap-x-2'>
               <Typography color='text.primary' variant='h4'>
@@ -101,7 +101,7 @@ const OurTeam = () => {
                 ทีมงานคุณภาพ
               </Typography>
             </div>
-            <Typography className='text-center'>ทีมผู้อยู่เบื้องหลังแพลตฟอร์ม SafePay ที่คุณไว้ใจได้</Typography>
+            <Typography className='text-center'>ทีมผู้อยู่เบื้องหลังแพลตฟอร์ม Deep ที่คุณไว้ใจได้</Typography>
           </div>
         </div>
         <Grid container rowSpacing={16} columnSpacing={6} className='pbs-[100px]'>

@@ -103,7 +103,7 @@ const UsefulFeature = () => {
               </Typography>
             </div>
             <Typography className='text-center'>
-              SafePay รวมเครื่องมือสร้างความน่าเชื่อถือไว้ครบ ใช้งานง่ายทั้งผู้ซื้อและผู้ขาย
+              Deep รวมเครื่องมือสร้างความน่าเชื่อถือไว้ครบ ใช้งานง่ายทั้งผู้ซื้อและผู้ขาย
             </Typography>
           </div>
         </div>

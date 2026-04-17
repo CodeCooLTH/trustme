@@ -29,10 +29,10 @@ const anuphan = Anuphan({
 })
 
 export const metadata: Metadata = {
-  title: 'SafePay — ซื้อขายออนไลน์อย่างมั่นใจ',
+  title: 'Deep — ซื้อขายออนไลน์อย่างมั่นใจ',
   description:
-    'SafePay คือระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ผ่านการยืนยันตัวตน Trust Score และ Badge เพื่อลดปัญหามิจฉาชีพ',
-  keywords: ['SafePay', 'Trust Score', 'ซื้อขายออนไลน์', 'ยืนยันตัวตน', 'มิจฉาชีพ'],
+    'Deep คือระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ผ่านการยืนยันตัวตน Trust Score และ Badge เพื่อลดปัญหามิจฉาชีพ',
+  keywords: ['Deep', 'Trust Score', 'ซื้อขายออนไลน์', 'ยืนยันตัวตน', 'มิจฉาชีพ'],
 }
 
 export default async function MarketingRootLayout({ children }: ChildrenType) {

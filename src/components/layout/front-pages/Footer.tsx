@@ -48,7 +48,7 @@ const Footer = ({ mode }: { mode: Mode }) => {
                   <Logo color='var(--mui-palette-common-white)' />
                 </Link>
                 <Typography color='white' className='md:max-is-[390px] opacity-[0.78]'>
-                  SafePay คือระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ด้วย Trust Score, Badge และการยืนยันตัวตนหลายระดับ
+                  Deep คือระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ด้วย Trust Score, Badge และการยืนยันตัวตนหลายระดับ
                 </Typography>
                 <div className='flex items-end'>
                   <CustomTextField
@@ -167,7 +167,7 @@ const Footer = ({ mode }: { mode: Mode }) => {
           )}
         >
           <Typography className='text-white' variant='body2'>
-            <span>{`© ${new Date().getFullYear()} SafePay — ซื้อขายออนไลน์อย่างมั่นใจ`}</span>
+            <span>{`© ${new Date().getFullYear()} Deep — ซื้อขายออนไลน์อย่างมั่นใจ`}</span>
           </Typography>
           <div className='flex gap-1.5 items-center'>
             <IconButton component={Link} size='small' href='#' target='_blank'>

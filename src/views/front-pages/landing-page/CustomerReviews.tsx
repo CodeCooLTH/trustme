@@ -32,7 +32,7 @@ import styles from './styles.module.css'
 // Data
 const data = [
   {
-    desc: 'ตั้งแต่ใช้ SafePay ไม่มีลูกค้าคนไหนถามเรื่องความน่าเชื่อถืออีกเลย Trust Score ช่วยเพิ่มยอดขายได้จริง',
+    desc: 'ตั้งแต่ใช้ Deep ไม่มีลูกค้าคนไหนถามเรื่องความน่าเชื่อถืออีกเลย Trust Score ช่วยเพิ่มยอดขายได้จริง',
     svg: <Pinterest color='#ee7676' />,
     rating: 5,
     name: 'พิมพ์ชนก ศรีสวัสดิ์',
@@ -40,7 +40,7 @@ const data = [
     avatarSrc: '/images/avatars/1.png'
   },
   {
-    desc: 'ก่อนใช้ SafePay ต้องโชว์สลิปให้ลูกค้าดูทุกคน ตอนนี้ไม่ต้องแล้ว ลูกค้าเชื่อตั้งแต่ยังไม่โอน',
+    desc: 'ก่อนใช้ Deep ต้องโชว์สลิปให้ลูกค้าดูทุกคน ตอนนี้ไม่ต้องแล้ว ลูกค้าเชื่อตั้งแต่ยังไม่โอน',
     svg: <Netflix color='#d34c4d' />,
     rating: 5,
     name: 'ณัฐพล วงศ์อนันต์',
@@ -72,7 +72,7 @@ const data = [
     avatarSrc: '/images/avatars/5.png'
   },
   {
-    desc: 'ใช้ SafePay กับลูกค้าต่างจังหวัดโดยเฉพาะ ช่วยลดคำถามซ้ำๆ เรื่องความน่าเชื่อถือไปเยอะ',
+    desc: 'ใช้ Deep กับลูกค้าต่างจังหวัดโดยเฉพาะ ช่วยลดคำถามซ้ำๆ เรื่องความน่าเชื่อถือไปเยอะ',
     svg: <Pinterest color='#ee7676' />,
     rating: 5,
     name: 'สุภาวดี แก้วใส',
@@ -104,7 +104,7 @@ const data = [
     avatarSrc: '/images/avatars/9.png'
   },
   {
-    desc: 'ตั้งแต่ย้ายมาใช้ SafePay ยอดเคลมเรื่องมิจฉาชีพลดลงเกินครึ่ง ประหยัดเวลาได้มาก',
+    desc: 'ตั้งแต่ย้ายมาใช้ Deep ยอดเคลมเรื่องมิจฉาชีพลดลงเกินครึ่ง ประหยัดเวลาได้มาก',
     svg: <Dribbble color='#ea4c89' />,
     rating: 5,
     name: 'ภาคิน ทิพย์โสภณ',
@@ -188,7 +188,7 @@ const CustomerReviews = () => {
                 />
               </span>
             </Typography>
-            <Typography>เสียงตอบรับจากผู้ซื้อและผู้ขายที่เลือกใช้ SafePay</Typography>
+            <Typography>เสียงตอบรับจากผู้ซื้อและผู้ขายที่เลือกใช้ Deep</Typography>
           </div>
           <div className='flex gap-x-4 mbs-11'>
             <CustomIconButton color='primary' variant='tonal' onClick={() => instanceRef.current?.prev()}>

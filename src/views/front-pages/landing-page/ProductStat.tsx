@@ -33,7 +33,7 @@ const statData: StatData[] = [
     isHover: false
   },
   {
-    title: 'ผู้ใช้ที่ไว้วางใจ SafePay',
+    title: 'ผู้ใช้ที่ไว้วางใจ Deep',
     value: '50k+',
     svg: <User color='var(--mui-palette-success-main)' />,
     color: 'var(--mui-palette-success-darkerOpacity)',

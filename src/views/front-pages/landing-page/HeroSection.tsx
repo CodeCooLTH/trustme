@@ -82,7 +82,7 @@ const HeroSection = ({ mode }: { mode: SystemMode }) => {
             ซื้อขายออนไลน์อย่างมั่นใจ ไม่ต้องกลัวมิจฉาชีพ
           </Typography>
           <Typography className='font-medium' color='text.primary'>
-            SafePay คือระบบสร้างความน่าเชื่อถือผ่านการยืนยันตัวตน Trust Score และ Badge เพื่อให้ทุกดีลเชื่อถือได้
+            Deep คือระบบสร้างความน่าเชื่อถือผ่านการยืนยันตัวตน Trust Score และ Badge เพื่อให้ทุกดีลเชื่อถือได้
           </Typography>
           <div className='flex mbs-6 items-baseline justify-center relative'>
             <div className='flex gap-2 absolute inline-start-[0%] block-start-[41%] max-md:hidden'>
