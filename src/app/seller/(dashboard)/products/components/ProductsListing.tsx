@@ -4,6 +4,7 @@ import Rating from '@/components/Rating'
 import DataTable from '@/components/table/DataTable'
 import DeleteConfirmationModal from '@/components/table/DeleteConfirmationModal'
 import TablePagination from '@/components/table/TablePagination'
+import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
 import Icon from '@/components/wrappers/Icon'
 import { cn } from '@/utils/helpers'
 import {
@@ -256,34 +257,39 @@ const ProductsListing = ({ products }: Props) => {
         <div className="flex flex-wrap items-center gap-2.5 md:flex-nowrap">
           <div className="items-center gap-3 md:flex">
             <span className="font-semibold">กรอง:</span>
-            <div className="input-icon-group">
-              <Icon icon="tag" className="input-icon" />
-              <select
-                value={(table.getColumn('type')?.getFilterValue() as string) ?? 'All'}
-                onChange={(e) =>
-                  table.getColumn('type')?.setFilterValue(e.target.value === 'All' ? undefined : e.target.value)
-                }
-                className="form-select"
-              >
-                <option value="All">ประเภท</option>
-                <option value="PHYSICAL">สินค้าจับต้องได้</option>
-                <option value="DIGITAL">ดิจิทัล</option>
-                <option value="SERVICE">บริการ</option>
-              </select>
+            <div className="flex items-center gap-2">
+              <Icon icon="tag" className="text-default-400" />
+              <div className="w-48">
+                <ChoiceSelect
+                  options={[
+                    { value: 'All', label: 'ทุกประเภท' },
+                    { value: 'PHYSICAL', label: 'สินค้าจับต้องได้' },
+                    { value: 'DIGITAL', label: 'ดิจิทัล' },
+                    { value: 'SERVICE', label: 'บริการ' },
+                  ]}
+                  value={(table.getColumn('type')?.getFilterValue() as string) ?? 'All'}
+                  onChange={(v) =>
+                    table.getColumn('type')?.setFilterValue((v as string) === 'All' ? undefined : (v as string))
+                  }
+                  search={false}
+                  sorting={false}
+                />
+              </div>
             </div>
           </div>
-          <div>
-            <select
-              className="form-select"
-              value={table.getState().pagination.pageSize}
-              onChange={(e) => table.setPageSize(Number(e.target.value))}
-            >
-              {[5, 10, 15, 20].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
+          <div className="w-20">
+            <ChoiceSelect
+              options={[
+                { value: '5', label: '5' },
+                { value: '10', label: '10' },
+                { value: '15', label: '15' },
+                { value: '20', label: '20' },
+              ]}
+              value={String(table.getState().pagination.pageSize)}
+              onChange={(v) => table.setPageSize(Number(v as string))}
+              search={false}
+              sorting={false}
+            />
           </div>
         </div>
         <div>

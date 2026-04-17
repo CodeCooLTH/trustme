@@ -2,6 +2,7 @@
 
 import DataTable from '@/components/table/DataTable'
 import TablePagination from '@/components/table/TablePagination'
+import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
 import Icon from '@/components/wrappers/Icon'
 import { createColumnHelper, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
 import type { SortingState } from '@tanstack/react-table'
@@ -95,17 +96,21 @@ const CategoryTable = ({ rows }: CategoryTableProps) => {
           </div>
         </div>
         <div className="flex items-center gap-1.25">
-          <select
-            className="form-select"
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
-          >
-            {[5, 8, 10, 15, 20].map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
+          <div className="w-20">
+            <ChoiceSelect
+              options={[
+                { value: '5', label: '5' },
+                { value: '8', label: '8' },
+                { value: '10', label: '10' },
+                { value: '15', label: '15' },
+                { value: '20', label: '20' },
+              ]}
+              value={String(table.getState().pagination.pageSize)}
+              onChange={(v) => table.setPageSize(Number(v as string))}
+              search={false}
+              sorting={false}
+            />
+          </div>
         </div>
       </div>
 

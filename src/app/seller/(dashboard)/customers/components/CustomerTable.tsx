@@ -2,6 +2,7 @@
 
 import DataTable from '@/components/table/DataTable'
 import TablePagination from '@/components/table/TablePagination'
+import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
 import Icon from '@/components/wrappers/Icon'
 import { cn } from '@/utils/helpers'
 import {
@@ -134,17 +135,20 @@ const CustomerTable = ({ customers }: CustomerTableProps) => {
           </div>
         </div>
         <div className="flex gap-2.5 items-center flex-wrap md:flex-nowrap">
-          <select
-            className="form-select"
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
-          >
-            {[5, 10, 15, 20].map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
+          <div className="w-20">
+            <ChoiceSelect
+              options={[
+                { value: '5', label: '5' },
+                { value: '10', label: '10' },
+                { value: '15', label: '15' },
+                { value: '20', label: '20' },
+              ]}
+              value={String(table.getState().pagination.pageSize)}
+              onChange={(v) => table.setPageSize(Number(v as string))}
+              search={false}
+              sorting={false}
+            />
+          </div>
         </div>
       </div>
 
