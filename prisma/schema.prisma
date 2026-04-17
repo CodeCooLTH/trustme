@@ -118,16 +118,17 @@ model Product {
 }
 
 model Order {
-  id           String   @id @default(uuid())
-  publicToken  String   @unique @default(uuid())
-  shopId       String
-  buyerUserId  String?
-  buyerContact String?
-  type         String   @default("PHYSICAL")
-  totalAmount  Decimal  @db.Decimal(12, 2)
-  status       String   @default("CREATED")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String   @id @default(uuid())
+  publicToken     String   @unique @default(uuid())
+  shopId          String
+  buyerUserId     String?
+  buyerContact    String?
+  type            String   @default("PHYSICAL")
+  totalAmount     Decimal  @db.Decimal(12, 2)
+  status          String   @default("CREATED")
+  shippingAddress Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   shop             Shop              @relation(fields: [shopId], references: [id])
   buyer            User?             @relation("BuyerOrders", fields: [buyerUserId], references: [id])

@@ -2,6 +2,29 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+type Addr = {
+  name: string; phone: string; line1: string; line2?: string;
+  district: string; amphoe: string; province: string; postalCode: string; note?: string;
+}
+
+const BKK_ADDR: Addr = {
+  name: 'สมชาย ใจดี', phone: '0812345678',
+  line1: '99/123 ถนนสุขุมวิท', line2: 'คอนโด Example Residence ห้อง 1505',
+  district: 'คลองเตย', amphoe: 'คลองเตย', province: 'กรุงเทพมหานคร', postalCode: '10110',
+  note: 'ฝากไว้กับ รปภ. ได้ครับ',
+}
+const UPCOUNTRY_ADDR: Addr = {
+  name: 'วิภา สุวรรณ', phone: '0823456789',
+  line1: '45 หมู่ 7 บ้านสวน',
+  district: 'แม่เหียะ', amphoe: 'เมืองเชียงใหม่', province: 'เชียงใหม่', postalCode: '50100',
+}
+const SUBURB_ADDR: Addr = {
+  name: 'ธีรพงษ์ รักษ์ดี', phone: '0834567890',
+  line1: '222/34 หมู่บ้านเอ็มเมอรัลด์',
+  district: 'บางบอน', amphoe: 'บางบอน', province: 'กรุงเทพมหานคร', postalCode: '10150',
+}
+const PHYSICAL_ADDRS: Addr[] = [BKK_ADDR, UPCOUNTRY_ADDR, SUBURB_ADDR];
+
 async function main() {
   // Seed default badges
   const badges = [
@@ -100,12 +123,13 @@ async function main() {
       productIdx: number;
       qty: number;
       createdDaysAgo: number;
+      addr?: Addr;
       tracking?: { provider: string; trackingNo: string };
       review?: { rating: number; comment: string; reviewerContact: string };
     }> = [
-      { status: "CREATED", type: "PHYSICAL", buyerContact: "0812345678", productIdx: 0, qty: 1, createdDaysAgo: 0 },
+      { status: "CREATED", type: "PHYSICAL", buyerContact: "0812345678", productIdx: 0, qty: 1, createdDaysAgo: 0, addr: BKK_ADDR },
       { status: "CREATED", type: "SERVICE", buyerContact: "0823456789", productIdx: 7, qty: 1, createdDaysAgo: 1 },
-      { status: "CONFIRMED", type: "PHYSICAL", buyerContact: "0834567890", productIdx: 1, qty: 1, createdDaysAgo: 2 },
+      { status: "CONFIRMED", type: "PHYSICAL", buyerContact: "0834567890", productIdx: 1, qty: 1, createdDaysAgo: 2, addr: SUBURB_ADDR },
       { status: "CONFIRMED", type: "SERVICE", buyerContact: "0845678901", productIdx: 6, qty: 1, createdDaysAgo: 3 },
       {
         status: "SHIPPED",
@@ -114,6 +138,7 @@ async function main() {
         productIdx: 2,
         qty: 1,
         createdDaysAgo: 4,
+        addr: UPCOUNTRY_ADDR,
         tracking: { provider: "Kerry Express", trackingNo: "KEX123456789TH" },
       },
       {
@@ -123,6 +148,7 @@ async function main() {
         productIdx: 4,
         qty: 1,
         createdDaysAgo: 5,
+        addr: BKK_ADDR,
         tracking: { provider: "Flash Express", trackingNo: "FL987654321TH" },
       },
       {
@@ -132,6 +158,7 @@ async function main() {
         productIdx: 1,
         qty: 1,
         createdDaysAgo: 7,
+        addr: SUBURB_ADDR,
         tracking: { provider: "Thailand Post", trackingNo: "EY112233445TH" },
         review: { rating: 5, comment: "ไฟสว่างมาก ติดตั้งง่าย ร้านบริการดี!", reviewerContact: "0878901234" },
       },
@@ -153,7 +180,7 @@ async function main() {
         createdDaysAgo: 10,
         review: { rating: 4, comment: "โคมใสขึ้นเยอะ รอดูว่าจะอยู่ได้นานแค่ไหน", reviewerContact: "0892345678" },
       },
-      { status: "CANCELLED", type: "PHYSICAL", buyerContact: "0890123456", productIdx: 3, qty: 2, createdDaysAgo: 1 },
+      { status: "CANCELLED", type: "PHYSICAL", buyerContact: "0890123456", productIdx: 3, qty: 2, createdDaysAgo: 1, addr: UPCOUNTRY_ADDR },
     ];
 
     let orderCount = 0;
@@ -168,6 +195,7 @@ async function main() {
           status: r.status,
           buyerContact: r.buyerContact,
           totalAmount: total,
+          shippingAddress: r.type === 'PHYSICAL' && r.addr ? (r.addr as object) : undefined,
           createdAt: created,
           updatedAt: created,
           items: {

@@ -26,9 +26,30 @@ const TYPE_META: Record<string, { label: string; icon: string; cls: string }> = 
   SERVICE: { label: 'บริการ', icon: 'mdi:wrench-outline', cls: 'bg-success/10 text-success' },
 }
 
+type ShippingAddress = {
+  name: string
+  phone: string
+  line1: string
+  line2?: string
+  district: string
+  amphoe: string
+  province: string
+  postalCode: string
+  note?: string
+}
+
 function maskContact(c: string) {
   if (!c || c.length <= 4) return c || '—'
   return '•'.repeat(Math.max(0, c.length - 4)) + c.slice(-4)
+}
+
+function formatPhone(phone: string) {
+  // 0812345678 → 081-234-5678
+  const digits = phone.replace(/\D/g, '')
+  if (digits.length === 10) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`
+  }
+  return phone
 }
 
 function formatAmount(amount: unknown) {
@@ -159,6 +180,39 @@ export default async function OrderDetailPage({ params }: PageProps) {
               )}
             </div>
           </div>
+
+          {/* Shipping Address Card — shown only for PHYSICAL orders with address */}
+          {order.shippingAddress && (() => {
+            const addr = order.shippingAddress as ShippingAddress
+            const isBkk = addr.province === 'กรุงเทพมหานคร'
+            const districtLabel = isBkk ? 'แขวง' : 'ตำบล'
+            const amphoeLabel = isBkk ? 'เขต' : 'อำเภอ'
+            return (
+              <div className="card rounded-xl p-5">
+                <h2 className="text-base font-semibold text-dark mb-4 flex items-center gap-2">
+                  <Icon icon="mdi:map-marker-outline" width={18} height={18} className="text-default-400" />
+                  ที่อยู่จัดส่ง
+                </h2>
+                <div className="text-sm text-dark leading-relaxed space-y-1">
+                  <p className="font-semibold">
+                    {addr.name}
+                    <span className="mx-2 text-default-300">·</span>
+                    <span className="font-normal text-default-600">{formatPhone(addr.phone)}</span>
+                  </p>
+                  <p>{addr.line1}</p>
+                  {addr.line2 && <p>{addr.line2}</p>}
+                  <p>
+                    {districtLabel}{addr.district} {amphoeLabel}{addr.amphoe} {addr.province} {addr.postalCode}
+                  </p>
+                  {addr.note && (
+                    <p className="text-default-400 text-xs mt-1">
+                      หมายเหตุ: {addr.note}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )
+          })()}
 
           {/* Items Table */}
           <div className="card rounded-xl overflow-hidden">
