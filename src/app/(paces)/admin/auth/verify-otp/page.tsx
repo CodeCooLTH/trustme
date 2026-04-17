@@ -25,7 +25,7 @@ export default function AdminVerifyOtpPage() {
 
             <div className="card rounded-2xl">
               <div className="grid grid-cols-1 lg:grid-cols-2">
-                <div className="card-body relative p-12.5">
+                <div className="card-body relative p-12.5 min-h-[560px]">
                   <Link
                     href="/admin/auth/sign-in"
                     aria-label="กลับไปหน้าเข้าสู่ระบบ Admin"
