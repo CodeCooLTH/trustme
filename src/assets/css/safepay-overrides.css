@@ -32,3 +32,46 @@ html[data-skin="orbit"] {
     --font-body: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
     --font-secondary: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
+
+/* ─── Base text-size bump — one visual step larger than paces saas default ─── */
+/* Inspected: src/assets/css/config/_root.css and _theme-saas.css              */
+/* Variables that exist in paces:                                               */
+/*   _root.css @theme: --text-body (14px), --text-xs (13px),                   */
+/*                      --text-2xs (11px), --text-md (15px)                    */
+/*   _theme-saas.css:  --text-body (13px override), --text-sm (13px override)  */
+
+html {
+    /* Bump root @theme defaults (+1px each) */
+    --text-body: 0.9375rem; /* 15px — was 0.875rem (14px) */
+    --text-xs:   0.875rem;  /* 14px — was 0.8125rem (13px) */
+    --text-2xs:  0.75rem;   /* 12px — was 11px */
+    --text-md:   1.0625rem; /* 17px — was 15px */
+}
+
+html[data-skin="default"],
+html[data-skin="saas"],
+html[data-skin="modern"],
+html[data-skin="minimal"],
+html[data-skin="silver"],
+html[data-skin="luxe"],
+html[data-skin="pixel"],
+html[data-skin="flat"],
+html[data-skin="crystal"],
+html[data-skin="zen"],
+html[data-skin="galaxy"],
+html[data-skin="retro"],
+html[data-skin="neon"],
+html[data-skin="soft"],
+html[data-skin="mono"],
+html[data-skin="neo"],
+html[data-skin="prism"],
+html[data-skin="nova"],
+html[data-skin="elegant"],
+html[data-skin="aurora"],
+html[data-skin="xenon"],
+html[data-skin="matrix"],
+html[data-skin="orbit"] {
+    /* Override any per-skin text-body and text-sm settings */
+    --text-body: 0.9375rem; /* 15px — was 13px (saas/many skins) / 14px (others) */
+    --text-sm:   0.875rem;  /* 14px — was 13px (saas skin override) */
+}
