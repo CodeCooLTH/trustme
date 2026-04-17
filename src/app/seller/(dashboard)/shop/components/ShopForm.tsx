@@ -3,9 +3,10 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Icon } from '@iconify/react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
+import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
 
 const CATEGORIES = [
   'อาหารและเครื่องดื่ม',
@@ -51,6 +52,7 @@ export default function ShopForm({ shop }: ShopFormProps) {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
@@ -145,14 +147,20 @@ export default function ShopForm({ shop }: ShopFormProps) {
                 หมวดหมู่ร้าน{' '}
                 <span className="text-default-400">(ไม่บังคับ)</span>
               </label>
-              <select id="category" className="form-select" {...register('category')}>
-                <option value="">-- เลือกหมวดหมู่ --</option>
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="category"
+                render={({ field }) => (
+                  <ChoiceSelect
+                    id="category"
+                    placeholder="-- เลือกหมวดหมู่ --"
+                    options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+                    value={field.value ?? ''}
+                    onChange={(v) => field.onChange(v)}
+                    search={false}
+                  />
+                )}
+              />
               {errors.category && (
                 <p className="text-danger mt-1 text-sm">{errors.category.message}</p>
               )}

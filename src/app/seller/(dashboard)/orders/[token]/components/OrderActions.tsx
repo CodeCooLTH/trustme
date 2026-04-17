@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
 
 const CARRIERS = [
   'Kerry Express',
@@ -40,6 +41,7 @@ export default function OrderActions({ order }: OrderActionsProps) {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
     reset,
@@ -160,12 +162,19 @@ export default function OrderActions({ order }: OrderActionsProps) {
 
               <div>
                 <label className="form-label text-xs mb-1 block">ขนส่ง <span className="text-danger">*</span></label>
-                <select {...register('provider')} className="form-input text-sm w-full">
-                  <option value="">-- เลือกขนส่ง --</option>
-                  {CARRIERS.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
+                <Controller
+                  control={control}
+                  name="provider"
+                  render={({ field }) => (
+                    <ChoiceSelect
+                      placeholder="-- เลือกขนส่ง --"
+                      options={CARRIERS.map((c) => ({ value: c, label: c }))}
+                      value={field.value ?? ''}
+                      onChange={(v) => field.onChange(v)}
+                      search={false}
+                    />
+                  )}
+                />
                 {errors.provider && <p className="text-danger text-xs mt-1">{errors.provider.message}</p>}
               </div>
 

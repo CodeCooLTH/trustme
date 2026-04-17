@@ -3,9 +3,10 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Icon } from '@iconify/react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
+import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
 
 const schema = Yup.object({
   name: Yup.string()
@@ -49,6 +50,7 @@ export default function ProductForm({ shopId, product }: ProductFormProps) {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
@@ -197,11 +199,23 @@ export default function ProductForm({ shopId, product }: ProductFormProps) {
             <label htmlFor="type" className="form-label">
               ประเภท<span className="text-danger">*</span>
             </label>
-            <select id="type" className="form-select" {...register('type')}>
-              <option value="PHYSICAL">สินค้าจับต้องได้ (PHYSICAL)</option>
-              <option value="DIGITAL">ดิจิทัล (DIGITAL)</option>
-              <option value="SERVICE">บริการ (SERVICE)</option>
-            </select>
+            <Controller
+              control={control}
+              name="type"
+              render={({ field }) => (
+                <ChoiceSelect
+                  id="type"
+                  options={[
+                    { value: 'PHYSICAL', label: 'สินค้าจับต้องได้' },
+                    { value: 'DIGITAL', label: 'ดิจิทัล' },
+                    { value: 'SERVICE', label: 'บริการ' },
+                  ]}
+                  value={field.value}
+                  onChange={(v) => field.onChange(v)}
+                  search={false}
+                />
+              )}
+            />
             {errors.type && <p className="text-danger mt-1 text-sm">{errors.type.message}</p>}
           </div>
         </div>

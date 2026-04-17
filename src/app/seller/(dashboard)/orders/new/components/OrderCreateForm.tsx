@@ -4,9 +4,10 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { Icon } from '@iconify/react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
-import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
+import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -198,13 +199,19 @@ export default function OrderCreateForm({ shopId, catalog }: Props) {
             <label htmlFor="order-type" className="form-label">
               ประเภทออเดอร์<span className="text-danger">*</span>
             </label>
-            <select id="order-type" className="form-select" {...register('type')}>
-              {TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="type"
+              render={({ field }) => (
+                <ChoiceSelect
+                  id="order-type"
+                  options={TYPE_OPTIONS}
+                  value={field.value}
+                  onChange={(v) => field.onChange(v)}
+                  search={false}
+                />
+              )}
+            />
             {errors.type && (
               <p className="text-danger mt-1 text-sm">{errors.type.message}</p>
             )}
@@ -266,18 +273,18 @@ export default function OrderCreateForm({ shopId, catalog }: Props) {
                 {/* Row 1: catalog picker */}
                 <div className="mb-4">
                   <label className="form-label">เลือกจากคลัง / กำหนดเอง</label>
-                  <select
-                    className="form-select"
+                  <ChoiceSelect
+                    options={[
+                      { value: ONOFF_VALUE, label: 'กำหนดเอง (one-off)' },
+                      ...catalog.map((p) => ({
+                        value: p.id,
+                        label: `${p.name} — ${formatThb(p.price)}`,
+                      })),
+                    ]}
                     value={currentProductId || ONOFF_VALUE}
-                    onChange={(e) => handleProductPick(index, e.target.value)}
-                  >
-                    <option value={ONOFF_VALUE}>กำหนดเอง (one-off)</option>
-                    {catalog.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name} — {formatThb(p.price)}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(v) => handleProductPick(index, v as string)}
+                    search={catalog.length > 5}
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
