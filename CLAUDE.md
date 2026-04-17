@@ -10,57 +10,97 @@ SafePay เป็นระบบสร้างความน่าเชื่
 - Design Spec: `docs/superpowers/specs/2026-04-04-safepay-trust-platform-design.md`
 - Implementation Plan: `docs/superpowers/plans/2026-04-04-safepay-trust-platform.md`
 
+## Current State — Paces UI Rebuild
+
+**2026-04-13: Full UI rewrite in progress.** Project was migrated from Vuexy (MUI + Emotion) to **Paces (Preline + Tailwind)**. All Vuexy UI was wiped; backend (Prisma, API routes, services) is preserved. Pages must be rebuilt on top of the paces scaffold.
+
+Safety checkpoint: `git checkout pre-paces-wipe` restores the pre-wipe state (including all Vuexy-era work-in-progress).
+
 ## Architecture
 
 - **Profile-Centric** — Trust Profile เป็นศูนย์กลาง ทุกอย่างไหลเข้า profile
 - ไม่แบ่ง role buyer/seller — ทุกคนมี trust profile เหมือนกัน, เปิดร้านเพิ่มได้ (isShop flag)
-- Subdomain routing: `safepay.co` (buyer), `seller.safepay.co` (seller), `admin.safepay.co` (admin)
+- Subdomain routing: `safepay.co` (buyer), `seller.safepay.co` (seller), `admin.safepay.co` (admin) — handled in `src/proxy.ts`
 - Session แยกตาม subdomain — login/logout แยกกัน, account เดียวกัน
 
 ## Tech Stack
 
 - **Framework:** Next.js 16 (App Router) — TypeScript strict mode
-- **UI:** MUI v7 + TailwindCSS (Vuexy theme as base)
-- **CSS-in-JS:** Emotion.js (required by MUI)
+- **UI:** **Preline 4 + TailwindCSS 4** (Paces theme as base — no MUI, no Emotion)
 - **Database:** PostgreSQL 16, Prisma ORM
 - **Auth:** NextAuth.js v4 (Facebook OAuth + Phone OTP)
-- **Validation:** Valibot (tree-shakeable, ~1KB, ตาม Vuexy theme)
-- **Form:** React Hook Form
+- **Validation:** Valibot (backend/API), Yup (frontend forms with react-hook-form — paces convention)
+- **Form:** React Hook Form + `@hookform/resolvers`
+- **Charts:** ApexCharts, ECharts (via `echarts-for-react`), Chart.js (via `react-chartjs-2`)
+- **Rich Text:** Quill (`react-quill-new`)
+- **Date:** flatpickr + react-datepicker
+- **Alerts:** SweetAlert2, react-toastify
+- **Icons:** `@iconify/react` (on-demand, no bundle)
 - **Testing:** Vitest
 - **Container:** Docker + Docker Compose
-- **Icons:** Tabler Icons via Iconify (from Vuexy)
 
-## Theme: Vuexy (MANDATORY)
+## Theme: Paces (MANDATORY)
 
-**ห้ามสร้าง UI component เองเด็ดขาด** — ต้องใช้จาก Vuexy theme เท่านั้น ถ้าต้องการ component ใด ให้ค้นหาจาก `theme/vuexy/` ก่อนเสมอ ถ้าไม่มีใน theme ให้ใช้ MUI component ที่ Vuexy ใช้อยู่ ห้ามติดตั้ง UI library เพิ่มเติมหรือเขียน component ขึ้นมาเอง
+**ห้ามสร้าง UI component เองเด็ดขาด** — ต้องใช้จาก paces theme หรือ compose จาก Preline + Tailwind เท่านั้น
 
-- Location: `theme/vuexy/`
-- Based on MUI v7 + TailwindCSS + Emotion
-- Layouts: VerticalLayout (sidebar), HorizontalLayout, BlankLayout
-- Core modules: `@core/` (theme engine), `@layouts/` (layout system), `@menu/` (navigation)
-- Color: Primary purple #7367F0, supports light/dark mode
-- Has pre-built: auth pages, dashboards, forms, tables, dialogs, OTP input
-- i18n ready (en, fr, ar with RTL)
+- Paces source: `theme/paces/Admin/TS/src/` (reference only — do not import from here)
+- Project scaffold in `src/{components,layouts,hooks,utils,context,assets,config,types}/` — copied from paces
+- CSS entry: `src/assets/css/app.css` (imported by `src/app/layout.tsx`)
+- Preline init: `src/utils/preline.ts` (called from `AppProvidersWrapper`)
 
-**Rules (ABSOLUTE — NO EXCEPTIONS):**
-1. **ห้ามเขียน UI/page เองเด็ดขาด** — ทุกหน้าต้อง copy จาก `theme/vuexy/typescript-version/full-version/src/` แล้วปรับแก้ content เท่านั้น
-2. **วิธีสร้างหน้าใหม่:** หา page/view ที่ใกล้เคียงที่สุดจาก theme → copy มา → ปรับ content/logic ให้ตรง SafePay ห้ามเขียนจาก scratch
-3. **Auth pages** → Login ใช้ `LoginV1.tsx`, Register ใช้ `RegisterV2.tsx` (register-v2) เป็น base
-4. **Landing page** → ใช้ `theme/vuexy/.../src/app/front-pages/landing-page/` เป็น base
-4. **Dashboard pages** → ใช้ `theme/vuexy/.../src/views/dashboards/` เป็น base
-5. **Table/List pages** → ใช้ `theme/vuexy/.../src/views/apps/` (user-list, invoice, ecommerce) เป็น base
-6. **Form pages** → ใช้ `theme/vuexy/.../src/views/forms/` เป็น base
-7. **Wrapper/Layout** → ใช้ `AuthIllustrationWrapper`, `BlankLayout`, `VerticalLayout` จาก theme
-8. ต้องใช้ `CustomTextField` จาก `@core/components/mui/TextField` — ไม่ใช่ MUI TextField ตรง
-9. ต้องใช้ `Logo` จาก `@components/layout/shared/Logo`
-10. ต้องใช้ `themeConfig` จาก `@configs/themeConfig`
-11. สร้างได้เฉพาะ domain-specific components (trust-score-badge, order-status-badge ฯลฯ) โดยต้อง compose จาก MUI components ที่ theme ใช้เท่านั้น
+### Rules (ABSOLUTE — NO EXCEPTIONS)
 
-**Checklist ก่อนสร้างหน้าใหม่:**
-- [ ] ค้นหา page/view ที่ใกล้เคียงจาก `theme/vuexy/typescript-version/full-version/src/views/` แล้วหรือยัง?
+1. **ห้ามเขียน UI/page เองเด็ดขาด** — ทุกหน้าต้อง copy จาก `theme/paces/Admin/TS/src/app/` หรือ `theme/paces/Admin/TS/src/components/` แล้วปรับ content
+2. **วิธีสร้างหน้าใหม่:**
+   - หา page ที่ใกล้เคียงจาก `theme/paces/Admin/TS/src/app/(admin)/` (list/detail/form/dashboard templates) หรือ `theme/paces/Admin/TS/src/app/auth/` (login, sign-up, OTP, reset-pass, 2fa)
+   - copy markup + Tailwind classes มา → ปรับ content/logic ให้ตรง SafePay
+   - ห้ามเขียนจาก scratch
+3. **Auth pages:**
+   - Login → base on `theme/paces/Admin/TS/src/app/auth/(basic)/sign-in/`
+   - Register → `auth/(basic)/sign-up/`
+   - OTP / Confirm → `auth/(basic)/two-factor/`
+   - Reset password → `auth/(basic)/reset-pass/`
+4. **Dashboard pages** → base on `theme/paces/Admin/TS/src/app/(admin)/dashboard/`
+5. **Table/List pages** → base on `theme/paces/Admin/TS/src/app/(admin)/apps/` (users, invoice, ecommerce, projects)
+6. **Form pages** → base on `theme/paces/Admin/TS/src/app/(admin)/form/`
+7. **Layout wrappers** → use `VerticalLayout` / `HorizontalLayout` / `MainLayout` from `src/layouts/`
+8. **Providers** → all client providers go through `AppProvidersWrapper` (already wires `SessionProvider`, `LayoutProvider`, Preline init)
+9. **Icons:** use `@iconify/react` or `src/components/wrappers/Icon.tsx` — never import from a local icon bundle
+10. **Styling:** Tailwind utility classes only. No inline `style={...}` color constants. No CSS-in-JS. No `@emotion/*`, no `@mui/*`.
+11. **Domain components** (trust-score-badge, verification-badges, order-status-badge, achievement-badges) ให้สร้างใน `src/components/safepay/` โดย compose จาก Preline + Tailwind classes เท่านั้น
+
+### Checklist ก่อนสร้างหน้าใหม่
+
+- [ ] ค้นหา page/view ที่ใกล้เคียงจาก `theme/paces/Admin/TS/src/app/` แล้วหรือยัง?
 - [ ] Copy มาแล้วปรับ content หรือยัง? (ห้ามเขียนเองจาก scratch)
-- [ ] ใช้ Vuexy components (CustomTextField, Logo, AuthIllustrationWrapper ฯลฯ) ครบหรือยัง?
-- [ ] Style/color มาจาก theme ทั้งหมดหรือยัง? (ห้ามกำหนด color เอง)
+- [ ] ใช้ paces layouts (VerticalLayout / HorizontalLayout / MainLayout) ครบหรือยัง?
+- [ ] ใช้ `@iconify/react` สำหรับ icons หรือยัง?
+- [ ] Style ใช้ Tailwind utility classes จากธีมหรือยัง? (ห้ามกำหนด color เอง)
+
+## Directory Structure
+
+```
+src/
+├── app/
+│   ├── api/              # Backend routes — preserved, uses @/lib + @/services
+│   ├── layout.tsx        # Root layout (paces pattern)
+│   ├── page.tsx          # Landing
+│   └── (will add)        # (buyer), seller, admin, auth routes
+├── assets/               # paces fonts, css, images
+│   └── css/app.css       # Main CSS entry — imports all paces + Tailwind + Preline
+├── components/           # paces reusable components (copy from theme/paces as needed)
+│   ├── wrappers/         # AppProvidersWrapper, Icon, Quill, Flatpickr, EChart, etc.
+│   └── safepay/          # Domain-specific components (create here)
+├── config/               # App-level constants (META_DATA, currency, etc.)
+├── context/              # React context (useLayoutContext from paces)
+├── hooks/                # Client hooks (useAuth wired to NextAuth)
+├── layouts/              # paces layouts (Vertical, Horizontal, Main)
+├── lib/                  # Backend: auth.ts, prisma.ts, otp.ts, upload.ts, validations.ts, subdomain.ts
+├── services/             # Backend: order, product, shop, user, verification, trust-score, badge, review, history-linking
+├── types/                # Shared types
+├── utils/                # Client utils (preline, layout, helpers — from paces)
+└── proxy.ts              # Subdomain routing middleware
+```
 
 ## Core Systems
 
@@ -74,11 +114,13 @@ SafePay เป็นระบบสร้างความน่าเชื่
 
 - Language: TypeScript (strict mode)
 - UI ภาษาไทย
-- Font: Noto Sans Thai (Google Fonts)
-- Mobile-first responsive
-- Service layer แยกจาก API layer
-- Input validation ด้วย Valibot ทุก endpoint
+- Font: Noto Sans Thai (Google Fonts) — linked in `src/app/layout.tsx`
+- Mobile-first responsive (Tailwind `sm:`, `md:`, `lg:` breakpoints)
+- Service layer (`src/services/`) แยกจาก API layer (`src/app/api/`)
+- Input validation:
+  - **Backend (API routes):** Valibot schemas from `src/lib/validations.ts`
+  - **Frontend (forms):** Yup + `@hookform/resolvers` (paces convention)
 - ไม่ใช้ Redux — ใช้ Server Components + React state/context
-- Follow Vuexy theme patterns: `@core/`, `@layouts/`, `@menu/` structure
+- Follow paces structure: `components/`, `layouts/`, `hooks/`, `context/`, `utils/`
 
 @AGENTS.md

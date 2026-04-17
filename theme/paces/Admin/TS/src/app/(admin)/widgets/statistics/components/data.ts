@@ -1,0 +1,400 @@
+export type SummaryType = {
+  title: string
+  value: number
+  suffix?: string
+  prefix?: string
+  icon: string
+  className: string
+  change: number
+}
+
+export const summaryData: SummaryType[] = [
+  {
+    title: 'Total Projects',
+    value: 6847,
+    icon: 'briefcase',
+    className: 'bg-secondary/10 text-secondary',
+    change: -9.19,
+  },
+  {
+    title: 'Total Tasks',
+    value: 9.6,
+    suffix: 'k',
+    icon: 'invoice',
+    className: 'bg-primary/10 text-primary',
+    change: 26.87,
+  },
+  {
+    title: 'Avg. Project Earnings',
+    value: 98.24,
+    prefix: '$',
+    suffix: 'k',
+    icon: 'wallet',
+    className: 'bg-warning/10 text-warning',
+    change: 3.51,
+  },
+  {
+    title: 'Productivity',
+    value: 87.84,
+    suffix: '%',
+    icon: 'trending-up',
+    className: 'bg-success/10 text-success',
+    change: -1.05,
+  },
+  {
+    title: 'Project Completion',
+    value: 72.4,
+    suffix: '%',
+    icon: 'circle-check',
+    className: 'bg-info/10 text-info',
+    change: 3.47,
+  },
+]
+
+export type ProgressType = {
+  title: string
+  value: number
+  progress: { label: string; value: number }
+  icon: string
+  variant: string
+}
+
+export const progressData: ProgressType[] = [
+  {
+    title: 'Active Projects',
+    value: 28,
+    progress: { label: 'PROGRESS', value: 75 },
+    icon: 'clipboard-list',
+    variant: 'border-info bg-info/75',
+  },
+  {
+    title: 'Tasks Completed',
+    value: 124,
+    progress: { label: 'TARGET', value: 88 },
+    icon: 'checklist',
+    variant: 'border-success bg-success/75',
+  },
+  {
+    title: 'Pending Tasks',
+    value: 16,
+    progress: { label: 'DEADLINES', value: 42 },
+    icon: 'clock',
+    variant: 'border-warning bg-warning/75',
+  },
+  {
+    title: 'Project Managers',
+    value: 9,
+    progress: { label: 'ALLOCATED', value: 100 },
+    icon: 'user-cog',
+    variant: 'border-danger bg-danger/75',
+  },
+]
+
+export type MetricType = {
+  title: string
+  value: number
+  suffix?: string
+  prefix?: string
+  icon: string
+  className: string
+}
+
+export const metricData: MetricType[] = [
+  {
+    title: 'New Subscriptions',
+    value: 438,
+    icon: 'bell-plus',
+    className: 'border-3 border-secondary bg-secondary/75 text-white',
+  },
+  {
+    title: 'Support Tickets',
+    value: 108,
+    icon: 'headset',
+    className: ' bg-danger/15 text-danger',
+  },
+  {
+    title: 'Conversion Rate',
+    value: 3.7,
+    suffix: '%',
+    icon: 'chart-pie',
+    className: 'bg-light rounded-full',
+  },
+  {
+    title: 'Revenue Growth',
+    value: 12.4,
+    prefix: '+',
+    suffix: '%',
+    icon: 'trending-up',
+    className: 'bg-dark text-white',
+  },
+]
+
+export type DealStatType = {
+  value: number
+  suffix?: string
+  prefix?: string
+  title: string
+  icon: string
+  change: number
+  progress: number
+  variant: string
+}
+
+export const dealStatData: DealStatType[] = [
+  {
+    value: 1230,
+    title: 'Total deals created',
+    icon: 'contract',
+    change: 9.85,
+    progress: 9.85,
+    variant: 'bg-primary',
+  },
+  {
+    value: 860,
+    title: 'Deals won',
+    icon: 'medal',
+    change: 5.2,
+    progress: 5.2,
+    variant: 'bg-success',
+  },
+  {
+    value: 270,
+    title: 'Deals lost',
+    icon: 'x',
+    change: -2.45,
+    progress: 2.45,
+    variant: 'bg-danger',
+  },
+  {
+    value: 220000,
+    prefix: '$',
+    title: 'Highest deal closed',
+    icon: 'currency-dollar',
+    change: 17.1,
+    progress: 100,
+    variant: 'bg-warning',
+  },
+  {
+    value: 15,
+    suffix: 'days',
+    title: 'Avg. close time',
+    icon: 'clock',
+    change: 1.1,
+    progress: 5.1,
+    variant: 'bg-secondary',
+  },
+]
+
+export type StatType = {
+  title: string
+  icon: string
+  value: number
+  suffix?: string
+  prefix?: string
+  change: number
+  changeText: string
+  target: {
+    label: string
+    value: string
+  }
+  badge: {
+    label: string
+    className: string
+    icon: string
+  }
+}
+
+export const statData: StatType[] = [
+  {
+    title: 'Model Requests',
+    icon: 'cpu',
+    value: 78.4,
+    suffix: 'k',
+    change: 6.8,
+    changeText: '5.0k Up',
+    target: {
+      label: 'Monthly Target',
+      value: '100k',
+    },
+    badge: {
+      label: 'On Track',
+      className: 'bg-success/10 text-success',
+      icon: 'circle-check',
+    },
+  },
+  {
+    title: 'Successful Inferences',
+    icon: 'circle-check',
+    value: 95.3,
+    suffix: '%',
+    change: -1.2,
+    changeText: 'Tiny Drop',
+    target: {
+      label: 'SLA Target',
+      value: '98%',
+    },
+    badge: {
+      label: 'Monitor',
+      className: 'bg-warning/10 text-warning',
+      icon: 'alert-circle',
+    },
+  },
+  {
+    title: 'Response Time',
+    icon: 'clock',
+    value: 185,
+    suffix: 'ms',
+    change: 3.4,
+    changeText: 'Faster',
+    target: {
+      label: 'Latency Target',
+      value: '200ms',
+    },
+    badge: {
+      label: 'Great',
+      className: 'bg-success/10 text-success',
+      icon: 'thumb-up',
+    },
+  },
+  {
+    title: 'AI Revenue Impact',
+    icon: 'chart-bar',
+    value: 2.84,
+    prefix: '$',
+    suffix: 'M',
+    change: 8.9,
+    changeText: '$230k Up',
+    target: {
+      label: 'Quarter Goal',
+      value: '$3.5M',
+    },
+    badge: {
+      label: 'Ahead',
+      className: 'bg-success/10 text-success',
+      icon: 'circle-check',
+    },
+  },
+]
+
+export type MiniStatType = {
+  icon: string
+  className: string
+  value: number
+  suffix?: string
+  prefix?: string
+  title: string
+  change: number
+}
+
+export const miniStatData: MiniStatType[] = [
+  {
+    icon: 'solar:cpu-bolt-bold-duotone',
+    className: 'text-primary',
+    value: 12.5,
+    suffix: 'M',
+    title: 'Tokens Processed',
+    change: 6.4,
+  },
+  {
+    icon: 'solar:cloud-plus-bold-duotone',
+    className: 'text-info',
+    value: 284,
+    suffix: 'k',
+    title: 'API Requests',
+    change: 4.8,
+  },
+  {
+    icon: 'solar:target-bold-duotone',
+    className: 'text-warning',
+    value: 98.6,
+    suffix: '%',
+    title: 'Model Accuracy',
+    change: 1.2,
+  },
+  {
+    icon: 'solar:clock-circle-bold-duotone',
+    className: 'text-secondary',
+    value: 210,
+    suffix: 'ms',
+    title: 'Response Time',
+    change: -3.1,
+  },
+  {
+    icon: 'solar:hand-money-bold-duotone',
+    className: 'text-success',
+    value: 76.4,
+    prefix: '$',
+    suffix: 'k',
+    title: 'Cost Savings',
+    change: 9.5,
+  },
+  {
+    icon: 'solar:server-square-cloud-bold-duotone',
+    className: 'text-danger',
+    value: 62.3,
+    suffix: '%',
+    title: 'GPU Utilization',
+    change: 2.7,
+  },
+]
+
+export type BusinessStatType = {
+  title: string
+  badge: { label: string; className: string }
+  icon: string
+  className: string
+  value: number
+  suffix?: string
+  prefix?: string
+  description: string
+}
+
+export const businessStatData: BusinessStatType[] = [
+  {
+    title: 'Active Subscribers',
+    badge: {
+      label: 'Monthly',
+      className: 'text-success bg-success/10',
+    },
+    icon: 'tabler:user-check',
+    className: 'text-white bg-dark',
+    value: 12850,
+    description: 'Current Active Users',
+  },
+  {
+    title: 'MRR (Revenue)',
+    badge: {
+      label: 'Monthly',
+      className: 'text-primary bg-primary/10',
+    },
+    icon: 'tabler:currency-dollar',
+    className: 'text-white bg-primary',
+    prefix: '$',
+    value: 245.6,
+    suffix: 'K',
+    description: 'Monthly Recurring Revenue',
+  },
+  {
+    title: 'Churn Rate',
+    badge: {
+      label: 'Monthly',
+      className: 'text-danger bg-danger/10',
+    },
+    icon: 'tabler:arrow-back-up',
+    className: 'text-white bg-danger',
+    value: 3.25,
+    suffix: '%',
+    description: 'Lost Subscribers Rate',
+  },
+  {
+    title: 'New Signups',
+    badge: {
+      label: 'Monthly',
+      className: 'text-warning bg-warning/10',
+    },
+    icon: 'tabler:user-plus',
+    className: 'text-white bg-warning',
+    value: 1942,
+    description: 'New Subscribers Added',
+  },
+]

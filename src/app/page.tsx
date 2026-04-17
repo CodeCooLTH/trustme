@@ -1,47 +1,31 @@
-// MUI Imports
-import Button from '@mui/material/Button'
+import Link from 'next/link'
 
-// Component Imports
-import Providers from '@components/Providers'
-import BlankLayout from '@layouts/BlankLayout'
-import FrontLayout from '@components/layout/front-pages'
-import LandingPageWrapper from '@views/front-pages/landing-page'
-import ScrollToTop from '@core/components/scroll-to-top'
-
-// Context Imports
-import { IntersectionProvider } from '@/contexts/intersectionContext'
-
-// Config Imports
-import { i18n } from '@configs/i18n'
-
-// Util Imports
-import { getServerMode, getSystemMode } from '@core/utils/serverHelpers'
-
-const LandingPage = async () => {
-  // Vars
-  const direction = i18n.langDirection[i18n.defaultLocale]
-  const mode = await getServerMode()
-  const systemMode = await getSystemMode()
-
+export default function LandingPage() {
   return (
-    <Providers direction={direction}>
-      <BlankLayout systemMode={systemMode}>
-        <IntersectionProvider>
-          <FrontLayout>
-            <LandingPageWrapper mode={mode} />
-            <ScrollToTop className='mui-fixed'>
-              <Button
-                variant='contained'
-                className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'
-              >
-                <i className='tabler-arrow-up' />
-              </Button>
-            </ScrollToTop>
-          </FrontLayout>
-        </IntersectionProvider>
-      </BlankLayout>
-    </Providers>
+    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
+      <div className="max-w-xl text-center">
+        <h1 className="text-4xl font-bold text-gray-900">SafePay</h1>
+        <p className="mt-4 text-lg text-gray-600">
+          ระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์
+        </p>
+        <p className="mt-2 text-sm text-gray-500">
+          Paces UI migration — scaffolding phase. Pages under construction.
+        </p>
+        <div className="mt-8 flex items-center justify-center gap-3">
+          <Link
+            href="/auth/sign-in"
+            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
+          >
+            เข้าสู่ระบบ
+          </Link>
+          <Link
+            href="/auth/sign-up"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+          >
+            สมัครสมาชิก
+          </Link>
+        </div>
+      </div>
+    </main>
   )
 }
-
-export default LandingPage

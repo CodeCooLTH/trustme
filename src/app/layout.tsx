@@ -1,51 +1,38 @@
-// Next Imports
-import { Noto_Sans_Thai } from 'next/font/google'
+import type { Metadata } from 'next'
 
-// MUI Imports
-import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
+import AppProvidersWrapper from '@/components/wrappers/AppProvidersWrapper'
+import { META_DATA } from '@/config/constants'
 
-// Third-party Imports
-import 'react-perfect-scrollbar/dist/css/styles.css'
+import '@/assets/css/app.css'
 
-// Type Imports
-import type { ChildrenType } from '@core/types'
-
-// Util Imports
-import { getSystemMode } from '@core/utils/serverHelpers'
-
-// Style Imports
-import '@/app/globals.css'
-
-// Generated Icon CSS Imports
-import '@assets/iconify-icons/generated-icons.css'
-
-const notoSansThai = Noto_Sans_Thai({
-  subsets: ['thai', 'latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-noto-sans-thai'
-})
-
-export const metadata = {
-  title: 'SafePay - Secure Payment Platform',
-  description: 'SafePay - Secure escrow payment platform for safe online transactions'
+export const metadata: Metadata = {
+  title: {
+    default: META_DATA.title,
+    template: `%s | ${META_DATA.name}`,
+  },
+  description: META_DATA.description,
+  keywords: META_DATA.keywords,
+  authors: [{ name: META_DATA.author }],
 }
 
-const RootLayout = async ({ children }: ChildrenType) => {
-  // Vars
-  const systemMode = await getSystemMode()
-
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
-    <html id='__next' lang='th' dir='ltr' suppressHydrationWarning>
-      <body
-        className={`${notoSansThai.variable} flex is-full min-bs-full flex-auto flex-col`}
-        style={{ fontFamily: 'var(--font-noto-sans-thai), sans-serif' }}
-      >
-        <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
-        {children}
+    <html lang="th">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Inter:wght@100..900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="antialiased">
+        <AppProvidersWrapper>{children}</AppProvidersWrapper>
       </body>
     </html>
   )
 }
-
-export default RootLayout
