@@ -116,7 +116,7 @@ export default async function ProductDetailPage({
 
   return (
     <>
-      <PageBreadcrumb title={product.name} subtitle="สินค้า" />
+      <PageBreadcrumb title={product.name} trail={[{ label: 'Business' }, { label: 'สินค้า', href: '/products' }]} />
       <div className="card">
         <div className="card-body">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-base">

@@ -78,7 +78,7 @@ export default async function CategoriesPage() {
 
   return (
     <>
-      <PageBreadcrumb title="หมวดหมู่สินค้า" subtitle="Business" />
+      <PageBreadcrumb title="หมวดหมู่สินค้า" trail={[{ label: 'Business' }]} />
       <CategoryTable rows={rows} />
     </>
   )

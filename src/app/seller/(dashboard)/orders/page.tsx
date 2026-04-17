@@ -84,7 +84,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <PageBreadcrumb title="ออเดอร์" subtitle="ผู้ขาย" />
+      <PageBreadcrumb title="คำสั่งซื้อ" trail={[{ label: 'Business' }]} />
 
       <div className="mb-base">
         <StatStrip

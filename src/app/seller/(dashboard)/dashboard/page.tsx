@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: 'แดชบอร์ด' }
 export default function SellerDashboardPage() {
   return (
     <>
-      <PageBreadcrumb title="แดชบอร์ด" subtitle="ผู้ขาย" />
+      <PageBreadcrumb title="ภาพรวมร้านค้า" trail={[{ label: 'Analytics' }]} />
 
       <div className="grid xl:grid-cols-12 grid-cols-1 gap-base mb-base">
         <div className="xl:col-span-5">

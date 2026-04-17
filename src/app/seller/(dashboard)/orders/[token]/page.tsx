@@ -88,7 +88,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
 
   return (
     <>
-      <PageBreadcrumb title="รายละเอียดออเดอร์" subtitle="ออเดอร์" />
+      <PageBreadcrumb title="รายละเอียดออเดอร์" trail={[{ label: 'Business' }, { label: 'คำสั่งซื้อ', href: '/orders' }]} />
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-default-400 mb-4">
         <Link href="/orders" className="hover:text-primary transition-colors">ออเดอร์</Link>

@@ -107,7 +107,7 @@ export default async function SalesPage({
 
   return (
     <>
-      <PageBreadcrumb title="ภาพรวมยอดขาย" subtitle="Analytics" />
+      <PageBreadcrumb title="ภาพรวมยอดขาย" trail={[{ label: 'Analytics' }]} />
 
       <div className="card mb-base">
         <div className="card-header flex items-center justify-between flex-wrap gap-3">

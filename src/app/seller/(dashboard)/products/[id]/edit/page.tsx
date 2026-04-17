@@ -55,7 +55,7 @@ export default async function EditProductPage({ params }: PageProps) {
 
   return (
     <>
-      <PageBreadcrumb title="แก้ไขสินค้า" subtitle="สินค้า" />
+      <PageBreadcrumb title="แก้ไขสินค้า" trail={[{ label: 'Business' }, { label: 'สินค้า', href: '/products' }]} />
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Link

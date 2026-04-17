@@ -107,7 +107,7 @@ export default async function CustomersPage() {
 
   return (
     <>
-      <PageBreadcrumb title="ลูกค้า" subtitle="ผู้ขาย" />
+      <PageBreadcrumb title="ผู้ซื้อ" trail={[{ label: 'Buyer' }]} />
       <div className="mb-base">
         <StatStrip items={stripItems} />
       </div>

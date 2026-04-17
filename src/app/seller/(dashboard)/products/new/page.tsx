@@ -41,7 +41,7 @@ export default async function NewProductPage() {
 
   return (
     <>
-      <PageBreadcrumb title="เพิ่มสินค้า" subtitle="สินค้า" />
+      <PageBreadcrumb title="เพิ่มสินค้า" trail={[{ label: 'Business' }, { label: 'สินค้า', href: '/products' }]} />
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Link

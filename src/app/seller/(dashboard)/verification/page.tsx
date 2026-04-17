@@ -95,7 +95,7 @@ export default async function VerificationPage() {
 
   return (
     <>
-      <PageBreadcrumb title="ยืนยันตัวตน" subtitle="ผู้ขาย" />
+      <PageBreadcrumb title="ยืนยันตัวตน" trail={[{ label: 'Setting' }]} />
       {/* Page header */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
