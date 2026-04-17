@@ -38,6 +38,8 @@
     "@rc-component/tour": "^2.2.0",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/table-core": "^8.21.3",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "@vis.gl/react-google-maps": "^1.5.5",
     "animate.css": "^4.1.1",
     "apexcharts": "^5.3.6",

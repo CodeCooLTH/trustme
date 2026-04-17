@@ -46,3 +46,4 @@ uploads/
 
 # claude code local settings
 .claude/
+.env*.local
