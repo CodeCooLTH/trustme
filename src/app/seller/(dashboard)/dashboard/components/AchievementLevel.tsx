@@ -2,15 +2,32 @@
 
 import { CountUp } from '@/components/wrappers/CountUp'
 import { cn } from '@/utils/helpers'
+import { Icon as IconifyIcon } from '@iconify/react'
 
 export type AchievementBadge = {
   id: string
   name: string
   nameEN: string
-  icon: string        // emoji or short text
+  icon: string        // legacy (emoji) — kept for backward compat, no longer rendered
   earned: boolean
   criteria: string    // human-readable criteria (e.g. "สั่ง 50 ออเดอร์")
 }
+
+// Map badge nameEN → lucide icon. Uses paces `@iconify/react` with
+// the 'lucide:' prefix (see theme/paces/Admin/TS/src/app/(admin)/icons/lucide).
+const LUCIDE_FOR_BADGE: Record<string, string> = {
+  'First Sale':          'lucide:store',
+  'Trusted Seller 50':   'lucide:star',
+  'Century Club':        'lucide:trophy',
+  'Perfect Rating':      'lucide:gem',
+  'Highly Rated':        'lucide:sparkles',
+  'Zero Complaint':      'lucide:shield-check',
+  'Veteran':             'lucide:medal',
+  'Speed Demon':         'lucide:zap',
+  'Fully Verified':      'lucide:badge-check',
+  'Community Favorite':  'lucide:heart',
+}
+const FALLBACK_LUCIDE = 'lucide:award'
 
 export type AchievementLevelProps = {
   score: number            // 0-100
@@ -75,21 +92,30 @@ export default function AchievementLevel({
 
         {/* Badges grid */}
         <div className="grid grid-cols-5 gap-2 mt-5">
-          {badges.map((b) => (
-            <div
-              key={b.id}
-              title={b.earned ? b.name : b.criteria}
-              className={cn(
-                'flex flex-col items-center gap-1 p-2 rounded-lg border border-default-200 transition',
-                b.earned ? 'bg-card' : 'bg-default-50 opacity-40 grayscale',
-              )}
-            >
-              <div className="text-2xl leading-none">{b.icon}</div>
-              <div className="text-[10px] text-default-500 text-center leading-tight line-clamp-2">
-                {b.name}
+          {badges.map((b) => {
+            const lucide = LUCIDE_FOR_BADGE[b.nameEN] ?? FALLBACK_LUCIDE
+            return (
+              <div
+                key={b.id}
+                title={b.earned ? b.name : b.criteria}
+                className={cn(
+                  'flex flex-col items-center gap-1 p-2 rounded-lg border border-default-200 transition',
+                  b.earned ? 'bg-card' : 'bg-default-50 opacity-40 grayscale',
+                )}
+              >
+                <IconifyIcon
+                  icon={lucide}
+                  className={cn(
+                    'size-6',
+                    b.earned ? 'text-primary' : 'text-default-400',
+                  )}
+                />
+                <div className="text-[10px] text-default-500 text-center leading-tight line-clamp-2">
+                  {b.name}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </div>
