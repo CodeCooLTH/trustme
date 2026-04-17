@@ -49,7 +49,7 @@ export default async function FullscreenLayout({ children }: { children: React.R
         </div>
       </header>
       <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto max-w-7xl p-4 md:p-8">{children}</div>
+        <div className="w-full p-4 md:p-8">{children}</div>
       </main>
     </div>
   )
