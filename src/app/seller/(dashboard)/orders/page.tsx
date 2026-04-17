@@ -6,9 +6,10 @@ import PageBreadcrumb from '@/components/PageBreadcrumb'
 import Link from 'next/link'
 import { getServerSession } from 'next-auth'
 import type { Metadata } from 'next'
-import type { OrderRow } from './components/data'
+import type { OrderRow, OrderItemRow } from './components/data'
 import OrdersList from './components/OrdersList'
 import StatStrip from '../_shared/StatStrip'
+import { prisma } from '@/lib/prisma'
 
 export const metadata: Metadata = { title: 'ออเดอร์' }
 
@@ -60,19 +61,55 @@ export default async function OrdersPage({ searchParams }: PageProps) {
     rawOrders = []
   }
 
+  // Collect all productIds referenced in orders so we can look up images once
+  const productIds = Array.from(
+    new Set(
+      rawOrders.flatMap((o: any) =>
+        (Array.isArray(o.items) ? o.items : [])
+          .map((i: any) => i.productId)
+          .filter(Boolean),
+      ),
+    ),
+  )
+
+  let productImagesById: Record<string, string> = {}
+  if (productIds.length > 0) {
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds as string[] } },
+      select: { id: true, images: true },
+    })
+    productImagesById = Object.fromEntries(
+      (
+        products.map((p) => {
+          const img = Array.isArray(p.images) && p.images.length > 0 ? String((p.images as any[])[0]) : null
+          return [p.id, img] as [string, string | null]
+        })
+      ).filter((entry): entry is [string, string] => entry[1] !== null),
+    )
+  }
+
   // Coerce Decimal → Number and shape into OrderRow
-  const orders: OrderRow[] = rawOrders.map((o: any) => ({
-    id: (o.publicToken ?? o.id).slice(0, 8),
-    publicToken: o.publicToken ?? o.id,
-    buyer: maskContact(o.buyerContact),
-    product: o.items?.[0]?.name ?? '—',
-    qty: o.items?.reduce((sum: number, i: any) => sum + (i.qty ?? 1), 0) ?? 0,
-    total: Number(o.totalAmount ?? 0),
-    status: o.status,
-    date: o.createdAt
-      ? new Date(o.createdAt).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })
-      : '—',
-  }))
+  const orders: OrderRow[] = rawOrders.map((o: any) => {
+    const rawItems = Array.isArray(o.items) ? o.items : []
+    const items: OrderItemRow[] = rawItems.map((i: any) => ({
+      name: i.name ?? '—',
+      qty: i.qty ?? 1,
+      image: i.productId ? (productImagesById[i.productId] ?? null) : null,
+    }))
+    const totalQty = items.reduce((s, it) => s + it.qty, 0)
+    return {
+      id: (o.publicToken ?? o.id).slice(0, 8),
+      publicToken: o.publicToken ?? o.id,
+      buyer: maskContact(o.buyerContact),
+      items,
+      totalQty,
+      total: Number(o.totalAmount ?? 0),
+      status: o.status,
+      date: o.createdAt
+        ? new Date(o.createdAt).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '—',
+    }
+  })
 
   // Compute stat card values
   const totalCount = orders.length

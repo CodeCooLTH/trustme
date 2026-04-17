@@ -2,6 +2,7 @@
 
 import DataTable from '@/components/table/DataTable'
 import TablePagination from '@/components/table/TablePagination'
+import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
 import Icon from '@/components/wrappers/Icon'
 import { cn } from '@/utils/helpers'
 import {
@@ -58,6 +59,29 @@ const OrdersList = ({ orders, activeStatus }: Props) => {
 
   const columns = useMemo(
     () => [
+      columnHelper.display({
+        id: 'image',
+        size: 56,
+        maxSize: 56,
+        enableSorting: false,
+        header: () => '',
+        cell: ({ row }) => {
+          const first = row.original.items[0]
+          if (first?.image) {
+            return (
+              // eslint-disable-next-line @next/next/no-img-element
+              <div className="size-10 rounded bg-default-100 overflow-hidden flex items-center justify-center shrink-0">
+                <img src={first.image} alt={first.name} className="size-full object-cover" />
+              </div>
+            )
+          }
+          return (
+            <div className="size-10 rounded bg-default-100 flex items-center justify-center shrink-0">
+              <Icon icon="package" className="size-5 text-default-400" />
+            </div>
+          )
+        },
+      }),
       columnHelper.accessor('id', {
         header: 'Order #',
         cell: ({ row }) => (
@@ -74,13 +98,28 @@ const OrdersList = ({ orders, activeStatus }: Props) => {
           <span className="text-default-700">{row.original.buyer}</span>
         ),
       }),
-      columnHelper.accessor('product', {
-        header: 'สินค้า',
-        cell: ({ row }) => (
-          <span className="max-w-[180px] truncate block text-default-700">{row.original.product}</span>
-        ),
+      columnHelper.display({
+        id: 'product',
+        enableSorting: false,
+        header: () => 'สินค้า',
+        cell: ({ row }) => {
+          const items = row.original.items
+          if (items.length === 0) return <span className="text-default-400">—</span>
+          return (
+            <ul className="space-y-1 min-w-[14rem] max-w-[24rem]">
+              {items.map((it, idx) => (
+                <li key={idx} className="flex items-start gap-1 text-sm leading-snug break-words">
+                  <span className="flex-1">{it.name}</span>
+                  {it.qty > 1 && (
+                    <span className="text-default-400 whitespace-nowrap">×{it.qty}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )
+        },
       }),
-      columnHelper.accessor('qty', {
+      columnHelper.accessor('totalQty', {
         header: 'จำนวน',
         cell: ({ getValue }) => <span>{getValue()}</span>,
       }),
@@ -230,17 +269,20 @@ const OrdersList = ({ orders, activeStatus }: Props) => {
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="flex items-center gap-2">
             <label className="text-sm font-semibold text-nowrap">แสดง:</label>
-            <select
-              className="form-select"
-              value={table.getState().pagination.pageSize}
-              onChange={(e) => table.setPageSize(Number(e.target.value))}
-            >
-              {[5, 10, 15, 20].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
+            <div className="w-20">
+              <ChoiceSelect
+                options={[
+                  { value: '5', label: '5' },
+                  { value: '10', label: '10' },
+                  { value: '15', label: '15' },
+                  { value: '20', label: '20' },
+                ]}
+                value={String(table.getState().pagination.pageSize)}
+                onChange={(v) => table.setPageSize(Number(v as string))}
+                search={false}
+                sorting={false}
+              />
+            </div>
           </div>
           <Link href="/orders/new" className="btn bg-primary text-white hover:bg-primary-hover">
             <Icon icon="plus" />
