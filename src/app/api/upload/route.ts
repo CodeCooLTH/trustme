@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { saveFile } from "@/lib/upload";
+import { saveFile } from "@/lib/storage";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
