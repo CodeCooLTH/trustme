@@ -10,11 +10,3 @@ export type OrderRow = {
   status: OrderStatus
   date: string       // formatted th-TH
 }
-
-export type StatCardData = {
-  label: string
-  value: number
-  icon: string       // tabler name
-  accent: 'primary' | 'warning' | 'info' | 'success' | 'danger'
-  change: number     // +/- % vs. previous period (0 when no history)
-}

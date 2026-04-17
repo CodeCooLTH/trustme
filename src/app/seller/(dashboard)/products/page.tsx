@@ -7,9 +7,10 @@ import { getProductsByShop } from '@/services/product.service'
 import { getOrdersByShop } from '@/services/order.service'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import ProductStats from './components/ProductStats'
 import ProductsListing from './components/ProductsListing'
-import type { StatCardData, ProductRow } from './components/data'
+import type { ProductRow } from './components/data'
+import StatStrip from '../_shared/StatStrip'
+import type { StatStripItem } from '../_shared/StatStrip'
 
 export const metadata: Metadata = { title: 'สินค้า' }
 
@@ -100,9 +101,6 @@ export default async function ProductsPage() {
     .flatMap((o: any) => (Array.isArray(o.items) ? o.items : []))
     .reduce((sum: number, i: any) => sum + Number(i.price ?? 0) * (i.qty ?? 1), 0)
 
-  const avgRevenue =
-    completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0
-
   // Best-seller by totalSold
   const topProduct = productRows.reduce<{ name: string; sales: number } | null>((best, p) => {
     if (!best || p.totalSold > best.sales) return { name: p.name, sales: p.totalSold }
@@ -116,70 +114,24 @@ export default async function ProductsPage() {
     allRatings.length > 0
       ? allRatings.reduce((a: number, b: number) => a + b, 0) / allRatings.length
       : 0
-  const totalReviews = productRows.reduce((s, p) => s + p.reviews, 0)
+  const productCount = products.length
+  const totalOrderCount = orders.length
+  const topSoldQty = topProduct?.sales ?? 0
+  const avgRatingRounded = Math.round(avgRating * 10) / 10
 
-  const stats: StatCardData[] = [
-    {
-      title: 'สินค้าทั้งหมด',
-      value: products.length,
-      change: 0,
-      icon: 'package',
-      iconClassName: 'bg-primary/15 text-primary',
-      bulletClassName: 'text-primary',
-      metric: 'เปิดขาย',
-      metricValue: String(productRows.filter((p) => p.isActive).length),
-    },
-    {
-      title: 'ออเดอร์',
-      value: orders.length,
-      change: 0,
-      icon: 'shopping-cart',
-      iconClassName: 'bg-secondary/15 text-secondary',
-      bulletClassName: 'text-secondary',
-      metric: 'สำเร็จ',
-      metricValue: new Intl.NumberFormat('th-TH').format(completedOrders.length),
-    },
-    {
-      title: 'รายได้',
-      value: totalRevenue,
-      prefix: '฿',
-      change: 0,
-      icon: 'cash',
-      iconClassName: 'bg-success/15 text-success',
-      bulletClassName: 'text-success',
-      metric: 'เฉลี่ย/ออเดอร์',
-      metricValue: `฿${new Intl.NumberFormat('th-TH').format(Math.round(avgRevenue))}`,
-    },
-    {
-      title: 'ขายดี',
-      value: topProduct?.sales ?? 0,
-      change: 0,
-      icon: 'trending-up',
-      iconClassName: 'bg-warning/15 text-warning',
-      bulletClassName: 'text-warning',
-      metric: 'สินค้า',
-      metricValue: topProduct?.name ?? '—',
-    },
-    {
-      title: 'เรตติ้งเฉลี่ย',
-      value: Math.round(avgRating * 10) / 10,
-      suffix: '/5',
-      change: 0,
-      icon: 'star',
-      iconClassName: 'bg-info/15 text-info',
-      bulletClassName: 'text-info',
-      metric: 'รีวิว',
-      metricValue: new Intl.NumberFormat('th-TH').format(totalReviews),
-    },
+  const stripItems: StatStripItem[] = [
+    { title: 'สินค้าทั้งหมด', value: productCount,      change: 0, icon: 'package',       iconClass: 'bg-primary/15 text-primary' },
+    { title: 'ออเดอร์',       value: totalOrderCount,   change: 0, icon: 'shopping-cart', iconClass: 'bg-secondary/15 text-secondary' },
+    { title: 'รายได้',        value: totalRevenue,      change: 0, icon: 'cash',          iconClass: 'bg-success/15 text-success',  prefix: '฿' },
+    { title: 'ขายดี',         value: topSoldQty,        change: 0, icon: 'trending-up',   iconClass: 'bg-warning/15 text-warning' },
+    { title: 'เรตติ้งเฉลี่ย', value: avgRatingRounded,  change: 0, icon: 'star',          iconClass: 'bg-info/15 text-info',        suffix: '/5' },
   ]
 
   return (
     <>
       <PageBreadcrumb title="สินค้า" subtitle="ผู้ขาย" />
-      <div className="mb-1.25 grid grid-cols-1 gap-1.25 md:grid-cols-2 lg:grid-cols-5">
-        {stats.map((stat, i) => (
-          <ProductStats key={i} stat={stat} />
-        ))}
+      <div className="mb-base">
+        <StatStrip items={stripItems} />
       </div>
       <ProductsListing products={productRows} />
     </>

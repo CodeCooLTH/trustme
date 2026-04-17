@@ -6,9 +6,9 @@ import PageBreadcrumb from '@/components/PageBreadcrumb'
 import Link from 'next/link'
 import { getServerSession } from 'next-auth'
 import type { Metadata } from 'next'
-import type { OrderRow, StatCardData } from './components/data'
+import type { OrderRow } from './components/data'
 import OrdersList from './components/OrdersList'
-import OrdersStatCard from './components/OrdersStatCard'
+import StatStrip from '../_shared/StatStrip'
 
 export const metadata: Metadata = { title: 'ออเดอร์' }
 
@@ -80,23 +80,21 @@ export default async function OrdersPage({ searchParams }: PageProps) {
   const activeCount = orders.filter((o) => o.status === 'CONFIRMED' || o.status === 'SHIPPED').length
   const completedCount = orders.filter((o) => o.status === 'COMPLETED').length
 
-  const statCards: StatCardData[] = [
-    { label: 'ออเดอร์ทั้งหมด', value: totalCount,     icon: 'shopping-cart',  accent: 'primary', change: 0 },
-    { label: 'รอยืนยัน',        value: pendingCount,   icon: 'clock',          accent: 'warning', change: 0 },
-    { label: 'กำลังดำเนินการ',  value: activeCount,    icon: 'truck-delivery', accent: 'info',    change: 0 },
-    { label: 'สำเร็จแล้ว',      value: completedCount, icon: 'check',          accent: 'success', change: 0 },
-  ]
-
   const activeStatus = sp.status ?? 'all'
 
   return (
     <>
       <PageBreadcrumb title="ออเดอร์" subtitle="ผู้ขาย" />
 
-      <div className="grid md:grid-cols-2 xl:grid-cols-4 grid-cols-1 gap-base mb-base">
-        {statCards.map((s) => (
-          <OrdersStatCard key={s.label} stat={s} />
-        ))}
+      <div className="mb-base">
+        <StatStrip
+          items={[
+            { title: 'ออเดอร์ทั้งหมด', value: totalCount,     change: 0, icon: 'shopping-cart',  iconClass: 'bg-primary/15 text-primary' },
+            { title: 'รอยืนยัน',        value: pendingCount,   change: 0, icon: 'clock',          iconClass: 'bg-warning/15 text-warning' },
+            { title: 'กำลังดำเนินการ',  value: activeCount,    change: 0, icon: 'truck-delivery', iconClass: 'bg-info/15 text-info' },
+            { title: 'สำเร็จแล้ว',      value: completedCount, change: 0, icon: 'check',          iconClass: 'bg-success/15 text-success' },
+          ]}
+        />
       </div>
 
       <OrdersList orders={orders} activeStatus={activeStatus} />

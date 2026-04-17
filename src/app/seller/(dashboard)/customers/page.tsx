@@ -8,6 +8,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import type { CustomerRow } from './components/data'
 import CustomerTable from './components/CustomerTable'
+import StatStrip from '../_shared/StatStrip'
 
 export const metadata: Metadata = { title: 'ลูกค้า' }
 
@@ -98,9 +99,18 @@ export default async function CustomersPage() {
 
   const customers = Array.from(map.values()).sort((a, b) => b.lastOrderRaw - a.lastOrderRaw)
 
+  const stripItems = [
+    { title: 'ลูกค้าทั้งหมด', value: customers.length,                                                  change: 0, icon: 'users',      iconClass: 'bg-primary/15 text-primary' },
+    { title: 'สมาชิก',         value: customers.filter((c) => c.isRegistered).length,                    change: 0, icon: 'user-check', iconClass: 'bg-success/15 text-success' },
+    { title: 'ยอดซื้อรวม',     value: customers.reduce((s, c) => s + c.totalSpent, 0), prefix: '฿',    change: 0, icon: 'cash',       iconClass: 'bg-info/15 text-info' },
+  ]
+
   return (
     <>
       <PageBreadcrumb title="ลูกค้า" subtitle="ผู้ขาย" />
+      <div className="mb-base">
+        <StatStrip items={stripItems} />
+      </div>
       <CustomerTable customers={customers} />
     </>
   )
