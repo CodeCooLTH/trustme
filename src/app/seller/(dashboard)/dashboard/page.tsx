@@ -14,19 +14,11 @@ export default async function SellerDashboardPage() {
   const user = (session as any)?.user
   if (!user) return null // proxy guard — belt & suspenders
 
-  // Try to fetch shop; may return null for new users
-  let shop: any = null
-  try {
-    shop = await getShopByUserId(user.id)
-  } catch {
-    shop = null
-  }
+  // Shop is guaranteed to exist — the (dashboard)/layout.tsx auto-creates it
+  const shop = await getShopByUserId(user.id)
+  if (!shop) return null // should never happen; defensive guard
 
-  if (!shop) {
-    return <NoShopCTA />
-  }
-
-  // Has shop — load orders
+  // Load orders
   let orders: any[] = []
   try {
     orders = await getOrdersByShop(shop.id)
@@ -96,25 +88,6 @@ export default async function SellerDashboardPage() {
 }
 
 // ─── Helper components (co-located — small enough to not warrant separate files) ───
-
-function NoShopCTA() {
-  return (
-    <div className="card p-10 rounded-xl text-center max-w-2xl mx-auto">
-      <Icon icon="mdi:storefront-plus-outline" width={64} height={64} className="text-primary mx-auto mb-4" />
-      <h2 className="text-xl font-bold text-dark mb-2">เริ่มต้นเป็นผู้ขาย</h2>
-      <p className="text-default-400 mb-6">
-        คุณยังไม่มีร้านค้า — ตั้งค่าข้อมูลร้านเพื่อเริ่มรับออเดอร์และสร้าง Trust Score
-      </p>
-      <Link
-        href="/shop"
-        className="btn bg-primary px-6 py-3 font-semibold text-white hover:bg-primary-hover inline-flex items-center gap-2"
-      >
-        <Icon icon="mdi:plus" width={18} height={18} />
-        สร้างร้านค้า
-      </Link>
-    </div>
-  )
-}
 
 function TrustScoreCard({ score }: { score: number }) {
   const level = getTrustLevel(score)
