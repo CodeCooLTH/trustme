@@ -50,9 +50,9 @@ export const authOptions: NextAuthOptions = {
                 },
               },
             });
-          } catch (err: any) {
+          } catch (err: unknown) {
             // P2002 = unique constraint on username or phone; surface as auth failure
-            if (err?.code === "P2002") return null;
+            if (err && typeof err === "object" && "code" in err && err.code === "P2002") return null;
             throw err;
           }
         }
