@@ -1,0 +1,31 @@
+# Vuexy + Paces theme references (huge, not needed at runtime —
+# Vercel already skips node_modules, but theme/ is committed in-repo)
+theme/
+
+# Documentation
+docs/
+
+# Local uploads (storage driver for local dev only)
+uploads/
+
+# Env files (Vercel injects via dashboard)
+.env
+.env.local
+.env.*.local
+.env.production.local
+.env.development.local
+
+# Local tooling
+.claude/
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+
+# OS
+.DS_Store
