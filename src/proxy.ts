@@ -1,45 +1,75 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 import { getSubdomain } from '@/lib/subdomain'
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const host = request.headers.get('host') || 'localhost:3000'
   const subdomain = getSubdomain(host)
   const { pathname } = request.nextUrl
 
-  // Skip internal paths
+  // Skip internal paths early (no auth checks, no rewrites)
   if (pathname.startsWith('/_next') || pathname.startsWith('/api')) {
     return NextResponse.next()
   }
 
-  // Seller subdomain: rewrite to /seller/* paths
+  // Cookies are per-hostname → this token is specific to this subdomain's session
+  const token = await getToken({ req: request })
+  const isAuthed = !!token
+
+  // ========== MAIN domain (buyer) ==========
+  if (subdomain === 'main') {
+    // Block direct access to /seller/* and /admin/* on the main domain
+    if (pathname.startsWith('/seller') || pathname.startsWith('/admin')) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+    // Authed user landing on / → send them to their account
+    if (pathname === '/' && isAuthed) {
+      return NextResponse.redirect(new URL('/my-account', request.url))
+    }
+    // /my-account (and any nested /my-account/*) requires login
+    if (pathname.startsWith('/my-account') && !isAuthed) {
+      const signIn = new URL('/auth/sign-in', request.url)
+      signIn.searchParams.set('callbackUrl', pathname)
+      return NextResponse.redirect(signIn)
+    }
+    return NextResponse.next()
+  }
+
+  // ========== SELLER subdomain ==========
   if (subdomain === 'seller') {
-    if (pathname.startsWith('/seller')) {
-      return NextResponse.next()
+    // Root dispatcher
+    if (pathname === '/') {
+      const target = isAuthed ? '/dashboard' : '/auth/sign-in'
+      return NextResponse.redirect(new URL(target, request.url))
     }
-
-    const url = request.nextUrl.clone()
-
-    url.pathname = `/seller${pathname}`
-
-    return NextResponse.rewrite(url)
+    // Dashboard (and nested) requires login
+    if (pathname.startsWith('/dashboard') && !isAuthed) {
+      return NextResponse.redirect(new URL('/auth/sign-in', request.url))
+    }
+    // Everything else: rewrite to the internal /seller/* path tree
+    if (!pathname.startsWith('/seller')) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/seller${pathname}`
+      return NextResponse.rewrite(url)
+    }
+    return NextResponse.next()
   }
 
-  // Admin subdomain: rewrite to /admin/* paths
+  // ========== ADMIN subdomain ==========
   if (subdomain === 'admin') {
-    if (pathname.startsWith('/admin')) {
-      return NextResponse.next()
+    if (pathname === '/') {
+      const target = isAuthed ? '/dashboard' : '/auth/sign-in'
+      return NextResponse.redirect(new URL(target, request.url))
     }
-
-    const url = request.nextUrl.clone()
-
-    url.pathname = `/admin${pathname}`
-
-    return NextResponse.rewrite(url)
-  }
-
-  // Main domain: block direct access to /seller/* and /admin/*
-  if (pathname.startsWith('/seller') || pathname.startsWith('/admin')) {
-    return NextResponse.redirect(new URL('/', request.url))
+    if (pathname.startsWith('/dashboard') && !isAuthed) {
+      return NextResponse.redirect(new URL('/auth/sign-in', request.url))
+    }
+    if (!pathname.startsWith('/admin')) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/admin${pathname}`
+      return NextResponse.rewrite(url)
+    }
+    return NextResponse.next()
   }
 
   return NextResponse.next()

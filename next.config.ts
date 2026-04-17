@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['safepay.local', 'seller.safepay.local', 'admin.safepay.local'],
+  allowedDevOrigins: ['deepth.local', 'seller.deepth.local', 'admin.deepth.local'],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**.fbcdn.net' },
