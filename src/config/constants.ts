@@ -5,7 +5,7 @@ export const META_DATA = {
   author: 'SafePay',
   username: 'safepay',
   keywords: 'safepay, trust, verification, trust score, order verification, anti-scam',
-  version: '0.1.0',
+  version: '0.2.0',
 }
 
 export const currentYear = new Date().getFullYear()
