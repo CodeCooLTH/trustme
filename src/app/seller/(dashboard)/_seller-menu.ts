@@ -10,6 +10,7 @@ export const sellerMenuItems: MenuItemType[] = [
       { url: '/dashboard', slug: 'seller:dashboard', label: 'แดชบอร์ด', icon: 'dashboard' },
       { url: '/products', slug: 'seller:products', label: 'สินค้า', icon: 'package' },
       { url: '/orders', slug: 'seller:orders', label: 'ออเดอร์', icon: 'receipt-2' },
+      { url: '/customers', slug: 'seller:customers', label: 'ลูกค้า', icon: 'users' },
       { url: '/reviews', slug: 'seller:reviews', label: 'รีวิว', icon: 'star' },
     ],
   },
