@@ -1,9 +1,9 @@
 /* SafePay — theme overrides */
-/* Force "Noto Sans Thai" as the primary font across every skin. */
+/* Force "Anuphan" as the primary font across every skin. */
 
 html {
-    --font-body: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --font-secondary: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-body: "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-secondary: "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 html[data-skin="default"],
@@ -29,14 +29,44 @@ html[data-skin="aurora"],
 html[data-skin="xenon"],
 html[data-skin="matrix"],
 html[data-skin="orbit"] {
-    --font-body: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --font-secondary: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-body: "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-secondary: "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-/* Font-size overrides intentionally removed — restore paces saas defaults     */
-/* to match the coderthemes reference demo exactly:                             */
-/*   html[data-skin="saas"] { font-size: 14px }  (from _theme-saas.css)         */
-/*   --text-body: 13px                           (saas skin override)           */
-/*   --text-sm:   13px                           (saas skin override)           */
-/* If Thai content proves hard to read in production, revisit with a +1px bump  */
-/* targeted only at body text rather than scaling every utility size.           */
+/* ─── Base size bump for Thai content ─────────────────────────────────────── */
+/* Thai glyphs read smaller than Latin at the same px size; bump the root     */
+/* font-size so every rem-based utility scales up accordingly, and override   */
+/* the paces saas literal-px --text-* vars so body text lands at 16px too.    */
+
+html[data-skin="saas"] {
+    font-size: 16px; /* was 14px — 1rem = 16px */
+}
+
+html[data-skin="default"],
+html[data-skin="saas"],
+html[data-skin="modern"],
+html[data-skin="minimal"],
+html[data-skin="silver"],
+html[data-skin="luxe"],
+html[data-skin="pixel"],
+html[data-skin="flat"],
+html[data-skin="crystal"],
+html[data-skin="zen"],
+html[data-skin="galaxy"],
+html[data-skin="retro"],
+html[data-skin="neon"],
+html[data-skin="soft"],
+html[data-skin="mono"],
+html[data-skin="neo"],
+html[data-skin="prism"],
+html[data-skin="nova"],
+html[data-skin="elegant"],
+html[data-skin="aurora"],
+html[data-skin="xenon"],
+html[data-skin="matrix"],
+html[data-skin="orbit"] {
+    --text-body: 1rem;     /* 16px — was 13px (saas) / 14px (root default) */
+    --text-sm:   0.9375rem;/* 15px — was 13px (saas skin override) */
+    --text-xs:   0.875rem; /* 14px — was 13px (root default) */
+    --text-2xs:  0.75rem;  /* 12px — was 11px */
+}
