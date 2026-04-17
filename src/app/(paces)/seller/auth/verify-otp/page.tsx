@@ -4,7 +4,6 @@ import AuthLogo from '@/components/AuthLogo'
 import { currentYear, META_DATA } from '@/config/constants'
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
 import { Suspense } from 'react'
 import VerifyOtpForm from './components/VerifyOtpForm'
 
@@ -38,13 +37,6 @@ export default function SellerVerifyOtpPage() {
                     <Suspense fallback={<p className="text-center text-default-400">กำลังโหลด...</p>}>
                       <VerifyOtpForm />
                     </Suspense>
-
-                    <p className="text-default-400 mt-7.5 text-center">
-                      กลับไปยัง{' '}
-                      <Link href="/auth/sign-in" className="text-primary font-semibold underline underline-offset-4">
-                        หน้าเข้าสู่ระบบผู้ขาย
-                      </Link>
-                    </p>
 
                     <p className="text-default-400 mt-7.5 text-center">
                       &copy; {currentYear} {META_DATA.name} - by <span>{META_DATA.author}</span>

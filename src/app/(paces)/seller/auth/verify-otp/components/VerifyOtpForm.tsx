@@ -1,10 +1,8 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, type FormEvent } from 'react'
-import { toast } from 'react-toastify'
 
 export default function VerifyOtpForm() {
   const router = useRouter()
@@ -18,7 +16,6 @@ export default function VerifyOtpForm() {
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [resending, setResending] = useState(false)
 
   // Redirect if no phone context
   useEffect(() => {
@@ -71,29 +68,6 @@ export default function VerifyOtpForm() {
     }
   }
 
-  const onResend = async () => {
-    if (!phone) return
-    setResending(true)
-    try {
-      const res = await fetch('/api/otp/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contact: phone, type: 'PHONE' }),
-      })
-      if (res.ok) {
-        toast.success('ส่งรหัสใหม่แล้ว')
-        setDigits(['', '', '', '', '', ''])
-        setErrorMsg(null)
-      } else {
-        toast.error('ส่งรหัสใหม่ไม่สำเร็จ')
-      }
-    } catch {
-      toast.error('ส่งรหัสใหม่ไม่สำเร็จ')
-    } finally {
-      setResending(false)
-    }
-  }
-
   if (!phone) return null
 
   return (
@@ -142,41 +116,6 @@ export default function VerifyOtpForm() {
         </button>
       </form>
 
-      <p className="text-default-400 my-9 text-center">
-        ไม่ได้รับรหัส?&nbsp;
-        <button
-          type="button"
-          onClick={onResend}
-          disabled={resending}
-          className="text-primary font-semibold underline underline-offset-3 disabled:opacity-60"
-        >
-          {resending ? 'กำลังส่ง...' : 'ส่งรหัสใหม่'}
-        </button>
-      </p>
-
-      <p className="text-default-400 text-center">
-        {mode === 'signup' ? (
-          <>
-            ต้องการ&nbsp;
-            <Link
-              href="/auth/sign-up"
-              className="text-primary font-semibold underline underline-offset-3"
-            >
-              แก้ไขข้อมูล
-            </Link>
-          </>
-        ) : (
-          <>
-            กลับไป&nbsp;
-            <Link
-              href="/auth/sign-in"
-              className="text-primary font-semibold underline underline-offset-3"
-            >
-              เข้าสู่ระบบ
-            </Link>
-          </>
-        )}
-      </p>
     </>
   )
 }

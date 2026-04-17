@@ -4,7 +4,6 @@ import AuthLogo from '@/components/AuthLogo'
 import { currentYear, META_DATA } from '@/config/constants'
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
 import { Suspense } from 'react'
 import FacebookButton from './components/FacebookButton'
 import OAuthErrorToast from './components/OAuthErrorToast'
@@ -47,13 +46,6 @@ export default function SellerSignInPage() {
 
                   <div className="rounded-md">
                     <SignInForm />
-
-                    <p className="text-default-400 mt-7.5 text-center">
-                      ยังไม่มีบัญชีผู้ขาย?&nbsp;
-                      <Link href="/auth/sign-up" className="text-primary font-semibold underline underline-offset-4">
-                        สมัครผู้ขาย
-                      </Link>
-                    </p>
 
                     <p className="text-default-400 mt-7.5 text-center">
                       &copy; {currentYear} {META_DATA.name} - by <span>{META_DATA.author}</span>
