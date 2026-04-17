@@ -34,7 +34,7 @@ export default async function FullscreenLayout({ children }: { children: React.R
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-body-bg flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-card flex flex-col overflow-hidden">
       <main className="flex-1 overflow-y-auto">
         <div className="w-full p-4 md:p-8">{children}</div>
       </main>

@@ -286,7 +286,7 @@ export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Pr
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[20%_60%_20%] gap-6">
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {/* COLUMN 1 — ข้อมูลลูกค้า                                           */}
@@ -294,28 +294,7 @@ export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Pr
         <div className="card rounded-xl p-6 flex flex-col gap-5">
           <h2 className="text-base font-semibold text-dark">ข้อมูลลูกค้า</h2>
 
-          {/* Order type */}
-          <div>
-            <label htmlFor="order-type" className="form-label">
-              ประเภทออเดอร์<span className="text-danger">*</span>
-            </label>
-            <Controller
-              control={control}
-              name="type"
-              render={({ field }) => (
-                <ChoiceSelect
-                  id="order-type"
-                  options={TYPE_OPTIONS}
-                  value={field.value}
-                  onChange={(v) => field.onChange(v)}
-                  search={false}
-                />
-              )}
-            />
-            {errors.type && (
-              <p className="text-danger mt-1 text-sm">{errors.type.message}</p>
-            )}
-          </div>
+          {/* Order type hidden — defaults to PHYSICAL in form state */}
 
           {/* Buyer name — UI-only */}
           <div>
