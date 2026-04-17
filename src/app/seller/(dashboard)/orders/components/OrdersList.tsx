@@ -17,13 +17,13 @@ import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import type { OrderRow, OrderStatus } from './data'
 
-const STATUS_TABS: { value: string; label: string }[] = [
-  { value: 'all', label: 'ทั้งหมด' },
-  { value: 'CREATED', label: 'รอยืนยัน' },
-  { value: 'CONFIRMED', label: 'ยืนยันแล้ว' },
-  { value: 'SHIPPED', label: 'จัดส่งแล้ว' },
-  { value: 'COMPLETED', label: 'สำเร็จ' },
-  { value: 'CANCELLED', label: 'ยกเลิก' },
+const STATUS_TABS: { value: string; label: string; icon: string; dot?: string }[] = [
+  { value: 'all',       label: 'ทั้งหมด',    icon: 'list' },
+  { value: 'CREATED',   label: 'รอยืนยัน',   icon: 'clock',         dot: 'bg-warning' },
+  { value: 'CONFIRMED', label: 'ยืนยันแล้ว', icon: 'circle-check',  dot: 'bg-info' },
+  { value: 'SHIPPED',   label: 'จัดส่งแล้ว', icon: 'truck-delivery', dot: 'bg-primary' },
+  { value: 'COMPLETED', label: 'สำเร็จ',     icon: 'check',         dot: 'bg-success' },
+  { value: 'CANCELLED', label: 'ยกเลิก',    icon: 'x',             dot: 'bg-danger' },
 ]
 
 const STATUS_META: Record<OrderStatus, { label: string; cls: string }> = {
@@ -161,25 +161,55 @@ const OrdersList = ({ orders, activeStatus }: Props) => {
     }
   }
 
+  // Counts per status for the tab badges
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: orders.length }
+    for (const o of orders) {
+      counts[o.status] = (counts[o.status] ?? 0) + 1
+    }
+    return counts
+  }, [orders])
+
   return (
     <div className="card">
-      {/* Status Tabs */}
-      <div className="card-header border-b border-default-200 flex flex-wrap gap-1.5 pb-3 pt-4 px-5">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            type="button"
-            onClick={() => handleStatusTab(tab.value)}
-            className={cn(
-              'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-              localStatus === tab.value
-                ? 'bg-primary text-white'
-                : 'bg-default-100 text-default-900 hover:bg-default-200'
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Status Tabs — paces underline style */}
+      <div className="card-header px-0 pt-0 pb-0 border-b border-default-200">
+        <div className="flex gap-1 px-5 overflow-x-auto">
+          {STATUS_TABS.map((tab) => {
+            const active = localStatus === tab.value
+            const count = statusCounts[tab.value] ?? 0
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => handleStatusTab(tab.value)}
+                className={cn(
+                  'relative inline-flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap',
+                  'border-b-2 transition-colors focus:outline-none',
+                  active
+                    ? 'text-primary border-primary'
+                    : 'text-default-500 border-transparent hover:text-primary hover:border-default-400',
+                )}
+              >
+                {tab.dot && (
+                  <span className={cn('inline-block size-1.5 rounded-full', tab.dot)} />
+                )}
+                <Icon icon={tab.icon} className="size-4" />
+                <span>{tab.label}</span>
+                <span
+                  className={cn(
+                    'inline-flex items-center justify-center rounded-full text-xs font-semibold leading-none px-2 py-0.5 min-w-[1.25rem]',
+                    active
+                      ? 'bg-primary text-white'
+                      : 'bg-default-100 text-default-700',
+                  )}
+                >
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Toolbar */}
