@@ -2,7 +2,7 @@
 
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
@@ -51,6 +51,7 @@ export default function SignUpForm() {
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>({
     state: 'idle',
   })
+  const reqId = useRef(0)
 
   // Debounce check-username on value change
   useEffect(() => {
@@ -65,18 +66,21 @@ export default function SignUpForm() {
     }
     setUsernameStatus({ state: 'checking' })
     const t = setTimeout(async () => {
+      const id = ++reqId.current
       try {
         const res = await fetch(
           `/api/users/check-username?u=${encodeURIComponent(username)}`
         )
         const data: { available: boolean; reason?: 'taken' | 'reserved' | 'invalid' } =
           await res.json()
+        if (reqId.current !== id) return
         if (data.available) {
           setUsernameStatus({ state: 'ok' })
         } else {
           setUsernameStatus({ state: 'error', reason: data.reason ?? 'invalid' })
         }
       } catch {
+        if (reqId.current !== id) return
         setUsernameStatus({ state: 'error', reason: 'network' })
       }
     }, 400)
