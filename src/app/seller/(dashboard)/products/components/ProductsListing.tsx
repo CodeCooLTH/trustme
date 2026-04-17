@@ -22,6 +22,12 @@ import { useState } from 'react'
 import { toast } from 'react-toastify'
 import type { ProductRow } from './data'
 
+const STATUS_TABS: { value: string; label: string; icon: string; dot?: string }[] = [
+  { value: 'all', label: 'ทั้งหมด', icon: 'list' },
+  // Future: { value: 'ACTIVE', label: 'เปิดขาย', icon: 'eye', dot: 'bg-success' },
+  //         { value: 'HIDDEN', label: 'ซ่อน',    icon: 'eye-off', dot: 'bg-default-400' },
+]
+
 const TYPE_LABELS: Record<ProductRow['type'], string> = {
   PHYSICAL: 'สินค้าจับต้องได้',
   DIGITAL: 'ดิจิทัล',
@@ -49,6 +55,12 @@ const ProductsListing = ({ products }: Props) => {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
   const [selectedRowIds, setSelectedRowIds] = useState<Record<string, boolean>>({})
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<string>('all')
+
+  // Counts per tab for the badges (only "ทั้งหมด" for now)
+  const tabCounts: Record<string, number> = {
+    all: products.length,
+  }
 
   const columns = [
     {
@@ -234,6 +246,42 @@ const ProductsListing = ({ products }: Props) => {
 
   return (
     <div className="card">
+      {/* Status Tabs — paces underline style (matches /orders) */}
+      <div className="card-header px-0 pt-0 pb-0 border-b border-default-200">
+        <div className="flex gap-1 px-5 overflow-x-auto">
+          {STATUS_TABS.map((tab) => {
+            const active = activeTab === tab.value
+            const count = tabCounts[tab.value] ?? 0
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setActiveTab(tab.value)}
+                className={cn(
+                  'relative inline-flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap',
+                  'border-b-2 transition-colors focus:outline-none',
+                  active
+                    ? 'text-primary border-primary'
+                    : 'text-default-500 border-transparent hover:text-primary hover:border-default-400',
+                )}
+              >
+                {tab.dot && <span className={cn('inline-block size-1.5 rounded-full', tab.dot)} />}
+                <Icon icon={tab.icon} className="size-4" />
+                <span>{tab.label}</span>
+                <span
+                  className={cn(
+                    'inline-flex items-center justify-center rounded-full text-xs font-semibold leading-none px-2 py-0.5 min-w-[1.25rem]',
+                    active ? 'bg-primary text-white' : 'bg-default-100 text-default-700',
+                  )}
+                >
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       <div className="card-header">
         <div className="flex gap-2.5">
           <div className="input-icon-group">
