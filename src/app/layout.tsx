@@ -21,7 +21,19 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="th">
+    <html
+      lang="th"
+      data-layout="vertical"
+      data-sidenav-user="false"
+      data-layout-position="fixed"
+      data-topbar-color="light"
+      data-menu-color="dark"
+      data-theme="light"
+      data-skin="saas"
+      data-sidenav-size="on-hover-active"
+      data-layout-width="fluid"
+      dir="ltr"
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

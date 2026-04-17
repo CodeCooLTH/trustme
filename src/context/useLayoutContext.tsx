@@ -61,7 +61,7 @@ export const hideBackdrop = () => {
 }
 
 const INIT_STATE: LayoutState = {
-  skin: 'default',
+  skin: 'saas',
   theme: 'light',
   orientation: 'vertical',
   sidenavSize: 'on-hover-active',
