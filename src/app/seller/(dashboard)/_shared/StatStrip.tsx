@@ -4,6 +4,26 @@ import { CountUp } from '@/components/wrappers/CountUp'
 import Icon from '@/components/wrappers/Icon'
 import { cn } from '@/utils/helpers'
 
+// Compact number formatter: 999 → "999", 1000 → "1K", 52100 → "52.1K",
+// 1_000_000 → "1M", 1_250_000 → "1.25M". Decimals trimmed when ".0".
+function compactNumber(n: number): string {
+  const abs = Math.abs(n)
+  const sign = n < 0 ? '-' : ''
+  if (abs < 1000) {
+    return sign + (Number.isInteger(n) ? abs.toString() : abs.toFixed(2))
+  }
+  if (abs < 1_000_000) {
+    const v = abs / 1000
+    return sign + (v >= 100 ? v.toFixed(0) : v.toFixed(1)).replace(/\.0$/, '') + 'K'
+  }
+  if (abs < 1_000_000_000) {
+    const v = abs / 1_000_000
+    return sign + (v >= 100 ? v.toFixed(0) : v.toFixed(2)).replace(/\.?0+$/, '') + 'M'
+  }
+  const v = abs / 1_000_000_000
+  return sign + (v >= 100 ? v.toFixed(0) : v.toFixed(2)).replace(/\.?0+$/, '') + 'B'
+}
+
 export type StatStripItem = {
   title: string
   value: number
@@ -55,7 +75,7 @@ export default function StatStrip({ items }: { items: StatStripItem[] }) {
                     duration={1}
                     prefix={item.prefix}
                     suffix={item.suffix}
-                    decimals={Number.isInteger(item.value) ? 0 : 2}
+                    formattingFn={(n) => `${item.prefix ?? ''}${compactNumber(n)}${item.suffix ?? ''}`}
                   />
                 </h3>
               </div>
