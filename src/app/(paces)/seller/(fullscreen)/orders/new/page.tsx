@@ -5,9 +5,9 @@ import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import OrderCreateForm, { type CatalogProduct } from '@/app/seller/(dashboard)/orders/new/components/OrderCreateForm'
+import OrderCreateForm, { type CatalogProduct } from '@/app/(paces)/seller/(dashboard)/orders/new/components/OrderCreateForm'
 import Icon from '@/components/wrappers/Icon'
-import FullscreenPageHeader from '@/app/seller/(fullscreen)/_shared/FullscreenPageHeader'
+import FullscreenPageHeader from '@/app/(paces)/seller/(fullscreen)/_shared/FullscreenPageHeader'
 
 export const metadata: Metadata = { title: 'สร้างออเดอร์' }
 

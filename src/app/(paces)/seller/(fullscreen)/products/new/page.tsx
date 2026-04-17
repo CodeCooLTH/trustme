@@ -5,8 +5,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
-import ProductForm from '@/app/seller/(dashboard)/products/components/ProductForm'
-import FullscreenPageHeader from '@/app/seller/(fullscreen)/_shared/FullscreenPageHeader'
+import ProductForm from '@/app/(paces)/seller/(dashboard)/products/components/ProductForm'
+import FullscreenPageHeader from '@/app/(paces)/seller/(fullscreen)/_shared/FullscreenPageHeader'
 
 export const metadata: Metadata = { title: 'เพิ่มสินค้า' }
 
