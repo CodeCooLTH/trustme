@@ -1,12 +1,14 @@
 # Vuexy + Paces theme references (huge, not needed at runtime —
-# Vercel already skips node_modules, but theme/ is committed in-repo)
-theme/
+# Vercel already skips node_modules, but theme/ is committed in-repo).
+# Use leading slash to scope to repo root — bare "theme/" would also
+# match src/components/theme/ and break Vuexy ThemeProvider import.
+/theme/
 
 # Documentation
-docs/
+/docs/
 
 # Local uploads (storage driver for local dev only)
-uploads/
+/uploads/
 
 # Env files (Vercel injects via dashboard)
 .env
