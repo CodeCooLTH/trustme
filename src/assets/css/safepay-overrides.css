@@ -75,3 +75,9 @@ html[data-skin="orbit"] {
     --text-body: 0.9375rem; /* 15px — was 13px (saas/many skins) / 14px (others) */
     --text-sm:   0.875rem;  /* 14px — was 13px (saas skin override) */
 }
+
+/* saas skin sets html { font-size: 14px } as a raw rule (not a CSS var). */
+/* Override here so rem-based sizing follows the +1 step bump too. */
+html[data-skin="saas"] {
+    font-size: 15px;
+}
