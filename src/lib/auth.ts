@@ -15,29 +15,46 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         phone: { label: "Phone", type: "text" },
         otp: { label: "OTP", type: "text" },
+        mode: { label: "Mode", type: "text" },
+        displayName: { label: "DisplayName", type: "text" },
+        username: { label: "Username", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.phone || !credentials?.otp) return null;
 
-        // Verify OTP
         const { verifyOtp } = await import("@/lib/otp");
         if (!verifyOtp(credentials.phone, credentials.otp)) return null;
 
-        // Find or create user
         let user = await prisma.user.findFirst({
           where: { phone: credentials.phone },
         });
+
         if (!user) {
-          user = await prisma.user.create({
-            data: {
-              phone: credentials.phone,
-              displayName: `User_${credentials.phone.slice(-4)}`,
-              username: `user_${Date.now()}`,
-              authAccounts: {
-                create: { provider: "PHONE", providerAccountId: credentials.phone },
+          const displayName =
+            credentials.displayName?.trim() ||
+            `User_${credentials.phone.slice(-4)}`;
+          const username =
+            credentials.username?.trim() || `user_${Date.now()}`;
+
+          try {
+            user = await prisma.user.create({
+              data: {
+                phone: credentials.phone,
+                displayName,
+                username,
+                authAccounts: {
+                  create: {
+                    provider: "PHONE",
+                    providerAccountId: credentials.phone,
+                  },
+                },
               },
-            },
-          });
+            });
+          } catch (err: any) {
+            // P2002 = unique constraint on username or phone; surface as auth failure
+            if (err?.code === "P2002") return null;
+            throw err;
+          }
         }
         return { id: user.id, name: user.displayName, email: user.email };
       },
@@ -105,7 +122,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/login",
+    signIn: "/auth/sign-in",
   },
 };
 
