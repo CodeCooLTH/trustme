@@ -26,7 +26,7 @@ export default function SignUpPage() {
               <div className="mb-3 flex flex-col items-center justify-center text-center">
                 <AuthLogo />
                 <p className="text-default-400 mx-auto mt-6 mb-4 w-full lg:w-3/4">
-                  เริ่มต้นใช้งาน SafePay — กรอกข้อมูลด้านล่างเพื่อสร้างบัญชี
+                  เริ่มต้นใช้งาน Deep — กรอกข้อมูลด้านล่างเพื่อสร้างบัญชี
                 </p>
               </div>
 

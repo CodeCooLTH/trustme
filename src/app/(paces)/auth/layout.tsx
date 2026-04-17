@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: {
     default: 'Auth',
-    template: '%s | SafePay',
+    template: '%s | Deep',
   },
 }
 

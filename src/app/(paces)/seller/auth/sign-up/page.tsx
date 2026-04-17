@@ -26,7 +26,7 @@ export default function SellerSignUpPage() {
               <div className="mb-3 flex flex-col items-center justify-center text-center">
                 <AuthLogo />
                 <p className="text-default-400 mx-auto mt-6 mb-4 w-full lg:w-3/4">
-                  เริ่มต้นเป็นผู้ขายบน SafePay — กรอกข้อมูลร้านค้าของคุณ
+                  เริ่มต้นเป็นผู้ขายบน Deep — กรอกข้อมูลร้านค้าของคุณ
                 </p>
               </div>
 

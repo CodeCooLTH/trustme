@@ -32,7 +32,7 @@ export default function AdminSignInPage() {
                 <div className="card-body relative p-12.5">
                   <div className="mb-7.5 flex flex-col items-center justify-center text-center">
                     <AuthLogo />
-                    <h4 className="mt-5 mb-2 text-base font-bold">SafePay Admin</h4>
+                    <h4 className="mt-5 mb-2 text-base font-bold">Deep Admin</h4>
                     <p className="text-default-400 mx-auto w-full lg:w-3/4">
                       เข้าสู่ระบบผู้ดูแลระบบด้วยเบอร์โทรศัพท์
                     </p>

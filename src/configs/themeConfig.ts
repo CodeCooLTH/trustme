@@ -54,7 +54,7 @@ export type Config = {
 }
 
 const themeConfig: Config = {
-  templateName: 'SafePay',
+  templateName: 'Deep',
   homePageUrl: '/',
   settingsCookieName: 'safepay-marketing-settings',
   mode: 'system', // 'system', 'light', 'dark'

@@ -94,7 +94,7 @@ const ContactUs = () => {
                     <div>
                       <Typography>อีเมล</Typography>
                       <Typography color='text.primary' className='font-medium'>
-                        hello@safepay.co
+                        hello@deepthailand.app
                       </Typography>
                     </div>
                   </div>
