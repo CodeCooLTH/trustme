@@ -64,7 +64,7 @@ const ProductCard = ({ product }: { product: ProductCardData }) => {
 
         {/* Name link */}
         <h6 className="card-title mb-1.5 text-sm">
-          <Link href={`/products/${id}/edit`} className="hover:text-primary line-clamp-2">
+          <Link href={`/products/${id}`} className="hover:text-primary line-clamp-2">
             {name}
           </Link>
         </h6>
