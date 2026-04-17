@@ -81,10 +81,10 @@ export default async function OrdersPage({ searchParams }: PageProps) {
   const completedCount = orders.filter((o) => o.status === 'COMPLETED').length
 
   const statCards: StatCardData[] = [
-    { label: 'ออเดอร์ทั้งหมด', value: totalCount,     icon: 'shopping-cart',  accent: 'primary' },
-    { label: 'รอยืนยัน',        value: pendingCount,   icon: 'clock',          accent: 'warning' },
-    { label: 'กำลังดำเนินการ',  value: activeCount,    icon: 'truck-delivery', accent: 'info'    },
-    { label: 'สำเร็จแล้ว',      value: completedCount, icon: 'check',          accent: 'success' },
+    { label: 'ออเดอร์ทั้งหมด', value: totalCount,     icon: 'shopping-cart',  accent: 'primary', change: 0 },
+    { label: 'รอยืนยัน',        value: pendingCount,   icon: 'clock',          accent: 'warning', change: 0 },
+    { label: 'กำลังดำเนินการ',  value: activeCount,    icon: 'truck-delivery', accent: 'info',    change: 0 },
+    { label: 'สำเร็จแล้ว',      value: completedCount, icon: 'check',          accent: 'success', change: 0 },
   ]
 
   const activeStatus = sp.status ?? 'all'

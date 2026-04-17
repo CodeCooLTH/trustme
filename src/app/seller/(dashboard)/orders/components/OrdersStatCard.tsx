@@ -30,7 +30,20 @@ const OrdersStatCard = ({ stat }: OrdersStatCardProps) => {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xs uppercase font-bold">{stat.label}</span>
+          <div className="flex items-center gap-1">
+            <span className="text-[15px] uppercase font-bold">{stat.label}</span>
+          </div>
+          {stat.change !== 0 && (
+            <span
+              className={cn(
+                'badge ms-auto',
+                stat.change > 0 ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger',
+              )}
+            >
+              {stat.change > 0 ? '+' : ''}
+              {stat.change}%
+            </span>
+          )}
         </div>
       </div>
     </div>
