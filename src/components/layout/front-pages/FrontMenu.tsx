@@ -115,6 +115,16 @@ const FrontMenu = (props: Props) => {
       <Typography
         color='text.primary'
         component={Link}
+        href='/pricing'
+        className={classnames('font-medium plb-3 pli-1.5 hover:text-primary', {
+          'text-primary': pathname === '/pricing'
+        })}
+      >
+        ราคา
+      </Typography>
+      <Typography
+        color='text.primary'
+        component={Link}
         href='#team'
         className={classnames('font-medium plb-3 pli-1.5 hover:text-primary', {
           'text-primary': intersections.team
