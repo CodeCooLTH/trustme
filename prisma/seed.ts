@@ -39,6 +39,23 @@ async function main() {
     },
   });
   console.log(`Seeded admin user: ${admin.id}`);
+
+  // Seed test account — phone 0920791649 / OTP 123456 (bypass in src/lib/otp.ts)
+  // Remove together with the OTP bypass before production.
+  const testUser = await prisma.user.upsert({
+    where: { username: "testuser" },
+    update: {},
+    create: {
+      phone: "0920791649",
+      displayName: "ผู้ใช้ทดสอบ",
+      username: "testuser",
+      trustScore: 50,
+      authAccounts: {
+        create: { provider: "PHONE", providerAccountId: "0920791649" },
+      },
+    },
+  });
+  console.log(`Seeded test user: ${testUser.id}`);
 }
 
 main()

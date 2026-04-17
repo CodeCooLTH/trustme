@@ -22,17 +22,8 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.phone || !credentials?.otp) return null;
 
-        const { verifyOtp, TEST_ACCOUNT } = await import("@/lib/otp");
+        const { verifyOtp } = await import("@/lib/otp");
         if (!verifyOtp(credentials.phone, credentials.otp)) return null;
-
-        // Test account short-circuit — bypass DB for smoke testing.
-        if (credentials.phone === TEST_ACCOUNT.phone) {
-          return {
-            id: TEST_ACCOUNT.id,
-            name: TEST_ACCOUNT.displayName,
-            email: null,
-          };
-        }
 
         let user = await prisma.user.findFirst({
           where: { phone: credentials.phone },
@@ -111,21 +102,6 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token.userId) {
-        // Test account short-circuit — bypass DB for smoke testing.
-        const { TEST_ACCOUNT } = await import("@/lib/otp");
-        if (token.userId === TEST_ACCOUNT.id) {
-          (session as any).user = {
-            id: TEST_ACCOUNT.id,
-            displayName: TEST_ACCOUNT.displayName,
-            username: TEST_ACCOUNT.username,
-            avatar: null,
-            isShop: false,
-            isAdmin: false,
-            trustScore: 50,
-          };
-          return session;
-        }
-
         const user = await prisma.user.findUnique({
           where: { id: token.userId as string },
           select: {
