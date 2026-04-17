@@ -65,6 +65,23 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
+    // Keep redirect targets on the same origin as the request (subdomain + port
+    // aware). NextAuth's default redirect prefixes relative URLs with
+    // NEXTAUTH_URL, which breaks multi-subdomain dev (seller.deepth.local:4000
+    // would bounce to localhost:3000). Returning the URL unchanged lets the
+    // browser resolve relative paths against window.location — so signIn /
+    // signOut land where the user currently is.
+    async redirect({ url, baseUrl }) {
+      // Relative path → trust as-is (browser resolves against current origin)
+      if (url.startsWith("/")) return url;
+      // Absolute URL → allow only if it matches baseUrl origin for safety
+      try {
+        if (new URL(url).origin === new URL(baseUrl).origin) return url;
+      } catch {
+        /* fall through */
+      }
+      return baseUrl;
+    },
     async jwt({ token, user, account }) {
       if (user) {
         token.userId = user.id;
