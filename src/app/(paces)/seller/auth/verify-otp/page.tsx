@@ -24,7 +24,7 @@ export default function SellerVerifyOtpPage() {
 
             <div className="card rounded-2xl">
               <div className="grid grid-cols-1 lg:grid-cols-2">
-                <div className="card-body relative p-12.5 min-h-[560px]">
+                <div className="card-body relative p-12.5 min-h-[580px]">
                   <div className="mb-7.5 flex flex-col items-center justify-center text-center">
                     <AuthLogo />
                     <h4 className="mt-5 mb-2 text-base font-bold">ยืนยันรหัส OTP</h4>

@@ -97,15 +97,7 @@ export default function VerifyOtpForm() {
 
   return (
     <>
-      <div className="mb-3 flex flex-col items-center justify-center text-center">
-        <p className="text-default-400 mx-auto mt-6 mb-4 w-full lg:w-3/4">
-          เราได้ส่งรหัส 6 หลักไปที่เบอร์
-        </p>
-      </div>
-
-      <div className="mb-9">
-        <div className="text-center text-2xl font-bold">{masked}</div>
-      </div>
+      <div className="mb-6 text-center text-2xl font-bold">{masked}</div>
 
       <form onSubmit={onSubmit}>
         <div className="mb-5">
