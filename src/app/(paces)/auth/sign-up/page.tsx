@@ -51,7 +51,7 @@ export default function SignUpPage() {
               </p>
             </div>
 
-            <p className="text-default-400 mt-7.5 text-center">
+            <p className="text-default-400 mt-7.5 text-center text-sm">
               &copy; {currentYear} {META_DATA.name} - by <span>{META_DATA.author}</span>
             </p>
           </div>

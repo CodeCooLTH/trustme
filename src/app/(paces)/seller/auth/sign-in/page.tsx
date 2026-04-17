@@ -47,9 +47,6 @@ export default function SellerSignInPage() {
                   <div className="rounded-md">
                     <SignInForm />
 
-                    <p className="text-default-400 mt-7.5 text-center">
-                      &copy; {currentYear} {META_DATA.name} - by <span>{META_DATA.author}</span>
-                    </p>
                   </div>
                 </div>
 
@@ -61,6 +58,9 @@ export default function SellerSignInPage() {
                 </div>
               </div>
             </div>
+            <p className="text-default-400 mt-5 text-center text-sm">
+              &copy; {currentYear} {META_DATA.name} - by <span>{META_DATA.author}</span>
+            </p>
           </div>
         </div>
       </div>
