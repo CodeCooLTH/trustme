@@ -1,0 +1,330 @@
+'use client'
+
+import Rating from '@/components/Rating'
+import DataTable from '@/components/table/DataTable'
+import DeleteConfirmationModal from '@/components/table/DeleteConfirmationModal'
+import TablePagination from '@/components/table/TablePagination'
+import Icon from '@/components/wrappers/Icon'
+import { cn } from '@/utils/helpers'
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import Link from 'next/link'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { toast } from 'react-toastify'
+import type { ProductRow } from './data'
+
+const TYPE_LABELS: Record<ProductRow['type'], string> = {
+  PHYSICAL: 'สินค้าจับต้องได้',
+  DIGITAL: 'ดิจิทัล',
+  SERVICE: 'บริการ',
+}
+
+const TYPE_COLORS: Record<ProductRow['type'], string> = {
+  PHYSICAL: 'bg-primary/10 text-primary',
+  DIGITAL: 'bg-info/10 text-info',
+  SERVICE: 'bg-success/10 text-success',
+}
+
+const columnHelper = createColumnHelper<ProductRow>()
+
+type Props = {
+  products: ProductRow[]
+}
+
+const ProductsListing = ({ products }: Props) => {
+  const router = useRouter()
+  const [data, setData] = useState<ProductRow[]>(() => [...products])
+  const [globalFilter, setGlobalFilter] = useState('')
+  const [sorting, setSorting] = useState<any[]>([])
+  const [columnFilters, setColumnFilters] = useState<any[]>([])
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
+  const [selectedRowIds, setSelectedRowIds] = useState<Record<string, boolean>>({})
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const columns = [
+    {
+      id: 'select',
+      maxSize: 45,
+      size: 45,
+      header: ({ table }: any) => (
+        <input
+          type="checkbox"
+          className="form-checkbox form-checkbox-light size-4.5"
+          checked={table.getIsAllRowsSelected()}
+          onChange={table.getToggleAllRowsSelectedHandler()}
+        />
+      ),
+      cell: ({ row }: any) => (
+        <input
+          type="checkbox"
+          className="form-checkbox form-checkbox-light size-4.5"
+          checked={row.getIsSelected()}
+          onChange={row.getToggleSelectedHandler()}
+        />
+      ),
+      enableSorting: false,
+      enableColumnFilter: false,
+    },
+    columnHelper.accessor('name', {
+      header: 'สินค้า',
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <div className="me-1 size-9 shrink-0">
+            {row.original.image ? (
+              <Image
+                src={row.original.image}
+                alt={row.original.name}
+                width={36}
+                height={36}
+                className="rounded object-cover size-9"
+              />
+            ) : (
+              <div className="bg-default-100 rounded size-9 flex items-center justify-center">
+                <Icon icon="package" className="size-5 text-default-300" />
+              </div>
+            )}
+          </div>
+          <div>
+            <h5 className="mb-0.5">
+              <Link href={`/products/${row.original.id}`} className="hover:text-primary font-medium">
+                {row.original.name}
+              </Link>
+            </h5>
+            <p className="text-default-400 text-2xs line-clamp-1 max-w-[180px]">
+              {row.original.description || '—'}
+            </p>
+          </div>
+        </div>
+      ),
+    }),
+    columnHelper.accessor('type', {
+      header: 'ประเภท',
+      cell: ({ row }) => (
+        <span className={cn('badge py-0 font-semibold text-2xs', TYPE_COLORS[row.original.type])}>
+          {TYPE_LABELS[row.original.type]}
+        </span>
+      ),
+      filterFn: 'equalsString',
+      enableColumnFilter: true,
+    }),
+    columnHelper.accessor('price', {
+      header: 'ราคา',
+      cell: ({ row }) => (
+        <span>฿{new Intl.NumberFormat('th-TH').format(row.original.price)}</span>
+      ),
+    }),
+    columnHelper.accessor('isActive', {
+      header: 'สถานะ',
+      cell: ({ row }) => (
+        <span
+          className={cn(
+            'badge py-0 font-semibold text-2xs',
+            row.original.isActive ? 'bg-success/10 text-success' : 'bg-default-200 text-default-700'
+          )}
+        >
+          {row.original.isActive ? 'เปิดขาย' : 'ซ่อน'}
+        </span>
+      ),
+    }),
+    columnHelper.accessor('totalSold', {
+      header: 'ขายแล้ว',
+      cell: ({ row }) => <span>{new Intl.NumberFormat('th-TH').format(row.original.totalSold)}</span>,
+    }),
+    columnHelper.accessor('rating', {
+      header: 'เรตติ้ง',
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1">
+          <Rating rating={row.original.rating} />
+          <span className="ms-1 text-default-400 text-xs">({row.original.reviews})</span>
+        </div>
+      ),
+    }),
+    {
+      id: 'action',
+      header: () => <div className="text-center mx-auto">การจัดการ</div>,
+      cell: ({ row }: any) => (
+        <div className="flex justify-center gap-1.5">
+          <Link
+            href={`/products/${row.original.id}`}
+            className="btn btn-icon size-7.75 border border-default-300 text-default-800 hover:border-default-400"
+          >
+            <Icon icon="eye" className="text-base" />
+          </Link>
+          <Link
+            href={`/products/${row.original.id}/edit`}
+            className="btn btn-icon size-7.75 border border-default-300 text-default-800 hover:border-default-400"
+          >
+            <Icon icon="pencil" className="text-base" />
+          </Link>
+          <button
+            type="button"
+            className="btn btn-icon size-7.75 border border-default-300 text-default-800 hover:border-default-400"
+            onClick={() => {
+              'use no memo'
+              setDeletingId(row.original.id)
+              setSelectedRowIds({ [row.id]: true })
+            }}
+            data-hs-overlay="#confirm-delete-modal"
+            suppressHydrationWarning
+          >
+            <Icon icon="trash" className="text-base" />
+          </button>
+        </div>
+      ),
+    },
+  ]
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      sorting,
+      globalFilter,
+      columnFilters,
+      pagination,
+      rowSelection: selectedRowIds,
+    },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: setPagination,
+    onRowSelectionChange: setSelectedRowIds,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    globalFilterFn: 'includesString',
+    enableColumnFilters: true,
+    enableRowSelection: true,
+  })
+
+  const pageIndex = table.getState().pagination.pageIndex
+  const pageSize = table.getState().pagination.pageSize
+  const totalItems = table.getFilteredRowModel().rows.length
+  const start = pageIndex * pageSize + 1
+  const end = Math.min(start + pageSize - 1, totalItems)
+
+  const handleDelete = async () => {
+    const id = deletingId
+    if (!id) return
+    try {
+      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('ลบไม่สำเร็จ')
+      setData((prev) => prev.filter((p) => p.id !== id))
+      setSelectedRowIds({})
+      setDeletingId(null)
+      setPagination({ ...pagination, pageIndex: 0 })
+      toast.success('ลบสินค้าเรียบร้อย')
+      router.refresh()
+    } catch {
+      toast.error('เกิดข้อผิดพลาด ลบสินค้าไม่สำเร็จ')
+    } finally {
+      window.HSOverlay?.close('#confirm-delete-modal')
+    }
+  }
+
+  return (
+    <div className="card">
+      <div className="card-header">
+        <div className="flex gap-2.5">
+          <div className="input-icon-group">
+            <Icon icon="search" className="input-icon" />
+            <input
+              value={globalFilter ?? ''}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              type="text"
+              className="form-input"
+              placeholder="ค้นหาชื่อสินค้า..."
+            />
+          </div>
+          <button
+            className={cn('btn bg-danger text-white hover:bg-danger-hover', !(Object.keys(selectedRowIds).length > 0) && 'hidden')}
+            type="button"
+            data-hs-overlay="#confirm-delete-modal"
+          >
+            ลบ
+          </button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2.5 md:flex-nowrap">
+          <div className="items-center gap-3 md:flex">
+            <span className="font-semibold">กรอง:</span>
+            <div className="input-icon-group">
+              <Icon icon="tag" className="input-icon" />
+              <select
+                value={(table.getColumn('type')?.getFilterValue() as string) ?? 'All'}
+                onChange={(e) =>
+                  table.getColumn('type')?.setFilterValue(e.target.value === 'All' ? undefined : e.target.value)
+                }
+                className="form-select"
+              >
+                <option value="All">ประเภท</option>
+                <option value="PHYSICAL">สินค้าจับต้องได้</option>
+                <option value="DIGITAL">ดิจิทัล</option>
+                <option value="SERVICE">บริการ</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <select
+              className="form-select"
+              value={table.getState().pagination.pageSize}
+              onChange={(e) => table.setPageSize(Number(e.target.value))}
+            >
+              {[5, 10, 15, 20].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div>
+          <Link href="/products/new" className="btn bg-primary text-white hover:bg-primary-hover">
+            <Icon icon="plus" />
+            เพิ่มสินค้า
+          </Link>
+        </div>
+      </div>
+
+      <DataTable table={table} emptyMessage="ไม่พบสินค้า" />
+
+      {table.getRowModel().rows.length > 0 && (
+        <div className="card-footer">
+          <TablePagination
+            totalItems={totalItems}
+            start={start}
+            end={end}
+            itemsName="สินค้า"
+            showInfo
+            previousPage={table.previousPage}
+            canPreviousPage={table.getCanPreviousPage()}
+            pageCount={table.getPageCount()}
+            pageIndex={table.getState().pagination.pageIndex}
+            setPageIndex={table.setPageIndex}
+            nextPage={table.nextPage}
+            canNextPage={table.getCanNextPage()}
+          />
+        </div>
+      )}
+
+      <DeleteConfirmationModal
+        onConfirm={handleDelete}
+        selectedCount={Object.keys(selectedRowIds).length}
+        itemName="สินค้า"
+        modalTitle="ยืนยันการลบ"
+        confirmButtonText="ลบ"
+        cancelButtonText="ยกเลิก"
+      />
+    </div>
+  )
+}
+
+export default ProductsListing
