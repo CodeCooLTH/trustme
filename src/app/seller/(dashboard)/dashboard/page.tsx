@@ -37,6 +37,11 @@ export default async function SellerDashboardPage() {
     rawProducts = []
   }
 
+  // Prisma returns Decimal for price/totalAmount fields; coerce to Number
+  // before they cross the server→client boundary (Next 16 disallows Decimal
+  // in client-component props).
+  const toNumber = (v: any): number => (v == null ? 0 : Number(v))
+
   // ── Stats ──────────────────────────────────────────────────────────────────
   const pendingCount = rawOrders.filter((o) => o.status === 'CREATED').length
   const activeCount = rawOrders.filter((o) => o.status === 'CONFIRMED' || o.status === 'SHIPPED').length
@@ -44,7 +49,7 @@ export default async function SellerDashboardPage() {
     .filter((o) => o.status === 'COMPLETED')
     .reduce((sum: number, o: any) => {
       const itemTotal = Array.isArray(o.items)
-        ? o.items.reduce((s: number, item: any) => s + (item.price ?? 0) * (item.qty ?? item.quantity ?? 1), 0)
+        ? o.items.reduce((s: number, item: any) => s + toNumber(item.price) * (item.qty ?? item.quantity ?? 1), 0)
         : 0
       return sum + itemTotal
     }, 0)
@@ -65,7 +70,7 @@ export default async function SellerDashboardPage() {
   const recentOrders: OrderType[] = rawOrders.slice(0, 10).map((o: any) => {
     const firstItem = Array.isArray(o.items) && o.items.length > 0 ? o.items[0] : null
     const itemTotal = Array.isArray(o.items)
-      ? o.items.reduce((s: number, item: any) => s + (item.price ?? 0) * (item.qty ?? item.quantity ?? 1), 0)
+      ? o.items.reduce((s: number, item: any) => s + toNumber(item.price) * (item.qty ?? item.quantity ?? 1), 0)
       : 0
     const shortId = o.publicToken ? o.publicToken.slice(0, 8) : o.id.slice(0, 8)
     return {
@@ -104,7 +109,7 @@ export default async function SellerDashboardPage() {
       name: p.name,
       image: p.imageUrl ?? p.image ?? '',
       type: (p.type as ProductType['type']) ?? 'PHYSICAL',
-      price: p.price ?? 0,
+      price: toNumber(p.price),
       sales: salesMap[p.id] ?? 0,
     }))
     .sort((a: ProductType, b: ProductType) => b.sales - a.sales)
@@ -130,7 +135,7 @@ export default async function SellerDashboardPage() {
 
     const rev = dayCompletedOrders.reduce((sum: number, o: any) => {
       const itemTotal = Array.isArray(o.items)
-        ? o.items.reduce((s: number, item: any) => s + (item.price ?? 0) * (item.qty ?? item.quantity ?? 1), 0)
+        ? o.items.reduce((s: number, item: any) => s + toNumber(item.price) * (item.qty ?? item.quantity ?? 1), 0)
         : 0
       return sum + itemTotal
     }, 0)
