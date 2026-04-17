@@ -8,6 +8,7 @@ import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
 import OrderActions from './components/OrderActions'
 import CopyLinkButton from './components/CopyLinkButton'
+import PageBreadcrumb from '@/components/PageBreadcrumb'
 
 export const metadata: Metadata = { title: 'รายละเอียดออเดอร์' }
 
@@ -87,6 +88,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
 
   return (
     <>
+      <PageBreadcrumb title="รายละเอียดออเดอร์" subtitle="ออเดอร์" />
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-default-400 mb-4">
         <Link href="/orders" className="hover:text-primary transition-colors">ออเดอร์</Link>

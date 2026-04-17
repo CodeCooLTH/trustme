@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
 import ShopForm from './components/ShopForm'
+import PageBreadcrumb from '@/components/PageBreadcrumb'
 
 export const metadata: Metadata = { title: 'ตั้งค่าร้าน' }
 
@@ -50,6 +51,7 @@ export default async function ShopSettingsPage() {
 
   return (
     <>
+      <PageBreadcrumb title="ตั้งค่าร้าน" subtitle="ผู้ขาย" />
       {/* Page header */}
       <div className="flex items-center gap-4 mb-6">
         <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">

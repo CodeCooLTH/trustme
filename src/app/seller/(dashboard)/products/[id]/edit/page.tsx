@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
 import ProductForm from '../../components/ProductForm'
+import PageBreadcrumb from '@/components/PageBreadcrumb'
 
 export const metadata: Metadata = { title: 'แก้ไขสินค้า' }
 
@@ -54,6 +55,7 @@ export default async function EditProductPage({ params }: PageProps) {
 
   return (
     <>
+      <PageBreadcrumb title="แก้ไขสินค้า" subtitle="สินค้า" />
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Link

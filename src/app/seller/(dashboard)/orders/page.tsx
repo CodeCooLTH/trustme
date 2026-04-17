@@ -5,6 +5,7 @@ import { getOrdersByShop } from '@/services/order.service'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
+import PageBreadcrumb from '@/components/PageBreadcrumb'
 
 export const metadata: Metadata = { title: 'ออเดอร์' }
 
@@ -86,6 +87,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
 
   return (
     <>
+      <PageBreadcrumb title="ออเดอร์" subtitle="ผู้ขาย" />
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

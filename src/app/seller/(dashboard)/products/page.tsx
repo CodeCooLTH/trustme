@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
 import DeleteButton from './components/DeleteButton'
+import PageBreadcrumb from '@/components/PageBreadcrumb'
 
 export const metadata: Metadata = { title: 'สินค้า' }
 
@@ -68,6 +69,7 @@ export default async function ProductsPage() {
 
   return (
     <>
+      <PageBreadcrumb title="สินค้า" subtitle="ผู้ขาย" />
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

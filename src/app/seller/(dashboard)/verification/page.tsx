@@ -4,6 +4,7 @@ import { getUserVerifications, getMaxVerificationLevel } from '@/services/verifi
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
 import LevelCard from './components/LevelCard'
+import PageBreadcrumb from '@/components/PageBreadcrumb'
 
 export const metadata: Metadata = { title: 'ยืนยันตัวตนร้านค้า' }
 
@@ -94,6 +95,7 @@ export default async function VerificationPage() {
 
   return (
     <>
+      <PageBreadcrumb title="ยืนยันตัวตน" subtitle="ผู้ขาย" />
       {/* Page header */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

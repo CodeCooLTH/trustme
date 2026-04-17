@@ -4,6 +4,7 @@ import { getReviewsByShopUser } from '@/services/review.service'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
+import PageBreadcrumb from '@/components/PageBreadcrumb'
 
 export const metadata: Metadata = { title: 'รีวิวจากลูกค้า' }
 
@@ -61,6 +62,7 @@ export default async function ReviewsPage() {
 
   return (
     <>
+      <PageBreadcrumb title="รีวิว" subtitle="ผู้ขาย" />
       {/* Page header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-dark">รีวิวจากลูกค้า</h1>

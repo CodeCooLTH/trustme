@@ -7,6 +7,7 @@ import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import OrderCreateForm, { type CatalogProduct } from './components/OrderCreateForm'
+import PageBreadcrumb from '@/components/PageBreadcrumb'
 
 export const metadata: Metadata = { title: 'สร้างออเดอร์' }
 
@@ -60,6 +61,7 @@ export default async function NewOrderPage() {
 
   return (
     <>
+      <PageBreadcrumb title="สร้างออเดอร์" subtitle="ออเดอร์" />
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Link
