@@ -50,20 +50,25 @@ export default function VerifyOtpForm() {
       return
     }
     setSubmitting(true)
-    const result = await signIn('phone-otp', {
-      phone,
-      otp,
-      mode,
-      displayName,
-      username,
-      redirect: false,
-    })
-    setSubmitting(false)
-    if (result?.ok) {
-      router.push('/')
-      return
+    try {
+      const result = await signIn('phone-otp', {
+        phone,
+        otp,
+        mode,
+        displayName,
+        username,
+        redirect: false,
+      })
+      if (result?.ok) {
+        router.push('/')
+        return
+      }
+      setErrorMsg('รหัสไม่ถูกต้องหรือหมดอายุ ลองอีกครั้ง')
+    } catch {
+      setErrorMsg('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      setSubmitting(false)
     }
-    setErrorMsg('รหัสไม่ถูกต้องหรือหมดอายุ ลองอีกครั้ง')
   }
 
   const onResend = async () => {
