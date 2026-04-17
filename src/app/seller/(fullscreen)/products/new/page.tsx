@@ -5,8 +5,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Metadata } from 'next'
-import ProductForm from '../components/ProductForm'
-import PageBreadcrumb from '@/components/PageBreadcrumb'
+import ProductForm from '@/app/seller/(dashboard)/products/components/ProductForm'
 
 export const metadata: Metadata = { title: 'เพิ่มสินค้า' }
 
@@ -41,19 +40,9 @@ export default async function NewProductPage() {
 
   return (
     <>
-      <PageBreadcrumb title="เพิ่มสินค้า" trail={[{ label: 'Business' }, { label: 'สินค้า', href: '/products' }]} />
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <Link
-          href="/products"
-          className="btn btn-icon border border-default-300 bg-card hover:bg-default-50 text-default-600"
-        >
-          <Icon icon="mdi:arrow-left" width={18} height={18} />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-dark">เพิ่มสินค้า</h1>
-          <p className="text-default-400 mt-0.5">กรอกข้อมูลสินค้าใหม่</p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-dark">เพิ่มสินค้า</h1>
+        <p className="text-default-400 mt-0.5">กรอกข้อมูลสินค้าใหม่</p>
       </div>
 
       <ProductForm shopId={shop.id} />

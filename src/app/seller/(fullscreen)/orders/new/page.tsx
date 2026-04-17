@@ -6,8 +6,7 @@ import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import OrderCreateForm, { type CatalogProduct } from './components/OrderCreateForm'
-import PageBreadcrumb from '@/components/PageBreadcrumb'
+import OrderCreateForm, { type CatalogProduct } from '@/app/seller/(dashboard)/orders/new/components/OrderCreateForm'
 
 export const metadata: Metadata = { title: 'สร้างออเดอร์' }
 
@@ -61,21 +60,11 @@ export default async function NewOrderPage() {
 
   return (
     <>
-      <PageBreadcrumb title="สร้างออเดอร์" trail={[{ label: 'Business' }, { label: 'คำสั่งซื้อ', href: '/orders' }]} />
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <Link
-          href="/orders"
-          className="btn btn-icon border border-default-300 bg-card hover:bg-default-50 text-default-600"
-        >
-          <Icon icon="mdi:arrow-left" width={18} height={18} />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-dark">สร้างออเดอร์</h1>
-          <p className="text-default-400 mt-0.5">
-            ร้าน {shop.shopName} — ระบบจะสร้างลิงก์สาธารณะให้แชร์แก่ผู้ซื้อ
-          </p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-dark">สร้างออเดอร์</h1>
+        <p className="text-default-400 mt-0.5">
+          ร้าน {shop.shopName} — ระบบจะสร้างลิงก์สาธารณะให้แชร์แก่ผู้ซื้อ
+        </p>
       </div>
 
       <OrderCreateForm shopId={shop.id} catalog={catalog} />
