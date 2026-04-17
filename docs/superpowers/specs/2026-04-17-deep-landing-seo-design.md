@@ -129,7 +129,6 @@ export const SITE = {
     // Brand
     'Deep', 'Deep Thailand', 'deepthailand',
   ],
-  twitter: '@deepthailand', // placeholder handle; create in follow-up
   ogImage: { width: 1200, height: 630 },
 } as const
 ```
@@ -148,7 +147,7 @@ Accepts:
 - `noIndex?: boolean` — set on internal/auth pages to emit `robots: noindex, nofollow`.
 - `ogImage?: string` — per-page override; omit to let `opengraph-image.tsx` handle it.
 
-Returns a `Metadata` object with: `metadataBase`, `title` (plain string, see above), `description`, `keywords`, `alternates.canonical`, `openGraph`, `twitter`, `robots`, and `verification` (conditional on `NEXT_PUBLIC_GSC_VERIFICATION`).
+Returns a `Metadata` object with: `metadataBase`, `title` (plain string, see above), `description`, `keywords`, `alternates.canonical`, `openGraph`, `twitter` (card + title + description + images; no `site` handle at launch), `robots`, and `verification` (conditional on `NEXT_PUBLIC_GSC_VERIFICATION`).
 
 ### Usage examples
 
@@ -421,5 +420,10 @@ src/views/front-pages/landing-page/Faqs/index.tsx
 
 - **Brand colour.** The gradient uses indigo → violet → pink as a placeholder. If the final brand palette is different (e.g., trust-blue / secure-green), change the gradient in `opengraph-image.tsx`, `icon.tsx`, `apple-icon.tsx`, and `manifest.ts` `theme_color`. Four files; single-session change.
 - **Logo.** Favicons currently render a text-based "D". When a logo SVG exists, swap `icon.tsx` / `apple-icon.tsx` to render the SVG inside `ImageResponse` (or move to static PNGs if preferred). OG image would ideally include the logo mark alongside the wordmark.
-- **Twitter/X handle.** `@deepthailand` is a placeholder. Create the handle and confirm, otherwise remove `twitter.site` to avoid pointing at a non-existent account.
 - **Search Console verification code.** TBD — user generates after go-live.
+
+## 13. Decisions Confirmed (post-review)
+
+- **Brand color.** Keep the placeholder indigo → violet → pink gradient for launch; revisit when the final brand palette is chosen (four-file change: `opengraph-image.tsx`, `icon.tsx`, `apple-icon.tsx`, `manifest.ts`).
+- **Logo.** Keep the text-based "D" favicon and the wordmark-only OG image. Revisit when a logo SVG exists.
+- **Twitter/X handle.** No handle at launch. `twitter.site` is omitted from `buildMetadata`'s Twitter card (Twitter card still renders without `site`, it just will not link back to an account).
