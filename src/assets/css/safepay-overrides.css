@@ -1,9 +1,9 @@
 /* SafePay — theme overrides */
-/* Force "Prompt" (Thai-supported) as the primary font across every skin. */
+/* Force "Noto Sans Thai" as the primary font across every skin. */
 
 html {
-    --font-body: "Prompt", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --font-secondary: "Prompt", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-body: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-secondary: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 html[data-skin="default"],
@@ -29,6 +29,6 @@ html[data-skin="aurora"],
 html[data-skin="xenon"],
 html[data-skin="matrix"],
 html[data-skin="orbit"] {
-    --font-body: "Prompt", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --font-secondary: "Prompt", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-body: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-secondary: "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
