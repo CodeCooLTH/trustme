@@ -32,11 +32,17 @@ This spec covers **site-wide public SEO infrastructure** and the **landing page 
 
 Full scope (A + B + C from brainstorming): landing page SEO **plus** reusable framework for future public pages **plus** site-wide technical SEO (robots, sitemap, manifest, analytics, structured data).
 
-Target keyword clusters for landing:
+Target keyword clusters for landing (full taxonomy lives in §4):
 
-- **A. Anti-fraud / safety:** ป้องกันมิจฉาชีพ, เช็คคนโกง, ซื้อของออนไลน์ปลอดภัย, ตรวจสอบร้านค้าออนไลน์, โดนโกงออนไลน์
-- **B. Verify / trust:** ยืนยันตัวตนร้านค้า, ร้านค้าน่าเชื่อถือ, trust score, verified seller, badge ร้านค้า, ร้านค้าผ่านการตรวจสอบ
-- **Brand:** Deep, Deep Thailand, deepthailand
+- **brand:** Deep, Deep Thailand, deepthailand, deepthailand.app, Deep ร้านค้า, Deep ยืนยันตัวตน
+- **antiFraud:** ป้องกันมิจฉาชีพ, เช็คคนโกง, ตรวจสอบคนโกง, ซื้อของออนไลน์ปลอดภัย, ซื้อของไอจีไม่โดนโกง, ตรวจสอบร้านค้าออนไลน์, เช็คร้านค้าก่อนโอน, โดนโกงออนไลน์, รายชื่อคนโกง, แบล็คลิสต์มิจฉาชีพ, …
+- **verify:** ยืนยันตัวตน seller, ยืนยันตัวตนร้านค้า, verified seller, verified seller Thailand, trust score, คะแนนความน่าเชื่อถือ, ร้านค้าน่าเชื่อถือ, ร้านค้าผ่านการตรวจสอบ, badge ร้านค้า, เครื่องหมายรับรองร้านค้า, …
+- **transaction:** OTP confirm order, ยืนยันการซื้อขายด้วย OTP, ระบบยืนยันคำสั่งซื้อ, คุ้มครองผู้ซื้อออนไลน์, buyer protection Thailand
+- **longTail:** พ่อค้าแม่ค้าออนไลน์ ยืนยันตัวตน, แอพตรวจสอบร้านค้า, เว็บเช็คคนโกง, ระบบ trust score ร้านค้า
+
+### On the honesty of `<meta name="keywords">`
+
+Google does **not** use the `<meta name="keywords">` tag as a ranking signal — Matt Cutts confirmed this publicly in 2009 and it has not changed since. We still emit the tag (Bing and some local engines give it minimal weight, and it costs effectively nothing) but the real value of `SITE.keywords` is as the project's **canonical keyword taxonomy**. The 5 typed groups in §4 are the reference source we draw from when writing H1/H2, body copy, image `alt` text, FAQ questions, and URL slugs — the on-page signals Google actually reads. Treat the taxonomy as a content playbook first and a `<meta>` payload second.
 
 ## 3. Architecture
 
@@ -108,33 +114,63 @@ Holds brand constants plus two helpers: `buildCanonical` and `buildMetadata`.
 
 ### `SITE` constants
 
+Keywords are modelled as a typed, grouped taxonomy (not a flat array). Pages can opt into specific groups via `buildMetadata({ keywordGroups })`; omit the field to merge all groups (what the landing page does).
+
 ```ts
+const _keywords = {
+  brand: [
+    'Deep', 'Deep Thailand', 'deepthailand', 'deepthailand.app',
+    'Deep ร้านค้า', 'Deep ยืนยันตัวตน',
+  ],
+  antiFraud: [
+    'ป้องกันมิจฉาชีพ', 'เช็คคนโกง', 'ตรวจสอบคนโกง',
+    'ซื้อของออนไลน์ปลอดภัย', 'ขายของออนไลน์ปลอดภัย',
+    'ซื้อของไอจีไม่โดนโกง', 'ซื้อของเฟสบุ๊คไม่โดนโกง',
+    'ตรวจสอบร้านค้าออนไลน์', 'วิธีตรวจสอบร้านค้าก่อนซื้อ', 'เช็คร้านค้าก่อนโอน',
+    'โดนโกงออนไลน์', 'โดนโกงออนไลน์ทำยังไง',
+    'รายชื่อคนโกง', 'แบล็คลิสต์มิจฉาชีพ',
+    '5 สัญญาณเตือนมิจฉาชีพออนไลน์',
+  ],
+  verify: [
+    'ยืนยันตัวตน seller', 'ยืนยันตัวตนร้านค้า', 'ร้านค้ายืนยันตัวตน',
+    'verified seller', 'verified seller Thailand',
+    'trust score', 'trust score ร้านค้า', 'คะแนนความน่าเชื่อถือ',
+    'ร้านค้าน่าเชื่อถือ', 'ร้านค้าผ่านการตรวจสอบ',
+    'badge ร้านค้า', 'badge ร้านค้าออนไลน์', 'เครื่องหมายรับรองร้านค้า',
+  ],
+  transaction: [
+    'OTP confirm order', 'ยืนยันการซื้อขายด้วย OTP', 'ระบบยืนยันคำสั่งซื้อ',
+    'คุ้มครองผู้ซื้อออนไลน์', 'buyer protection Thailand',
+  ],
+  longTail: [
+    'พ่อค้าแม่ค้าออนไลน์ ยืนยันตัวตน', 'แอพตรวจสอบร้านค้า', 'เว็บเช็คคนโกง',
+    'ระบบ trust score ร้านค้า',
+  ],
+} as const
+
+export type KeywordGroup = keyof typeof _keywords
+
 export const SITE = {
   name: 'Deep',
   legalName: 'Deep Thailand',
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://deepthailand.app',
   locale: 'th_TH',
   defaultTitle: 'Deep — ซื้อขายออนไลน์อย่างมั่นใจ ไม่ต้องกลัวมิจฉาชีพ',
-  titleTemplate: '%s | Deep',
   description:
-    'Deep ระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ยืนยันตัวตน ' +
-    'ร้านค้า เช็ค Trust Score ป้องกันมิจฉาชีพ ซื้อขายปลอดภัยด้วย OTP confirm',
-  keywords: [
-    // Group A — anti-fraud
-    'ป้องกันมิจฉาชีพ', 'เช็คคนโกง', 'ซื้อของออนไลน์ปลอดภัย',
-    'ตรวจสอบร้านค้าออนไลน์', 'โดนโกงออนไลน์',
-    // Group B — verify/trust
-    'ยืนยันตัวตนร้านค้า', 'ร้านค้าน่าเชื่อถือ', 'trust score',
-    'verified seller', 'badge ร้านค้า', 'ร้านค้าผ่านการตรวจสอบ',
-    // Brand
-    'Deep', 'Deep Thailand', 'deepthailand',
-  ],
+    'Deep ระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ยืนยันตัวตนร้านค้า เช็ค Trust Score ป้องกันมิจฉาชีพ ซื้อขายปลอดภัยด้วย OTP confirm',
+  keywords: _keywords,
   ogImage: { width: 1200, height: 630 },
 } as const
+
+export function resolveKeywords(groups?: KeywordGroup[]): string[] {
+  if (!groups || groups.length === 0) return Object.values(_keywords).flat()
+  return groups.flatMap((g) => _keywords[g])
+}
 ```
 
 Title: 58 characters (under Google's 60-char SERP cap).
 Description: 158 characters (under the 160-char cap).
+Keyword taxonomy: ~45 terms across 5 typed groups (`brand`, `antiFraud`, `verify`, `transaction`, `longTail`).
 
 ### `buildMetadata(opts)` — returns Next.js `Metadata`
 
@@ -143,7 +179,8 @@ Accepts:
 - `title?: string` — omit to use `defaultTitle` verbatim (the full hero-style title is used as-is). If provided, the helper concatenates it into `"${title} | ${SITE.name}"` (e.g., `"Dashboard | Deep"`). The Next.js `title: { default, template }` form is *not* used because `template` only applies to nested child segments; `buildMetadata` is called per-page so a direct string is correct.
 - `description?: string` — omit to use `SITE.description`.
 - `path?: string` — canonical / OG URL basis, defaults to `/`.
-- `keywords?: string[]` — merged with `SITE.keywords`.
+- `keywords?: string[]` — extra ad-hoc keywords, merged on top of the resolved taxonomy.
+- `keywordGroups?: KeywordGroup[]` — restrict merged keywords to specific groups (default: all groups).
 - `noIndex?: boolean` — set on internal/auth pages to emit `robots: noindex, nofollow`.
 - `ogImage?: string` — per-page override; omit to let `opengraph-image.tsx` handle it.
 
@@ -167,6 +204,13 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 
 // Authenticated / internal page
 export const metadata = buildMetadata({ title: 'Dashboard', noIndex: true })
+
+// Shop profile — narrower keyword targeting
+buildMetadata({
+  title: `ร้าน ${shop.name}`,
+  path: `/shop/${shop.id}`,
+  keywordGroups: ['brand', 'verify'],
+})
 ```
 
 ## 5. Site-root SEO Files
@@ -427,3 +471,4 @@ src/views/front-pages/landing-page/Faqs/index.tsx
 - **Brand color.** Keep the placeholder indigo → violet → pink gradient for launch; revisit when the final brand palette is chosen (four-file change: `opengraph-image.tsx`, `icon.tsx`, `apple-icon.tsx`, `manifest.ts`).
 - **Logo.** Keep the text-based "D" favicon and the wordmark-only OG image. Revisit when a logo SVG exists.
 - **Twitter/X handle.** No handle at launch. `twitter.site` is omitted from `buildMetadata`'s Twitter card (Twitter card still renders without `site`, it just will not link back to an account).
+- **Keyword taxonomy.** Expanded from 13 flat items to ~45 items across 5 typed groups (`brand`, `antiFraud`, `verify`, `transaction`, `longTail`) to support per-page keyword targeting. `<meta name="keywords">` remains emitted for completeness; the taxonomy's primary job is guiding body/heading/alt copy.

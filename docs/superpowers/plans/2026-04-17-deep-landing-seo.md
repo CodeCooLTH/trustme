@@ -68,7 +68,7 @@ git commit -m "feat(seo): add NEXT_PUBLIC_SITE_URL / GA / GSC env vars"
 ## Task 2: `src/lib/seo.ts` — central config & helpers (with Vitest)
 
 **Files:**
-- Create: `src/lib/seo.ts`
+- Create: `src/lib/seo.ts` — exports `SITE` (with `keywords` as a 5-group tiered object: `brand`, `antiFraud`, `verify`, `transaction`, `longTail`), `resolveKeywords(groups?)`, `buildCanonical`, `buildMetadata`, and `KeywordGroup` / `BuildMetadataInput` types.
 - Create: `src/lib/seo.test.ts`
 - Create: `vitest.config.ts` (if not present)
 - Modify: `package.json` (add `test` script)
@@ -106,7 +106,7 @@ export default defineConfig({
 
 ```ts
 import { describe, expect, it, beforeEach, afterEach } from 'vitest'
-import { SITE, buildCanonical, buildMetadata } from './seo'
+import { SITE, buildCanonical, buildMetadata, resolveKeywords } from './seo'
 
 describe('SITE constants', () => {
   it('has title under Google SERP limit (60 chars)', () => {
@@ -125,6 +125,16 @@ describe('SITE constants', () => {
     // reading env-independent default
     expect(SITE.url.startsWith('https://')).toBe(true)
   })
+
+  it('keywords is a tiered object (brand/antiFraud/verify/transaction/longTail)', () => {
+    expect(SITE.keywords).toMatchObject({
+      brand: expect.any(Array),
+      antiFraud: expect.any(Array),
+      verify: expect.any(Array),
+      transaction: expect.any(Array),
+      longTail: expect.any(Array),
+    })
+  })
 })
 
 describe('buildCanonical', () => {
@@ -138,6 +148,33 @@ describe('buildCanonical', () => {
 
   it('defaults to "/" when no arg is passed', () => {
     expect(buildCanonical()).toBe(`${SITE.url}/`)
+  })
+})
+
+describe('resolveKeywords', () => {
+  it('returns the full flattened list when called with no args', () => {
+    const all = resolveKeywords()
+    const expectedLen = Object.values(SITE.keywords).reduce((sum, g) => sum + g.length, 0)
+    expect(all.length).toBe(expectedLen)
+    expect(all).toContain('Deep')
+    expect(all).toContain('ป้องกันมิจฉาชีพ')
+  })
+
+  it('returns only the requested groups (sum of their lengths)', () => {
+    const picked = resolveKeywords(['verify', 'brand'])
+    const expectedLen = SITE.keywords.verify.length + SITE.keywords.brand.length
+    expect(picked.length).toBe(expectedLen)
+    expect(picked).toEqual(
+      expect.arrayContaining([...SITE.keywords.verify, ...SITE.keywords.brand]),
+    )
+    // Anti-fraud items must not leak in.
+    expect(picked).not.toContain('ป้องกันมิจฉาชีพ')
+  })
+
+  it('returns the full list when given an empty groups array', () => {
+    const all = resolveKeywords([])
+    const expectedLen = Object.values(SITE.keywords).reduce((sum, g) => sum + g.length, 0)
+    expect(all.length).toBe(expectedLen)
   })
 })
 
@@ -159,10 +196,22 @@ describe('buildMetadata', () => {
     expect(m.title).toBe(`Dashboard | ${SITE.name}`)
   })
 
-  it('merges extra keywords with SITE.keywords', () => {
-    const m = buildMetadata({ keywords: ['extra-kw'] })
+  it('defaults keywords to the full flattened list', () => {
+    const m = buildMetadata({})
+    expect(m.keywords).toEqual(resolveKeywords())
+  })
+
+  it('restricts keywords to the requested groups', () => {
+    const m = buildMetadata({ keywordGroups: ['brand'] })
+    expect(m.keywords).toContain('Deep')
+    expect(m.keywords).not.toContain('ป้องกันมิจฉาชีพ')
+  })
+
+  it('merges extra keywords on top of the selected groups', () => {
+    const m = buildMetadata({ keywordGroups: ['brand'], keywords: ['extra-kw'] })
+    expect(m.keywords).toContain('Deep')
     expect(m.keywords).toContain('extra-kw')
-    expect(m.keywords).toEqual(expect.arrayContaining(SITE.keywords))
+    expect(m.keywords).not.toContain('ป้องกันมิจฉาชีพ')
   })
 
   it('sets canonical based on path', () => {
@@ -222,6 +271,42 @@ Expected: test file cannot resolve `./seo`. Good.
 ```ts
 import type { Metadata } from 'next'
 
+// Tiered keyword taxonomy — MUST stay in sync with the design spec
+// (`docs/superpowers/specs/2026-04-17-deep-landing-seo-design.md`). Callers
+// can opt into a subset via `buildMetadata({ keywordGroups: [...] })`.
+const _keywords = {
+  brand: [
+    'Deep', 'Deep Thailand', 'deepthailand', 'deepthailand.app',
+    'Deep ร้านค้า', 'Deep ยืนยันตัวตน',
+  ],
+  antiFraud: [
+    'ป้องกันมิจฉาชีพ', 'เช็คคนโกง', 'ตรวจสอบคนโกง',
+    'ซื้อของออนไลน์ปลอดภัย', 'ขายของออนไลน์ปลอดภัย',
+    'ซื้อของไอจีไม่โดนโกง', 'ซื้อของเฟสบุ๊คไม่โดนโกง',
+    'ตรวจสอบร้านค้าออนไลน์', 'วิธีตรวจสอบร้านค้าก่อนซื้อ', 'เช็คร้านค้าก่อนโอน',
+    'โดนโกงออนไลน์', 'โดนโกงออนไลน์ทำยังไง',
+    'รายชื่อคนโกง', 'แบล็คลิสต์มิจฉาชีพ',
+    '5 สัญญาณเตือนมิจฉาชีพออนไลน์',
+  ],
+  verify: [
+    'ยืนยันตัวตน seller', 'ยืนยันตัวตนร้านค้า', 'ร้านค้ายืนยันตัวตน',
+    'verified seller', 'verified seller Thailand',
+    'trust score', 'trust score ร้านค้า', 'คะแนนความน่าเชื่อถือ',
+    'ร้านค้าน่าเชื่อถือ', 'ร้านค้าผ่านการตรวจสอบ',
+    'badge ร้านค้า', 'badge ร้านค้าออนไลน์', 'เครื่องหมายรับรองร้านค้า',
+  ],
+  transaction: [
+    'OTP confirm order', 'ยืนยันการซื้อขายด้วย OTP', 'ระบบยืนยันคำสั่งซื้อ',
+    'คุ้มครองผู้ซื้อออนไลน์', 'buyer protection Thailand',
+  ],
+  longTail: [
+    'พ่อค้าแม่ค้าออนไลน์ ยืนยันตัวตน', 'แอพตรวจสอบร้านค้า', 'เว็บเช็คคนโกง',
+    'ระบบ trust score ร้านค้า',
+  ],
+} as const
+
+export type KeywordGroup = keyof typeof _keywords
+
 export const SITE = {
   name: 'Deep',
   legalName: 'Deep Thailand',
@@ -230,18 +315,17 @@ export const SITE = {
   defaultTitle: 'Deep — ซื้อขายออนไลน์อย่างมั่นใจ ไม่ต้องกลัวมิจฉาชีพ',
   description:
     'Deep ระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ยืนยันตัวตนร้านค้า เช็ค Trust Score ป้องกันมิจฉาชีพ ซื้อขายปลอดภัยด้วย OTP confirm',
-  keywords: [
-    // A — anti-fraud
-    'ป้องกันมิจฉาชีพ', 'เช็คคนโกง', 'ซื้อของออนไลน์ปลอดภัย',
-    'ตรวจสอบร้านค้าออนไลน์', 'โดนโกงออนไลน์',
-    // B — verify / trust
-    'ยืนยันตัวตนร้านค้า', 'ร้านค้าน่าเชื่อถือ', 'trust score',
-    'verified seller', 'badge ร้านค้า', 'ร้านค้าผ่านการตรวจสอบ',
-    // Brand
-    'Deep', 'Deep Thailand', 'deepthailand',
-  ],
+  // NOTE: tiered — use `resolveKeywords(groups?)` to flatten.
+  keywords: _keywords,
   ogImage: { width: 1200, height: 630 },
 } as const
+
+export function resolveKeywords(groups?: KeywordGroup[]): string[] {
+  if (!groups || groups.length === 0) {
+    return Object.values(_keywords).flat()
+  }
+  return groups.flatMap((g) => _keywords[g])
+}
 
 export function buildCanonical(path: string = '/'): string {
   const clean = path.startsWith('/') ? path : `/${path}`
@@ -253,6 +337,7 @@ export type BuildMetadataInput = {
   description?: string
   path?: string
   keywords?: string[]
+  keywordGroups?: KeywordGroup[]
   noIndex?: boolean
   ogImage?: string
 }
@@ -263,13 +348,15 @@ export function buildMetadata(opts: BuildMetadataInput = {}): Metadata {
   const description = opts.description ?? SITE.description
   const images = opts.ogImage ? [opts.ogImage] : undefined
 
+  const baseKeywords = resolveKeywords(opts.keywordGroups)
+
   const gsc = process.env.NEXT_PUBLIC_GSC_VERIFICATION
 
   return {
     metadataBase: new URL(SITE.url),
     title,
     description,
-    keywords: [...SITE.keywords, ...(opts.keywords ?? [])],
+    keywords: [...baseKeywords, ...(opts.keywords ?? [])],
     alternates: { canonical },
     openGraph: {
       type: 'website',
@@ -1410,6 +1497,54 @@ Also audit sub-section titles inside each file: card titles, step titles, FAQ qu
 
 Also look for any remaining "SafePay" string in these files and rename to "Deep".
 
+- [ ] **Step 1a: SEO-optimised H2 rewrites**
+
+The previous step adds the `component='h2'` semantic wrapper. This step rewrites the visible Thai text of each section title so it embeds a Tier 1 keyword from the spec's keyword map. Apply the recommendation column verbatim (Thai is hand-tuned — keep it as-is). The `<span>` + `bg-shape` decoration usually wraps only one phrase within the title; pick the phrase shown in the "Recommended SEO H2" column as the wrapped fragment (the part with the underline brush stroke) — the remainder becomes plain text after the span.
+
+`ProductStat.tsx` has no visible section title (it only renders stat tiles), so it is intentionally absent from the table.
+
+| File | Current H2 (Thai) | Recommended SEO H2 (Thai) | Primary keyword embedded |
+| --- | --- | --- | --- |
+| UsefulFeature.tsx | ทุกอย่างที่ต้องใช้ เพื่อซื้อขายอย่างปลอดภัย | ทุกเครื่องมือที่ต้องใช้ เพื่อ**ซื้อของออนไลน์ปลอดภัย** ไม่โดนโกง | ซื้อของออนไลน์ปลอดภัย / โดนโกงออนไลน์ |
+| CustomerReviews.tsx | ผู้ใช้พูดถึง | ผู้ใช้จริงพูดถึง Deep — แพลตฟอร์ม**ป้องกันมิจฉาชีพ**ออนไลน์ | ป้องกันมิจฉาชีพ (+ brand) |
+| OurTeam.tsx | ดูแลโดย ทีมงานคุณภาพ | ดูแลโดยทีมงานคุณภาพ เบื้องหลังแพลตฟอร์ม Deep | Deep (brand anchor — team section fits brand, not Tier 1) |
+| Pricing.tsx | เลือกแพ็กเกจ ที่เหมาะกับคุณ | เลือกแพ็กเกจ**ร้านค้ายืนยันตัวตน** ที่เหมาะกับคุณ | ยืนยันตัวตนร้านค้า (verify cluster) |
+| Faqs.tsx | คำถาม ที่พบบ่อย | คำถามที่พบบ่อยเกี่ยวกับ Deep และการ**ตรวจสอบร้านค้าออนไลน์** | ตรวจสอบร้านค้าออนไลน์ |
+| GetStarted.tsx | พร้อมเริ่มต้นกับ SafePay หรือยัง? | พร้อม**ซื้อขายออนไลน์ปลอดภัย**กับ Deep หรือยัง? | ซื้อของออนไลน์ปลอดภัย (+ brand) |
+| ContactUs.tsx | มาทำงาน ร่วมกัน | มาทำงานร่วมกัน สร้างระบบ**ป้องกันมิจฉาชีพ**ออนไลน์ | ป้องกันมิจฉาชีพ |
+
+Notes for the implementer:
+- In `GetStarted.tsx` the heading is currently `variant='h3'` — still tag it `component='h2'` (semantic hierarchy beats the default variant mapping). Don't drop the `variant='h3'` styling.
+- In `Faqs.tsx` the wrapped `<span>` currently contains "ที่พบบ่อย" (with the `bg-shape` image inside it). After the rewrite, move the wrapping to "ตรวจสอบร้านค้าออนไลน์" so the decorative brush stroke sits under the primary keyword.
+- In `OurTeam.tsx` team-member biography context is inherently weak for Tier 1 fraud keywords; do not force one in. Brand anchor is acceptable here.
+- Leave any currently-correct Thai phrasing untouched (e.g., the introductory `Chip` labels). This table modifies only the section-title `<Typography>` contents.
+
+- [ ] **Step 1b: Body copy + image alt text**
+
+Lightweight copy pass that runs alongside the heading rewrites:
+
+- **Image alt text.** Every `<img>` / `<Image>` in the landing sections currently has generic alt (`bg-shape`, `dashboard-image`, `contact-border`, `boy with laptop`, etc.). Rewrite each alt to (1) describe what the image actually shows and (2) embed a relevant keyword where natural. Examples:
+  - Hero dashboard → `alt="หน้าจอระบบตรวจสอบร้านค้าออนไลน์ Deep"`
+  - `get-started-bg-*.png` → `alt="เริ่มต้นซื้อขายออนไลน์ปลอดภัยกับ Deep"`
+  - `customer-service.png` (ContactUs) → `alt="ทีมซัพพอร์ต Deep — ป้องกันมิจฉาชีพออนไลน์"`
+  - `crm-dashboard.png` → `alt="แดชบอร์ด Trust Score ร้านค้า Deep"`
+  - Purely decorative assets (`bg-shape.png`, `pricing-arrow.png`, `contact-border.png`) may stay with short descriptive alt or `alt=""` — do **not** stuff keywords into decorative images.
+- **Keyword density.** Primary Tier 1 keywords (`ซื้อของออนไลน์ปลอดภัย`, `ป้องกันมิจฉาชีพ`, `เช็คคนโกง`, `ตรวจสอบร้านค้าออนไลน์`, `โดนโกงออนไลน์`) should collectively appear at least **twice** in total landing body copy (outside the H2s themselves). If a scan of the rendered HTML shows fewer than 2 hits across `UsefulFeature`/`CustomerReviews`/`GetStarted`/`ContactUs` body paragraphs, rewrite one body paragraph in whichever section reads most naturally — e.g., the `UsefulFeature` sub-heading paragraph "SafePay รวมเครื่องมือ…" → "Deep รวมเครื่องมือ**ตรวจสอบร้านค้าออนไลน์** ไว้ครบ ใช้งานง่ายทั้งผู้ซื้อและผู้ขายที่ต้องการ**ป้องกันมิจฉาชีพ**".
+- **Don't keyword-stuff.** If a keyword makes the Thai read awkwardly, skip it for that paragraph. Natural language > density.
+
+Quick verification once Step 1/1a/1b are applied:
+
+```bash
+npm run dev &
+sleep 3
+curl -s http://localhost:3000 > /tmp/landing.html
+for kw in 'ซื้อของออนไลน์ปลอดภัย' 'ป้องกันมิจฉาชีพ' 'ตรวจสอบร้านค้าออนไลน์'; do
+  echo "$kw -> $(grep -o "$kw" /tmp/landing.html | wc -l)"
+done
+```
+
+Expected: each Tier 1 keyword above appears at least once; combined count ≥ 5 across the page.
+
 - [ ] **Step 2: Verify heading structure**
 
 ```bash
@@ -1421,7 +1556,7 @@ echo "h3 count: $(grep -oE '<h3[^>]*>' /tmp/landing.html | wc -l)"
 
 Expected:
 - `h1 count: 1`
-- `h2 count: 8` (one per section)
+- `h2 count: 7` (one per section — `ProductStat.tsx` has no section title, so it does not contribute an `h2`)
 - `h3 count:` several (cards, tiers, team members, etc.)
 
 ```bash
