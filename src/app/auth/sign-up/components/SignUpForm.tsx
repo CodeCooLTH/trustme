@@ -88,8 +88,10 @@ export default function SignUpForm() {
   }, [username])
 
   const onSubmit = async (values: FormValues) => {
-    if (usernameStatus.state === 'error') {
-      toast.error(REASON_MESSAGE[usernameStatus.reason])
+    if (usernameStatus.state !== 'ok') {
+      if (usernameStatus.state === 'error') {
+        toast.error(REASON_MESSAGE[usernameStatus.reason])
+      }
       return
     }
     try {
@@ -180,7 +182,12 @@ export default function SignUpForm() {
 
       <button
         type="submit"
-        disabled={isSubmitting || usernameStatus.state === 'checking'}
+        disabled={
+          isSubmitting ||
+          usernameStatus.state === 'checking' ||
+          usernameStatus.state === 'error' ||
+          (!!username && /^[a-zA-Z0-9_]{3,30}$/.test(username) && usernameStatus.state === 'idle')
+        }
         className="btn bg-primary w-full py-3 font-semibold text-white hover:bg-primary-hover disabled:opacity-60"
       >
         {isSubmitting ? 'กำลังส่งรหัส...' : 'สร้างบัญชีและรับรหัส OTP'}
