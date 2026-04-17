@@ -7,17 +7,20 @@ import SellerTopBar from './components/SellerTopBar'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions)
-  if (!session) redirect('/auth/sign-in')
-
-  const user = (session as any).user as {
-    id: string
-    displayName: string
-    username: string
-    avatar: string | null
-    isShop: boolean
-    isAdmin: boolean
-    trustScore: number
-  }
+  const user = (session as any)?.user as
+    | {
+        id: string
+        displayName: string
+        username: string
+        avatar: string | null
+        isShop: boolean
+        isAdmin: boolean
+        trustScore: number
+      }
+    | undefined
+  // No session OR token points to a user that no longer exists in DB (stale
+  // cookie from the old synthetic-session bypass) → force re-sign-in.
+  if (!session || !user?.id) redirect('/auth/sign-in')
 
   // Every seller MUST have a shop — auto-create a default one on first visit
   // so they land on a usable dashboard instead of a "create shop" CTA.

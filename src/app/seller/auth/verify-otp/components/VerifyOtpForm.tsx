@@ -60,7 +60,7 @@ export default function VerifyOtpForm() {
         redirect: false,
       })
       if (result?.ok) {
-        router.push('/')
+        router.push('/dashboard')
         return
       }
       setErrorMsg('รหัสไม่ถูกต้องหรือหมดอายุ ลองอีกครั้ง')

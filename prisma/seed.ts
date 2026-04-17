@@ -65,21 +65,25 @@ async function main() {
     const shop = await prisma.shop.create({
       data: {
         userId: testUser.id,
-        shopName: "ร้านทดสอบ SafePay",
+        shopName: "BT Premium Auto Xeon - สาขาสุขสวัสดิ์",
         description:
-          "ร้านสำหรับทดสอบระบบ — ของใช้ประจำวัน บริการ และของฝากจากคนไทย",
-        category: "อื่นๆ",
-        businessType: "INDIVIDUAL",
+          "ร้านทำไฟหน้ารถยนต์ครบวงจร รับอัพเกรด ซ่อมแซม ติดตั้งไฟซีนอน LED โปรเจคเตอร์ เดย์ไลท์ ทุกรุ่น",
+        category: "ยานยนต์",
+        address: "สาขาสุขสวัสดิ์ กรุงเทพมหานคร",
+        businessType: "COMPANY",
       },
     });
 
     const products = await Promise.all(
       [
-        { name: "เสื้อยืด SafePay", price: 350, type: "PHYSICAL", description: "เสื้อยืด cotton 100% ลายโลโก้ SafePay" },
-        { name: "หมวกแก๊ป Trust Badge", price: 450, type: "PHYSICAL", description: "หมวกแก๊ปปักโลโก้ ผ้า cotton twill" },
-        { name: "สติกเกอร์ไลน์ SafePay", price: 59, type: "DIGITAL", description: "ชุดสติกเกอร์ไลน์ 16 ตัว" },
-        { name: "E-book คู่มือเริ่มต้น", price: 99, type: "DIGITAL", description: "คู่มือ PDF 48 หน้า" },
-        { name: "บริการให้คำปรึกษาร้านออนไลน์", price: 1500, type: "SERVICE", description: "นัดคุย 1 ชม. ผ่าน Zoom" },
+        { name: "หลอดไฟซีนอน HID 6000K (คู่)", price: 2500, type: "PHYSICAL", description: "หลอดไฟซีนอน แสงขาว 6000K รับประกัน 1 ปี ใช้ได้ H1/H4/H7/H11/9005/9006" },
+        { name: "ชุด LED Headlight H4/H7 (คู่)", price: 3200, type: "PHYSICAL", description: "หลอด LED headlight ความสว่างสูง ระบายความร้อนด้วยพัดลม รับประกัน 2 ปี" },
+        { name: "ไฟเดย์ไลท์ DRL LED (คู่)", price: 1800, type: "PHYSICAL", description: "ไฟ Daytime Running Light LED ติดตั้งง่าย รับประกัน 1 ปี" },
+        { name: "บัลลาสซีนอน Slim Ballast (คู่)", price: 1500, type: "PHYSICAL", description: "บัลลาสไฟซีนอน slim 35W กันน้ำ IP67 รับประกัน 1 ปี" },
+        { name: "โคมไฟหน้า Projector Bi-Xenon", price: 8900, type: "PHYSICAL", description: "โคมไฟหน้าโปรเจคเตอร์ Bi-Xenon พร้อม shroud angle eye สำหรับรถทุกรุ่น" },
+        { name: "บริการติดตั้งไฟซีนอน", price: 800, type: "SERVICE", description: "บริการติดตั้งชุดไฟซีนอน HID ที่ร้าน ใช้เวลา 30-45 นาที" },
+        { name: "บริการโมไฟหน้ารถ Projector", price: 3500, type: "SERVICE", description: "บริการโมไฟหน้าใส่โคมโปรเจคเตอร์ พร้อมงานประกอบ ใช้เวลา 1-2 วัน" },
+        { name: "บริการซ่อมโคมไฟหน้าเบลอ/ขุ่น", price: 1200, type: "SERVICE", description: "ขัดและเคลือบโคมไฟหน้ารถที่เบลอหรือขุ่น คืนความใส เหมือนใหม่ ใช้เวลา 1-2 ชม." },
       ].map((p) =>
         prisma.product.create({
           data: { shopId: shop.id, ...p },
@@ -100,14 +104,14 @@ async function main() {
       review?: { rating: number; comment: string; reviewerContact: string };
     }> = [
       { status: "CREATED", type: "PHYSICAL", buyerContact: "0812345678", productIdx: 0, qty: 1, createdDaysAgo: 0 },
-      { status: "CREATED", type: "PHYSICAL", buyerContact: "0823456789", productIdx: 1, qty: 2, createdDaysAgo: 1 },
-      { status: "CONFIRMED", type: "PHYSICAL", buyerContact: "0834567890", productIdx: 0, qty: 3, createdDaysAgo: 2 },
-      { status: "CONFIRMED", type: "DIGITAL", buyerContact: "0845678901", productIdx: 2, qty: 1, createdDaysAgo: 3 },
+      { status: "CREATED", type: "SERVICE", buyerContact: "0823456789", productIdx: 7, qty: 1, createdDaysAgo: 1 },
+      { status: "CONFIRMED", type: "PHYSICAL", buyerContact: "0834567890", productIdx: 1, qty: 1, createdDaysAgo: 2 },
+      { status: "CONFIRMED", type: "SERVICE", buyerContact: "0845678901", productIdx: 6, qty: 1, createdDaysAgo: 3 },
       {
         status: "SHIPPED",
         type: "PHYSICAL",
         buyerContact: "0856789012",
-        productIdx: 1,
+        productIdx: 2,
         qty: 1,
         createdDaysAgo: 4,
         tracking: { provider: "Kerry Express", trackingNo: "KEX123456789TH" },
@@ -116,8 +120,8 @@ async function main() {
         status: "SHIPPED",
         type: "PHYSICAL",
         buyerContact: "0867890123",
-        productIdx: 0,
-        qty: 2,
+        productIdx: 4,
+        qty: 1,
         createdDaysAgo: 5,
         tracking: { provider: "Flash Express", trackingNo: "FL987654321TH" },
       },
@@ -129,26 +133,27 @@ async function main() {
         qty: 1,
         createdDaysAgo: 7,
         tracking: { provider: "Thailand Post", trackingNo: "EY112233445TH" },
-        review: { rating: 5, comment: "ของดี จัดส่งไว แพ็คเกจเรียบร้อย!", reviewerContact: "0878901234" },
-      },
-      {
-        status: "COMPLETED",
-        type: "DIGITAL",
-        buyerContact: "user-b@example.com",
-        productIdx: 3,
-        qty: 1,
-        createdDaysAgo: 9,
-        review: { rating: 4, comment: "เนื้อหาโอเค ภาพไม่ค่อยชัด", reviewerContact: "user-b@example.com" },
+        review: { rating: 5, comment: "ไฟสว่างมาก ติดตั้งง่าย ร้านบริการดี!", reviewerContact: "0878901234" },
       },
       {
         status: "COMPLETED",
         type: "SERVICE",
         buyerContact: "0889012345",
-        productIdx: 4,
+        productIdx: 5,
+        qty: 1,
+        createdDaysAgo: 9,
+        review: { rating: 5, comment: "ทีมช่างชำนาญ ติดตั้งเร็ว แนะนำเลย", reviewerContact: "0889012345" },
+      },
+      {
+        status: "COMPLETED",
+        type: "SERVICE",
+        buyerContact: "0892345678",
+        productIdx: 7,
         qty: 1,
         createdDaysAgo: 10,
+        review: { rating: 4, comment: "โคมใสขึ้นเยอะ รอดูว่าจะอยู่ได้นานแค่ไหน", reviewerContact: "0892345678" },
       },
-      { status: "CANCELLED", type: "PHYSICAL", buyerContact: "0890123456", productIdx: 0, qty: 1, createdDaysAgo: 1 },
+      { status: "CANCELLED", type: "PHYSICAL", buyerContact: "0890123456", productIdx: 3, qty: 2, createdDaysAgo: 1 },
     ];
 
     let orderCount = 0;
