@@ -70,3 +70,8 @@ html[data-skin="orbit"] {
     --text-xs:   0.875rem; /* 14px — was 13px (root default) */
     --text-2xs:  0.75rem;  /* 12px — was 11px */
 }
+
+/* Drop the unwanted right padding paces adds inside .page-content main. */
+.page-content main {
+    padding-right: 0 !important;
+}
