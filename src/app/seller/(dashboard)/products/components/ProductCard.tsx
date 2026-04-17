@@ -20,17 +20,17 @@ export type ProductCardData = {
 
 const TYPE_META: Record<ProductCardData['type'], { icon: string; label: string; cls: string }> = {
   PHYSICAL: {
-    icon: 'mdi:package-variant-closed',
+    icon: 'package',
     label: 'สินค้าจับต้องได้',
     cls: 'bg-primary/10 text-primary',
   },
   DIGITAL: {
-    icon: 'mdi:cloud-download-outline',
+    icon: 'cloud-download',
     label: 'ดิจิทัล',
     cls: 'bg-info/10 text-info',
   },
   SERVICE: {
-    icon: 'mdi:wrench-outline',
+    icon: 'tool',
     label: 'บริการ',
     cls: 'bg-success/10 text-success',
   },
