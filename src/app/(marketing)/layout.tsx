@@ -13,6 +13,7 @@ import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 import type { ChildrenType } from '@core/types'
 
 // Context Imports
+import { NextAuthProvider } from '@/contexts/nextAuthProvider'
 import { VerticalNavProvider } from '@menu/contexts/verticalNavContext'
 import { SettingsProvider } from '@core/contexts/settingsContext'
 import { IntersectionProvider } from '@/contexts/intersectionContext'
@@ -51,14 +52,16 @@ export default async function MarketingRootLayout({ children }: ChildrenType) {
     <html id="__next" lang="th" dir={direction} className={anuphan.variable} suppressHydrationWarning>
       <body className="marketing-body flex is-full min-bs-full flex-auto flex-col">
         <InitColorSchemeScript attribute="data" defaultMode={systemMode} />
-        <VerticalNavProvider>
-          <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
-            <ThemeProvider direction={direction} systemMode={systemMode}>
-              <IntersectionProvider>{children}</IntersectionProvider>
-              <ToastMount />
-            </ThemeProvider>
-          </SettingsProvider>
-        </VerticalNavProvider>
+        <NextAuthProvider basePath={process.env.NEXTAUTH_BASEPATH}>
+          <VerticalNavProvider>
+            <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
+              <ThemeProvider direction={direction} systemMode={systemMode}>
+                <IntersectionProvider>{children}</IntersectionProvider>
+                <ToastMount />
+              </ThemeProvider>
+            </SettingsProvider>
+          </VerticalNavProvider>
+        </NextAuthProvider>
         <Analytics />
         <SpeedInsights />
       </body>
