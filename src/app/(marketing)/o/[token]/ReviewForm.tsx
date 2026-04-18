@@ -1,11 +1,28 @@
 'use client'
 
+/**
+ * ReviewForm — post-order review (1-5 stars + optional comment)
+ *
+ * Base:
+ *   - theme/vuexy/typescript-version/full-version/src/views/apps/invoice/preview/PreviewCard.tsx
+ *     (Card/CardContent shell + sm:!p-* spacing)
+ *   - MUI Rating primitive (Vuexy uses it throughout, e.g. front-pages/pricing/Plans.tsx,
+ *     apps/ecommerce/manage-reviews — no dedicated template page for a review form)
+ *
+ * Business logic preserved from previous implementation:
+ *   - 1-5 star required, 500-char optional comment
+ *   - POST /api/orders/[token]/review -> on success reload so server page re-renders
+ *     the thank-you card.
+ */
+
+import { useState, type FormEvent } from 'react'
+
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import IconButton from '@mui/material/IconButton'
+import Rating from '@mui/material/Rating'
 import Typography from '@mui/material/Typography'
-import { useState, type FormEvent } from 'react'
+
 import { toast } from 'react-toastify'
 
 import CustomTextField from '@core/components/mui/TextField'
@@ -13,8 +30,7 @@ import CustomTextField from '@core/components/mui/TextField'
 type Props = { token: string }
 
 export default function ReviewForm({ token }: Props) {
-  const [rating, setRating] = useState(0)
-  const [hoverRating, setHoverRating] = useState(0)
+  const [rating, setRating] = useState<number>(0)
   const [comment, setComment] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -43,36 +59,28 @@ export default function ReviewForm({ token }: Props) {
     }
   }
 
-  const display = hoverRating || rating
-
   return (
     <Card>
-      <CardContent className='flex flex-col gap-4'>
-        <Typography variant='h6'>รีวิวร้านค้า</Typography>
-        <Typography color='text.secondary' className='text-sm'>
-          ประสบการณ์การซื้อครั้งนี้เป็นอย่างไร
-        </Typography>
+      <CardContent className='flex flex-col gap-6 sm:!p-10'>
+        <div className='flex flex-col gap-1'>
+          <Typography variant='h5'>รีวิวร้านค้า ⭐</Typography>
+          <Typography color='text.secondary'>
+            ประสบการณ์การซื้อครั้งนี้เป็นอย่างไร ช่วยแชร์เพื่อให้ชุมชน Deep น่าเชื่อถือยิ่งขึ้น
+          </Typography>
+        </div>
 
-        <form onSubmit={onSubmit} noValidate className='flex flex-col gap-4'>
-          <div className='flex items-center justify-center gap-1'>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <IconButton
-                key={i}
-                type='button'
-                onClick={() => setRating(i)}
-                onMouseEnter={() => setHoverRating(i)}
-                onMouseLeave={() => setHoverRating(0)}
-                size='large'
-              >
-                <i
-                  className={
-                    i <= display
-                      ? 'tabler-star-filled text-[var(--mui-palette-warning-main)] text-3xl'
-                      : 'tabler-star text-[var(--mui-palette-text-disabled)] text-3xl'
-                  }
-                />
-              </IconButton>
-            ))}
+        <form onSubmit={onSubmit} noValidate autoComplete='off' className='flex flex-col gap-6'>
+          <div className='flex flex-col items-center gap-2'>
+            <Rating
+              name='order-review-rating'
+              value={rating}
+              onChange={(_e, v) => setRating(v ?? 0)}
+              size='large'
+              className='!text-4xl'
+            />
+            <Typography color='text.disabled' className='text-xs'>
+              {rating ? `${rating}/5` : 'แตะเพื่อให้คะแนน'}
+            </Typography>
           </div>
 
           <CustomTextField
