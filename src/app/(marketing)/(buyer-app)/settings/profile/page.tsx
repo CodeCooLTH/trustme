@@ -1,8 +1,10 @@
+// Base: theme/vuexy/typescript-version/full-version/src/app/[lang]/(dashboard)/(private)/pages/account-settings/page.tsx
+// + theme/vuexy/typescript-version/full-version/src/views/pages/account-settings/account/AccountDetails.tsx
+// Dropped: tabs (security / billing-plans / notifications / connections) — MVP renders Account only.
+
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 
 import { getServerSession } from 'next-auth'
