@@ -92,12 +92,19 @@ export default function ProductPickerModal({ open, onClose, catalog, qtyByProduc
             {filtered.map((product) => {
               const qty = qtyByProduct(product.id)
               return (
-                <button
+                <div
                   key={product.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => inc(product)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      inc(product)
+                    }
+                  }}
                   className={cn(
-                    'card rounded-xl overflow-hidden flex flex-col transition hover:shadow-lg text-left',
+                    'card rounded-xl overflow-hidden flex flex-col transition hover:shadow-lg text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary',
                     qty > 0 && 'ring-2 ring-primary',
                   )}
                 >
@@ -150,7 +157,7 @@ export default function ProductPickerModal({ open, onClose, catalog, qtyByProduc
                       </div>
                     </div>
                   )}
-                </button>
+                </div>
               )
             })}
           </div>

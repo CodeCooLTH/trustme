@@ -25,8 +25,19 @@ export async function createReview(orderToken: string, data: {
     },
   });
 
-  await evaluateBadges(order.shop.userId);
-  await recalculateTrustScore(order.shop.userId);
+  // Review is persisted at this point. The post-create recalc is best-effort:
+  // a transient Prisma error (e.g. connection pool timeout in dev with
+  // connection_limit=1) should NOT fail the review request — the review row
+  // is already saved. Log the failure so it's visible, not silent.
+  try {
+    await evaluateBadges(order.shop.userId);
+    await recalculateTrustScore(order.shop.userId);
+  } catch (err) {
+    console.error(
+      `[review] post-create recalc failed for shop owner ${order.shop.userId}; review ${review.id} persisted but trust score / badges may be stale. Retry via admin tool.`,
+      err,
+    );
+  }
 
   return review;
 }
