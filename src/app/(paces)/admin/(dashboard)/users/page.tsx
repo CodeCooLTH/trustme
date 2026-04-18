@@ -29,15 +29,19 @@ const thDate = (d: Date): string =>
     day: 'numeric',
   }).format(d)
 
-// Resolve the buyer-facing URL for /u/{username} profile links. Admin runs on
-// `admin.<buyerHost>`; strip the prefix. Falls back to the relative path when
-// no absolute base is resolvable on the server (then the anchor opens on the
-// admin subdomain, which 404s for /u/* — acceptable fallback since the env
-// var is set in dev + prod).
+// Resolve the buyer-facing URL for /u/{username}. Admin runs on `admin.<host>`
+// — relative path 404s because admin doesn't serve /u/*. Preference order:
+// 1. NEXT_PUBLIC_BUYER_URL (explicit env — safest cross-env)
+// 2. Dev default http://deepth.local:4000 (when NODE_ENV != production)
+// 3. Prod default https://deepthailand.app (production brand domain)
 const resolveProfileUrl = (username: string): string => {
   const envUrl = process.env.NEXT_PUBLIC_BUYER_URL
   if (envUrl) return `${envUrl.replace(/\/$/, '')}/u/${username}`
-  return `/u/${username}`
+  const base =
+    process.env.NODE_ENV !== 'production'
+      ? 'http://deepth.local:4000'
+      : 'https://deepthailand.app'
+  return `${base}/u/${username}`
 }
 
 export default async function AdminUsersPage() {

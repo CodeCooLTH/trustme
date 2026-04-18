@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as v from "valibot";
 import { SendOtpSchema } from "@/lib/validations";
-import { storeOtp } from "@/lib/otp";
+import { consumeOtpRequestQuota, storeOtp } from "@/lib/otp";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -11,6 +11,16 @@ export async function POST(request: NextRequest) {
   }
 
   const { contact, type } = parsed.output;
+
+  // PRD NFR-2.7: "OTP rate limit: 3 ครั้ง / 10 นาที ต่อเบอร์โทร"
+  // Test accounts bypass ใน consumeOtpRequestQuota อัตโนมัติ
+  if (!consumeOtpRequestQuota(contact)) {
+    return NextResponse.json(
+      { error: "ขอ OTP บ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่" },
+      { status: 429 },
+    );
+  }
+
   const otp = storeOtp(contact);
 
   // MVP: log OTP to console (replace with SMS/email gateway)

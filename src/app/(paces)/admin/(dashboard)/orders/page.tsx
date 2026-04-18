@@ -51,23 +51,24 @@ const maskContact = (c: string | null | undefined): string | null => {
   return '•'.repeat(Math.max(0, c.length - 4)) + c.slice(-4)
 }
 
-// Resolve buyer-subdomain absolute URLs; admin runs on admin.<host> so we
-// need the configured buyer base for cross-subdomain links (/u/{username},
-// /o/{token}). Fallback to relative path keeps SSR safe when env is unset.
+// Resolve buyer-subdomain absolute URLs; admin runs on admin.<host> so
+// relative paths 404 on admin subdomain (ไม่มี /u หรือ /o ฝั่ง admin).
+// Preference: NEXT_PUBLIC_BUYER_URL → dev default deepth.local:4000 →
+// prod default deepthailand.app
 const buyerBase = (): string => {
   const envUrl = process.env.NEXT_PUBLIC_BUYER_URL
-  if (!envUrl) return ''
-  return envUrl.replace(/\/$/, '')
+  if (envUrl) return envUrl.replace(/\/$/, '')
+  return process.env.NODE_ENV !== 'production'
+    ? 'http://deepth.local:4000'
+    : 'https://deepthailand.app'
 }
 
 const shopProfileUrl = (username: string): string => {
-  const base = buyerBase()
-  return base ? `${base}/u/${username}` : `/u/${username}`
+  return `${buyerBase()}/u/${username}`
 }
 
 const orderViewUrl = (publicToken: string): string => {
-  const base = buyerBase()
-  return base ? `${base}/o/${publicToken}` : `/o/${publicToken}`
+  return `${buyerBase()}/o/${publicToken}`
 }
 
 interface PageProps {

@@ -1,6 +1,38 @@
 // In-memory OTP store (MVP — replace with Redis in production)
 const otpStore = new Map<string, { otp: string; expiresAt: number; attempts: number }>();
 
+// In-memory rate-limit bucket per contact (MVP — replace with Redis/Upstash)
+// PRD NFR-2.7: "OTP rate limit: 3 ครั้ง / 10 นาที ต่อเบอร์โทร"
+const otpRequestTimestamps = new Map<string, number[]>();
+
+/**
+ * ตรวจว่า contact นี้ยังส่ง OTP ได้อยู่ไหม ภายใต้ quota.
+ * Return true = ผ่าน (consume 1 slot), false = เกิน quota
+ *
+ * Test accounts (TEST_ACCOUNTS) bypass rate limit — dev/QA ไม่ติด
+ */
+export function consumeOtpRequestQuota(
+  contact: string,
+  max = 3,
+  windowMs = 10 * 60 * 1000,
+): boolean {
+  if (TEST_ACCOUNTS[contact]) return true; // bypass for bypass accounts
+
+  const now = Date.now();
+  const cutoff = now - windowMs;
+  const prev = otpRequestTimestamps.get(contact) ?? [];
+  const recent = prev.filter((t) => t > cutoff);
+
+  if (recent.length >= max) {
+    otpRequestTimestamps.set(contact, recent); // trim stale
+    return false;
+  }
+
+  recent.push(now);
+  otpRequestTimestamps.set(contact, recent);
+  return true;
+}
+
 export function generateOtp(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
