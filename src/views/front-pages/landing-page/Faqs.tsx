@@ -105,8 +105,12 @@ const Faqs = () => {
   }, [])
 
   return (
-    <section id='faq' ref={ref} className={classnames('plb-[100px] bg-backgroundDefault', styles.sectionStartRadius)}>
-      <div className={classnames('flex flex-col gap-16', frontCommonStyles.layoutSpacing)}>
+    <section
+      id='faq'
+      ref={ref}
+      className={classnames('plb-8 md:plb-[100px] bg-backgroundDefault', styles.sectionStartRadius)}
+    >
+      <div className={classnames('flex flex-col gap-8 md:gap-16', frontCommonStyles.layoutSpacing)}>
         <div className='flex flex-col gap-y-4 items-center justify-center'>
           <Chip size='small' variant='tonal' color='primary' label='คำถามที่พบบ่อย' />
           <div className='flex flex-col items-center gap-y-1 justify-center flex-wrap'>
@@ -130,11 +134,13 @@ const Faqs = () => {
         </div>
         <div>
           <Grid container spacing={6}>
-            <Grid size={{ xs: 12, lg: 5 }} className='text-center'>
+            <Grid size={{ xs: 12, lg: 5 }} className='text-center hidden lg:block'>
               <img
                 src='/images/front-pages/landing-page/boy-sitting-with-laptop.png'
                 alt='boy with laptop'
                 className='is-[80%] max-is-[320px]'
+                loading='lazy'
+                sizes='(max-width: 1200px) 0, 40vw'
               />
             </Grid>
             <Grid size={{ xs: 12, lg: 7 }}>

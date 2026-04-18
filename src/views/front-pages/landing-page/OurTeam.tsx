@@ -83,8 +83,8 @@ const OurTeam = () => {
   }, [])
 
   return (
-    <section id='team' className='plb-[100px] bg-backgroundPaper' ref={ref}>
-      <div className={frontCommonStyles.layoutSpacing}>
+    <section id='team' className='plb-8 md:plb-[100px] bg-backgroundPaper' ref={ref}>
+      <div className={classnames('overflow-visible', frontCommonStyles.layoutSpacing)}>
         <div className='flex flex-col gap-y-4 items-center justify-center'>
           <Chip size='small' variant='tonal' color='primary' label='ทีม Deep' />
           <div className='flex flex-col items-center gap-y-1 justify-center flex-wrap'>
@@ -104,7 +104,12 @@ const OurTeam = () => {
             <Typography className='text-center'>ทีมผู้อยู่เบื้องหลังแพลตฟอร์ม Deep ที่คุณไว้ใจได้</Typography>
           </div>
         </div>
-        <Grid container rowSpacing={16} columnSpacing={6} className='pbs-[100px]'>
+        <Grid
+          container
+          rowSpacing={{ xs: 6, md: 16 }}
+          columnSpacing={6}
+          className='pbs-8 md:pbs-[100px] overflow-visible'
+        >
           {team.map((member, index) => (
             <Grid size={{ xs: 12, md: 6, lg: 3 }} key={index}>
               <Card className='border overflow-visible' color={member.color as ThemeColor}>

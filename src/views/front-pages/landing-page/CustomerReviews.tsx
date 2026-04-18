@@ -171,13 +171,16 @@ const CustomerReviews = () => {
   )
 
   return (
-    <section className={classnames('flex flex-col gap-8 plb-[100px] bg-backgroundDefault', styles.sectionStartRadius)}>
-      <div
-        className={classnames('flex max-md:flex-col max-sm:flex-wrap is-full gap-6', frontCommonStyles.layoutSpacing)}
-      >
+    <section
+      className={classnames(
+        'flex flex-col gap-8 plb-8 md:plb-[100px] bg-backgroundDefault',
+        styles.sectionStartRadius
+      )}
+    >
+      <div className={classnames('flex flex-col md:flex-row is-full gap-6', frontCommonStyles.layoutSpacing)}>
         <div className='flex flex-col gap-1 bs-full justify-center items-center lg:items-start is-full md:is-[30%] mlb-auto sm:pbs-2'>
           <Chip label='รีวิวจากผู้ใช้จริง' variant='tonal' color='primary' size='small' className='mbe-3' />
-          <div className='flex flex-col gap-y-1 flex-wrap max-lg:text-center '>
+          <div className='flex flex-col gap-y-1 flex-wrap text-center lg:text-start'>
             <Typography color='text.primary' variant='h4'>
               <span className='relative z-[1] font-extrabold'>
                 ผู้ใช้พูดถึง
@@ -190,7 +193,7 @@ const CustomerReviews = () => {
             </Typography>
             <Typography>เสียงตอบรับจากผู้ซื้อและผู้ขายที่เลือกใช้ Deep</Typography>
           </div>
-          <div className='flex gap-x-4 mbs-11'>
+          <div className='flex gap-x-4 mbs-4 md:mbs-11'>
             <CustomIconButton color='primary' variant='tonal' onClick={() => instanceRef.current?.prev()}>
               <i className='tabler-chevron-left' />
             </CustomIconButton>
@@ -203,7 +206,7 @@ const CustomerReviews = () => {
           <AppKeenSlider>
             <div ref={sliderRef} className='keen-slider mbe-6'>
               {data.map((item, index) => (
-                <div key={index} className='keen-slider__slide flex p-4 sm:p-3'>
+                <div key={index} className='keen-slider__slide flex p-2 sm:p-3'>
                   <Card elevation={8} className='flex items-start'>
                     <CardContent className='p-8 items-center mlb-auto'>
                       <div className='flex flex-col gap-4 items-start'>
@@ -231,7 +234,7 @@ const CustomerReviews = () => {
         </div>
       </div>
       <Divider />
-      <div className='flex flex-wrap items-center justify-center gap-x-16 gap-y-6 mli-3'>
+      <div className='flex flex-wrap justify-center items-center gap-x-8 md:gap-x-16 gap-y-6 mli-3'>
         <Airbnb color='var(--mui-palette-text-secondary)' />
         <Netflix color='var(--mui-palette-text-secondary)' />
         <Dribbble color='var(--mui-palette-text-secondary)' />

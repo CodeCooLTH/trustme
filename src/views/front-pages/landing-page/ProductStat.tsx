@@ -57,13 +57,13 @@ const statData: StatData[] = [
 
 const ProductStat = () => {
   return (
-    <section className='plb-[84px] bg-backgroundPaper'>
+    <section className='plb-8 md:plb-[84px] bg-backgroundPaper'>
       <div className={frontCommonStyles.layoutSpacing}>
         <Grid container spacing={6}>
           {statData.map((stat, index) => (
             <Grid key={index} size={{ xs: 12, sm: 6, md: 3 }}>
               <div
-                className='flex flex-col items-center justify-center gap-y-4 border p-6 rounded'
+                className='flex flex-col items-center justify-center gap-y-4 border p-6 rounded min-h-[120px]'
                 style={{
                   borderColor: stat.color
                 }}

@@ -85,7 +85,12 @@ const UsefulFeature = () => {
 
   return (
     <section id='features' ref={ref} className='bg-backgroundPaper'>
-      <div className={classnames('flex flex-col gap-12 pbs-12 pbe-[100px]', frontCommonStyles.layoutSpacing)}>
+      <div
+        className={classnames(
+          'flex flex-col gap-12 pbs-8 pbe-12 md:pbs-12 md:pbe-[100px]',
+          frontCommonStyles.layoutSpacing
+        )}
+      >
         <div className='flex flex-col gap-y-4 items-center justify-center'>
           <Chip size='small' variant='tonal' color='primary' label='ฟีเจอร์เด่น' />
           <div className='flex flex-col items-center gap-y-1 justify-center flex-wrap'>
@@ -108,7 +113,7 @@ const UsefulFeature = () => {
           </div>
         </div>
         <div>
-          <Grid container spacing={6}>
+          <Grid container spacing={6} sx={{ alignItems: 'stretch' }}>
             {feature.map((item, index) => (
               <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={index}>
                 <div className='flex flex-col gap-2 justify-center items-center'>

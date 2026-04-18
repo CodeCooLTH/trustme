@@ -2,9 +2,6 @@
 import { useState } from 'react'
 import type { ChangeEvent } from 'react'
 
-// Next Imports
-import Link from 'next/link'
-
 // MUI Imports
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
@@ -12,7 +9,6 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Switch from '@mui/material/Switch'
 import Chip from '@mui/material/Chip'
-import Button from '@mui/material/Button'
 import InputLabel from '@mui/material/InputLabel'
 
 // Third-party Imports
@@ -20,6 +16,7 @@ import classnames from 'classnames'
 
 // Components Imports
 import CustomAvatar from '@core/components/mui/Avatar'
+import { LinkButton } from '@/app/(marketing)/_components/mui-link'
 
 // Styles Imports
 import frontCommonStyles from '@views/front-pages/styles.module.css'
@@ -92,7 +89,7 @@ const PricingPlan = () => {
     <section
       id='pricing-plans'
       className={classnames(
-        'flex flex-col gap-8 lg:gap-12 plb-[100px] bg-backgroundDefault rounded-[60px]',
+        'flex flex-col gap-6 md:gap-8 lg:gap-12 plb-8 md:plb-[100px] bg-backgroundDefault rounded-3xl md:rounded-[60px]',
         styles.sectionStartRadius
       )}
     >
@@ -120,7 +117,7 @@ const PricingPlan = () => {
             </Typography>
           </div>
         </div>
-        <div className='flex justify-center items-center max-sm:mlb-3 mbe-6'>
+        <div className='flex justify-center items-center mb-3 md:mb-6'>
           <InputLabel htmlFor='pricing-switch' className='cursor-pointer'>
             รายเดือน
           </InputLabel>
@@ -128,14 +125,14 @@ const PricingPlan = () => {
           <InputLabel htmlFor='pricing-switch' className='cursor-pointer'>
             รายปี
           </InputLabel>
-          <div className='flex gap-x-1 items-start max-sm:hidden mis-2 mbe-5'>
+          <div className='hidden sm:flex gap-x-1 items-start mis-2 mbe-5'>
             <img src='/images/front-pages/landing-page/pricing-arrow.png' width='50' />
             <Typography className='font-medium'>ประหยัด 25%</Typography>
           </div>
         </div>
         <Grid container spacing={6}>
           {pricingPlans.map((plan, index) => (
-            <Grid key={index} size={{ xs: 12, lg: 4 }}>
+            <Grid key={index} size={{ xs: 12, lg: 4 }} className={plan.current ? 'order-first lg:order-none' : ''}>
               <Card className={`${plan.current && 'border-2 border-[var(--mui-palette-primary-main)] shadow-xl'}`}>
                 <CardContent className='flex flex-col gap-8 p-8'>
                   <div className='is-full flex flex-col items-center gap-3'>
@@ -171,9 +168,9 @@ const PricingPlan = () => {
                       ))}
                     </div>
                   </div>
-                  <Button component={Link} href='#contact-us' variant={plan.current ? 'contained' : 'tonal'}>
+                  <LinkButton href='#contact-us' variant={plan.current ? 'contained' : 'tonal'}>
                     เริ่มใช้งาน
-                  </Button>
+                  </LinkButton>
                 </CardContent>
               </Card>
             </Grid>

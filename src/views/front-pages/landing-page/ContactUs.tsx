@@ -50,8 +50,8 @@ const ContactUs = () => {
   }, [])
 
   return (
-    <section id='contact-us' className='plb-[100px] bg-backgroundDefault' ref={ref}>
-      <div className={classnames('flex flex-col gap-14', frontCommonStyles.layoutSpacing)}>
+    <section id='contact-us' className='plb-8 md:plb-[100px] bg-backgroundDefault' ref={ref}>
+      <div className={classnames('flex flex-col gap-8 md:gap-14', frontCommonStyles.layoutSpacing)}>
         <div className='flex flex-col gap-y-4 items-center justify-center'>
           <Chip size='small' variant='tonal' color='primary' label='ติดต่อเรา' />
           <div className='flex flex-col items-center gap-y-1 justify-center flex-wrap'>
@@ -77,7 +77,7 @@ const ContactUs = () => {
               <div className={classnames('border p-[10px] relative', styles.contactRadius)}>
                 <img
                   src='/images/front-pages/landing-page/contact-border.png'
-                  className='absolute -block-start-[7%] -inline-start-[8%] max-is-full max-lg:hidden '
+                  className='absolute -block-start-[7%] -inline-start-[8%] max-is-full hidden lg:block'
                   alt='contact-border'
                   width='180'
                 />
@@ -123,12 +123,14 @@ const ContactUs = () => {
                     </Typography>
                   </div>
                   <form className='flex flex-col items-start gap-6'>
-                    <div className='flex gap-5 is-full'>
+                    <div className='flex flex-col sm:flex-row gap-4 is-full'>
                       <CustomTextField fullWidth label='ชื่อ-นามสกุล' id='name-input' />
                       <CustomTextField fullWidth label='อีเมล' id='email-input' type='email' />
                     </div>
                     <CustomTextField fullWidth multiline rows={7} label='ข้อความ' id='message-input' />
-                    <Button variant='contained'>ส่งข้อความ</Button>
+                    <Button variant='contained' fullWidth className='sm:!w-auto'>
+                      ส่งข้อความ
+                    </Button>
                   </form>
                 </CardContent>
               </Card>

@@ -50,10 +50,10 @@ const Footer = ({ mode }: { mode: Mode }) => {
                 <Typography color='white' className='md:max-is-[390px] opacity-[0.78]'>
                   Deep คือระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ด้วย Trust Score, Badge และการยืนยันตัวตนหลายระดับ
                 </Typography>
-                <div className='flex items-end'>
+                <div className='flex items-end is-full md:max-is-[390px]'>
                   <CustomTextField
                     size='small'
-                    className={styles.inputBorder}
+                    className={classnames('flex-1 min-w-0', styles.inputBorder)}
                     label='ติดตามข่าวสาร'
                     placeholder='อีเมลของคุณ'
                     sx={{
@@ -128,7 +128,7 @@ const Footer = ({ mode }: { mode: Mode }) => {
                 ดาวน์โหลดแอป
               </Typography>
               <div className='flex flex-col gap-4'>
-                <Link className='bg-[#282C3E] bs-[56px] is-[211px] rounded'>
+                <Link className='bg-[#282C3E] bs-[56px] w-full max-w-[211px] rounded'>
                   <div className='flex items-center pli-5 plb-[7px] gap-6'>
                     <img src='/images/front-pages/apple-icon.png' alt='apple store' className='bs-[34px]' />
                     <div className='flex flex-col items-start'>
@@ -141,7 +141,7 @@ const Footer = ({ mode }: { mode: Mode }) => {
                     </div>
                   </div>
                 </Link>
-                <Link className='bg-[#282C3E] bs-[56px] is-[211px] rounded'>
+                <Link className='bg-[#282C3E] bs-[56px] w-full max-w-[211px] rounded'>
                   <div className='flex items-center pli-5 plb-[7px] gap-6'>
                     <img src='/images/front-pages/google-play-icon.png' alt='Google play' className='bs-[34px]' />
                     <div className='flex flex-col items-start'>

@@ -1,15 +1,14 @@
-// Next Imports
-import Link from 'next/link'
-
 // MUI Imports
 import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
 
 // Third-party Imports
 import classnames from 'classnames'
 
 // Type Imports
 import type { SystemMode } from '@core/types'
+
+// Component Imports
+import { LinkButton } from '@/app/(marketing)/_components/mui-link'
 
 // Hooks Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
@@ -26,7 +25,7 @@ const GetStarted = ({ mode }: { mode: SystemMode }) => {
   const getStartedImage = useImageVariant(mode, getStartedImageLight, getStartedImageDark)
 
   return (
-    <section className='relative'>
+    <section className='relative py-8 md:py-0'>
       <img
         src={getStartedImage}
         alt='background-image'
@@ -38,22 +37,28 @@ const GetStarted = ({ mode }: { mode: SystemMode }) => {
           frontCommonStyles.layoutSpacing
         )}
       >
-        <div className='flex flex-col items-center lg:items-start gap-y-8 pbs-9 lg:plb-9 z-1'>
-          <div className='flex flex-col gap-1 max-lg:items-center'>
-            <Typography variant='h3' color='primary.main' className='font-bold text-[2.125rem] max-sm:text-center'>
+        <div className='flex flex-col items-center lg:items-start gap-y-8 py-6 lg:py-9 z-1'>
+          <div className='flex flex-col gap-1 items-center lg:items-start'>
+            <Typography variant='h3' color='primary.main' className='font-bold text-[2.125rem] text-center sm:text-start'>
               พร้อมเริ่มต้นกับ Deep หรือยัง?
             </Typography>
-            <Typography variant='h5' color='text.secondary' className='max-sm:text-center'>
+            <Typography variant='h5' color='text.secondary' className='text-center sm:text-start'>
               สมัครฟรีวันนี้ ทดลองใช้ฟีเจอร์ระดับธุรกิจ 14 วัน
             </Typography>
           </div>
-          <div className='flex gap-3 flex-wrap'>
-            <Button component={Link} href='/auth/sign-up' variant='contained'>
+          <div className='flex flex-col sm:flex-row gap-3 flex-wrap is-full sm:is-auto'>
+            <LinkButton
+              href='/auth/sign-up'
+              variant='contained'
+              size='large'
+              fullWidth
+              className='sm:!w-auto'
+            >
               สมัครใช้งาน
-            </Button>
-            <Button component={Link} href='/auth/sign-in' variant='outlined'>
+            </LinkButton>
+            <LinkButton href='/auth/sign-in' variant='outlined' size='large' className='sm:!w-auto'>
               เข้าสู่ระบบ
-            </Button>
+            </LinkButton>
           </div>
         </div>
         <div className='flex pbs-4 lg:pbs-[60px] md:pie-4 z-1'>
@@ -61,6 +66,8 @@ const GetStarted = ({ mode }: { mode: SystemMode }) => {
             src='/images/front-pages/landing-page/crm-dashboard.png'
             alt='dashboard-image'
             className='max-is-[600px] is-full rounded-bs'
+            loading='lazy'
+            sizes='(max-width: 600px) 100vw, 600px'
           />
         </div>
       </div>
