@@ -2,6 +2,10 @@
 import type { Metadata } from 'next'
 import { Anuphan } from 'next/font/google'
 
+// Vercel Imports
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+
 // MUI Imports
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 
@@ -55,6 +59,8 @@ export default async function MarketingRootLayout({ children }: ChildrenType) {
             </ThemeProvider>
           </SettingsProvider>
         </VerticalNavProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

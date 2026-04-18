@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
 
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+
 import AppProvidersWrapper from '@/components/wrappers/AppProvidersWrapper'
 import { META_DATA } from '@/config/constants'
 
@@ -44,6 +47,8 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <AppProvidersWrapper>{children}</AppProvidersWrapper>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
