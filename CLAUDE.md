@@ -1,132 +1,152 @@
 # SafePay — Trust & Reputation Platform
 
+> **Commercial brand:** "Deep" (UI copy, prod domain `deepthailand.app`). Internal codename "SafePay" is kept in repo, identifiers, and DB. See `~/.claude/projects/.../memory/feedback_brand_naming.md`.
+
+---
+
+## 🛑 HARD RULES — read this first, every time
+
+### 1. No UI from scratch — always copy from the theme
+
+**ห้ามเขียน UI/page เองเด็ดขาด** — ทุกหน้าต้อง copy จากไฟล์ theme ที่ระบุเจาะจง แล้วปรับ content
+
+Which theme depends on the route group:
+
+| Route | Theme | Source root |
+|---|---|---|
+| `src/app/(marketing)/**` (buyer + landing + public `/u/[username]` + `/o/[token]`) | **Vuexy** | `theme/vuexy/typescript-version/full-version/src/` |
+| `src/app/(paces)/seller/**` | **Paces** | `theme/paces/Admin/TS/src/` |
+| `src/app/(paces)/admin/**` | **Paces** | `theme/paces/Admin/TS/src/` |
+
+**Before any `Write` of a page/component/layout, state in the response:**
+
+1. Target route: `src/app/.../<path>/page.tsx`
+2. Theme source I will copy: `theme/<vuexy|paces>/.../<path>/<file>.tsx`
+3. I have `Read` that theme source this turn: ✅ / ❌
+
+If 3 is ❌ → stop, `Read` first. If 2 is vague → stop, research with Glob/Grep.
+
+Full mapping + workflow: **`docs/conventions/ui-page-sourcing.md`** (MANDATORY read before any UI task).
+
+### 2. No `component={Link}` in server components
+
+RSC refuses to serialize a component function prop across the server→client boundary. Use `LinkButton` / `LinkChip` wrappers (under `src/app/<group>/_components/mui-link.tsx`) or wrap `<Button>` with `<Link>`. Full pattern: **`docs/conventions/rsc-mui-navigation.md`**.
+
+### 3. Commit message must cite theme source for UI changes
+
+Every commit that touches `src/app/**`, `src/views/**`, or `src/components/**` (non-trivial UI) must include a `Base:` line pointing to the theme file it copied from. Trivial utility files are exempt. Missing `Base:` on a UI commit = convention violation.
+
+Example:
+```
+feat(buyer): /dashboard using Vuexy ecommerce widgets
+
+Base: theme/vuexy/.../(private)/apps/ecommerce/dashboard/page.tsx
+Widgets adapted: Congratulations → welcome, StatisticsCard, Orders, Transactions.
+Dropped: InvoiceListTable.
+```
+
+---
+
 ## Project Overview
 
 SafePay เป็นระบบสร้างความน่าเชื่อถือสำหรับการซื้อขายออนไลน์ ผ่านระบบ Verify ตัวตน, Trust Score, Badge และ Order History เพื่อแก้ปัญหามิจฉาชีพ
 
 ## Key Documents
 
-- PRD: `docs/PRD.md`
-- Design Spec: `docs/superpowers/specs/2026-04-04-safepay-trust-platform-design.md`
-- Implementation Plan: `docs/superpowers/plans/2026-04-04-safepay-trust-platform.md`
-
-## Current State — Paces UI Rebuild
-
-**2026-04-13: Full UI rewrite in progress.** Project was migrated from Vuexy (MUI + Emotion) to **Paces (Preline + Tailwind)**. All Vuexy UI was wiped; backend (Prisma, API routes, services) is preserved. Pages must be rebuilt on top of the paces scaffold.
-
-Safety checkpoint: `git checkout pre-paces-wipe` restores the pre-wipe state (including all Vuexy-era work-in-progress).
+- **PRD:** `docs/PRD.md`
+- **Conventions (must-read before UI work):**
+  - `docs/conventions/ui-page-sourcing.md` — theme-copy rule + page-type mapping
+  - `docs/conventions/rsc-mui-navigation.md` — RSC + MUI + next/link pattern
+- **Retros:** `docs/retro/` (post-mortems of phase mistakes — read the latest one before starting a new phase)
+- **Plans / specs:** `docs/superpowers/plans/`, `docs/superpowers/specs/`
 
 ## Architecture
 
 - **Profile-Centric** — Trust Profile เป็นศูนย์กลาง ทุกอย่างไหลเข้า profile
 - ไม่แบ่ง role buyer/seller — ทุกคนมี trust profile เหมือนกัน, เปิดร้านเพิ่มได้ (isShop flag)
-- Subdomain routing: `safepay.co` (buyer), `seller.safepay.co` (seller), `admin.safepay.co` (admin) — handled in `src/proxy.ts`
+- Subdomain routing: main (buyer), `seller.*`, `admin.*` — handled in `src/proxy.ts`
 - Session แยกตาม subdomain — login/logout แยกกัน, account เดียวกัน
+- Prod domain `deepthailand.app`; dev `deepth.local`
 
 ## Tech Stack
 
-- **Framework:** Next.js 16 (App Router) — TypeScript strict mode
-- **UI:** **Preline 4 + TailwindCSS 4** (Paces theme as base — no MUI, no Emotion)
-- **Database:** PostgreSQL 16, Prisma ORM
-- **Auth:** NextAuth.js v4 (Facebook OAuth + Phone OTP)
-- **Validation:** Valibot (backend/API), Yup (frontend forms with react-hook-form — paces convention)
+- **Framework:** Next.js 16 (App Router, Turbopack) — TypeScript strict mode
+- **UI:**
+  - Buyer + landing + public (`(marketing)/**`) → **Vuexy** (MUI v9 + Emotion + Tailwind 4)
+  - Seller + admin (`(paces)/**`) → **Paces** (Preline 4 + Tailwind 4, no MUI)
+- **Database:** PostgreSQL 16 (Supabase), Prisma ORM
+- **Auth:** NextAuth.js v4 (Facebook OAuth + Phone OTP via CredentialsProvider)
+- **Validation:** Valibot (backend/API), Yup (frontend react-hook-form)
 - **Form:** React Hook Form + `@hookform/resolvers`
-- **Charts:** ApexCharts, ECharts (via `echarts-for-react`), Chart.js (via `react-chartjs-2`)
-- **Rich Text:** Quill (`react-quill-new`)
-- **Date:** flatpickr + react-datepicker
-- **Alerts:** SweetAlert2, react-toastify
-- **Icons:** `@iconify/react` (on-demand, no bundle)
+- **Icons:** `@iconify/react` (on-demand) — use tabler icon names (e.g. `tabler-phone-check`)
+- **Charts:** ApexCharts, ECharts, Chart.js (wrappers in `src/components/wrappers/`)
+- **Alerts:** react-toastify (mounted once in `(marketing)/ToastMount.tsx`)
 - **Testing:** Vitest
-- **Container:** Docker + Docker Compose
-
-## Marketing Route Exception
-
-The `src/app/(marketing)/` route group is the ONLY place in the app where MUI + Emotion + Vuexy components are permitted. It is isolated via Next.js multiple root layouts — the `(marketing)` layout has its own `<html>` tag with Anuphan font and MUI theme, and does NOT load `@/assets/css/app.css`. All other routes (paces) remain strictly Tailwind/Preline-only per the rules below.
-
-If you touch `src/app/(marketing)/**`, `src/views/front-pages/**`, `src/components/layout/front-pages/**`, `src/@core/**` (Vuexy core), or `src/@layouts/BlankLayout.tsx`, the paces rules do NOT apply. For any other path, the paces rules are absolute.
-
-## Theme: Paces (MANDATORY)
-
-**ห้ามสร้าง UI component เองเด็ดขาด** — ต้องใช้จาก paces theme หรือ compose จาก Preline + Tailwind เท่านั้น
-
-- Paces source: `theme/paces/Admin/TS/src/` (reference only — do not import from here)
-- Project scaffold in `src/{components,layouts,hooks,utils,context,assets,config,types}/` — copied from paces
-- CSS entry: `src/assets/css/app.css` (imported by `src/app/(paces)/layout.tsx`)
-- Preline init: `src/utils/preline.ts` (called from `AppProvidersWrapper`)
-
-### Rules (ABSOLUTE — NO EXCEPTIONS)
-
-1. **ห้ามเขียน UI/page เองเด็ดขาด** — ทุกหน้าต้อง copy จาก `theme/paces/Admin/TS/src/app/` หรือ `theme/paces/Admin/TS/src/components/` แล้วปรับ content
-2. **วิธีสร้างหน้าใหม่:**
-   - หา page ที่ใกล้เคียงจาก `theme/paces/Admin/TS/src/app/(admin)/` (list/detail/form/dashboard templates) หรือ `theme/paces/Admin/TS/src/app/auth/` (login, sign-up, OTP, reset-pass, 2fa)
-   - copy markup + Tailwind classes มา → ปรับ content/logic ให้ตรง SafePay
-   - ห้ามเขียนจาก scratch
-3. **Auth pages:**
-   - Login → base on `theme/paces/Admin/TS/src/app/auth/(basic)/sign-in/`
-   - Register → `auth/(basic)/sign-up/`
-   - OTP / Confirm → `auth/(basic)/two-factor/`
-   - Reset password → `auth/(basic)/reset-pass/`
-4. **Dashboard pages** → base on `theme/paces/Admin/TS/src/app/(admin)/dashboard/`
-5. **Table/List pages** → base on `theme/paces/Admin/TS/src/app/(admin)/apps/` (users, invoice, ecommerce, projects)
-6. **Form pages** → base on `theme/paces/Admin/TS/src/app/(admin)/form/`
-7. **Layout wrappers** → use `VerticalLayout` / `HorizontalLayout` / `MainLayout` from `src/layouts/`
-8. **Providers** → all client providers go through `AppProvidersWrapper` (already wires `SessionProvider`, `LayoutProvider`, Preline init)
-9. **Icons:** use `@iconify/react` or `src/components/wrappers/Icon.tsx` — never import from a local icon bundle
-10. **Styling:** Tailwind utility classes only. No inline `style={...}` color constants. No CSS-in-JS. No `@emotion/*`, no `@mui/*`.
-11. **Domain components** (trust-score-badge, verification-badges, order-status-badge, achievement-badges) ให้สร้างใน `src/components/safepay/` โดย compose จาก Preline + Tailwind classes เท่านั้น
-
-### Checklist ก่อนสร้างหน้าใหม่
-
-- [ ] ค้นหา page/view ที่ใกล้เคียงจาก `theme/paces/Admin/TS/src/app/` แล้วหรือยัง?
-- [ ] Copy มาแล้วปรับ content หรือยัง? (ห้ามเขียนเองจาก scratch)
-- [ ] ใช้ paces layouts (VerticalLayout / HorizontalLayout / MainLayout) ครบหรือยัง?
-- [ ] ใช้ `@iconify/react` สำหรับ icons หรือยัง?
-- [ ] Style ใช้ Tailwind utility classes จากธีมหรือยัง? (ห้ามกำหนด color เอง)
+- **Container:** Docker + Docker Compose (local Postgres); prod on Supabase
 
 ## Directory Structure
 
 ```
 src/
 ├── app/
-│   ├── api/              # Backend routes — preserved, uses @/lib + @/services
-│   ├── layout.tsx        # Root layout (paces pattern)
-│   ├── page.tsx          # Landing
-│   └── (will add)        # (buyer), seller, admin, auth routes
-├── assets/               # paces fonts, css, images
-│   └── css/app.css       # Main CSS entry — imports all paces + Tailwind + Preline
-├── components/           # paces reusable components (copy from theme/paces as needed)
-│   ├── wrappers/         # AppProvidersWrapper, Icon, Quill, Flatpickr, EChart, etc.
-│   └── safepay/          # Domain-specific components (create here)
-├── config/               # App-level constants (META_DATA, currency, etc.)
-├── context/              # React context (useLayoutContext from paces)
-├── hooks/                # Client hooks (useAuth wired to NextAuth)
-├── layouts/              # paces layouts (Vertical, Horizontal, Main)
-├── lib/                  # Backend: auth.ts, prisma.ts, otp.ts, upload.ts, validations.ts, subdomain.ts
-├── services/             # Backend: order, product, shop, user, verification, trust-score, badge, review, history-linking
-├── types/                # Shared types
-├── utils/                # Client utils (preline, layout, helpers — from paces)
-└── proxy.ts              # Subdomain routing middleware
+│   ├── (marketing)/           # Vuexy route group (buyer + landing + public)
+│   │   ├── layout.tsx         # MUI ThemeProvider + Anuphan font + ToastMount
+│   │   ├── auth/              # sign-in, sign-up, verify-otp
+│   │   ├── dashboard/         # (→ to be wrapped in (buyer-app)/ per R2)
+│   │   ├── orders/            # same
+│   │   ├── reviews/           # same
+│   │   ├── settings/          # same
+│   │   ├── u/[username]/      # public profile
+│   │   ├── o/[token]/         # public order
+│   │   └── _components/       # shared client wrappers (mui-link, etc.)
+│   ├── (paces)/               # Paces route group (seller + admin)
+│   │   ├── layout.tsx         # Preline + Tailwind + AppProvidersWrapper
+│   │   ├── seller/            # seller dashboard, products, orders, verification, etc.
+│   │   └── admin/             # admin auth + (partial) dashboard
+│   └── api/                   # Backend — unified across subdomains
+├── @core/, @layouts/, @menu/  # Vuexy theme engine (copied from theme/vuexy)
+├── assets/, components/,      # Paces scaffolds (copied from theme/paces)
+│   config/, context/, hooks/,
+│   layouts/, utils/
+├── lib/                       # auth, prisma, otp, storage, subdomain, validations
+├── services/                  # user, shop, verification, trust-score, badge,
+│                              #   product, order, review, history-linking
+├── types/
+└── proxy.ts                   # Subdomain router (main/seller/admin)
+
+theme/
+├── vuexy/typescript-version/full-version/src/   # Vuexy source (reference only)
+└── paces/Admin/TS/src/                          # Paces source (reference only)
 ```
 
 ## Core Systems
 
 1. **Verification** — หลายระดับ: OTP (L1) → เอกสาร (L2) → จดทะเบียนธุรกิจ (L3), admin review
-2. **Trust Score** — คำนวณจาก Verification (35%), Orders (25%), Rating (20%), Age (10%), Badges (10%), MVP มีแต่ขึ้น
-3. **Badge** — Verification badges + Achievement badges (10 อัน)
-4. **Simple OMS** — Seller สร้าง order → ลิงก์ → buyer OTP confirm + review, รองรับ PHYSICAL/DIGITAL/SERVICE
-5. **Buyer History Linking** — Buyer ไม่ต้องสมัคร (OTP confirm), สมัครทีหลัง auto-link history
+2. **Trust Score** — คำนวณจาก Verification 35%, Orders 25%, Rating 20%, Age 10%, Badges 10%. MVP มีแต่ขึ้น (no penalties)
+3. **Badges** — Verification badges (auto) + 10 achievement badges (auto evaluated)
+4. **Simple OMS** — Seller creates order → public `/o/{token}` → buyer OTP confirm + review → trust recalc. Types: PHYSICAL / DIGITAL / SERVICE
+5. **Buyer History Linking** — Buyer confirms as guest (OTP + contact) → signs up later → `linkBuyerHistory` auto-links by phone/email match. Wired in `lib/auth.ts` on phone-OTP + Facebook signup.
 
 ## Conventions
 
-- Language: TypeScript (strict mode)
-- UI ภาษาไทย
-- Font: Noto Sans Thai (Google Fonts) — linked in `src/app/layout.tsx`
-- Mobile-first responsive (Tailwind `sm:`, `md:`, `lg:` breakpoints)
-- Service layer (`src/services/`) แยกจาก API layer (`src/app/api/`)
-- Input validation:
-  - **Backend (API routes):** Valibot schemas from `src/lib/validations.ts`
-  - **Frontend (forms):** Yup + `@hookform/resolvers` (paces convention)
-- ไม่ใช้ Redux — ใช้ Server Components + React state/context
-- Follow paces structure: `components/`, `layouts/`, `hooks/`, `context/`, `utils/`
+- **Language:** TypeScript strict mode; UI copy ภาษาไทย
+- **Font:** Anuphan (Google Fonts) — buyer/landing via `next/font`; Noto Sans Thai reference only
+- **Mobile-first:** Tailwind breakpoints (`sm:`/`md:`/`lg:`)
+- **Service layer** (`src/services/`) is separated from API layer (`src/app/api/`)
+- **Input validation:**
+  - Backend (API routes): Valibot schemas from `src/lib/validations.ts`
+  - Frontend (forms): Yup + `@hookform/resolvers`
+- **No Redux** — use Server Components + React state/context
+- **Icons:** use `@iconify/react` with tabler names — never bundle a static icon set
+- **Commit granularity:** one task/feature = one commit. Cite `Base:` theme file for UI commits (see Hard Rule 3).
+- **QA:** Chrome DevTools MCP (`mcp__chrome-devtools__*` tools) is the baseline E2E check for UI tasks. curl + type-check alone are insufficient.
+
+## Current State Snapshots
+
+- **2026-04-13:** Attempted Paces-wide UI rewrite (original plan wiped Vuexy).
+- **2026-04-18 (AM):** User reversed the decision for buyer side — buyer + landing back to Vuexy. Admin + seller stay Paces.
+- **2026-04-18 (PM):** P1 buyer build shipped (9 commits) but retrospectively violated theme-copy rule; R1-R11 rework planned. See `docs/retro/2026-04-18-p1-retrospective.md`.
+
+Safety checkpoint: `git checkout pre-paces-wipe` restores the pre-2026-04-13 state.
 
 @AGENTS.md
