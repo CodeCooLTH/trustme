@@ -44,6 +44,11 @@ export async function confirmOrder(publicToken: string, buyerContact: string, bu
 export async function shipOrder(publicToken: string, data: { provider: string; trackingNo: string }) {
   const order = await prisma.order.findUnique({ where: { publicToken } });
   if (!order) throw new Error("Order not found");
+  // Type guard — เฉพาะ PHYSICAL ที่มี SHIPPED state (PRD section 4 state machine)
+  // UI gate ที่ OrderActions.tsx ป้องกันไว้แต่ต้องกัน bypass ผ่าน API direct ด้วย
+  if (order.type !== "PHYSICAL") {
+    throw new Error(`Only PHYSICAL orders can be shipped (this order is ${order.type})`);
+  }
   assertTransition(order.status, "SHIPPED");
   return prisma.$transaction(async (tx) => {
     await tx.shipmentTracking.create({

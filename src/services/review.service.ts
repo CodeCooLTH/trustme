@@ -14,6 +14,11 @@ export async function createReview(orderToken: string, data: {
   });
   if (!order) throw new Error("Order not found");
   if (order.review) throw new Error("Review already exists for this order");
+  // State guard — รีวิวได้เฉพาะหลัง buyer ยืนยัน (CONFIRMED / SHIPPED / COMPLETED)
+  // PRD FR-7.1: "Buyer ให้ review + rating ได้หลัง confirm order"
+  if (!["CONFIRMED", "SHIPPED", "COMPLETED"].includes(order.status)) {
+    throw new Error(`Cannot review order in status ${order.status} (must be CONFIRMED or later)`);
+  }
 
   const review = await prisma.review.create({
     data: {
