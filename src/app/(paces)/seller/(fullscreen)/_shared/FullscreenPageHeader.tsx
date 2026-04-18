@@ -19,7 +19,7 @@ export default function FullscreenPageHeader({
   disableSave,
 }: FullscreenPageHeaderProps) {
   return (
-    <div className="sticky top-0 z-10 bg-card -mx-4 px-4 md:-mx-8 md:px-8 pt-2 pb-4 mb-6 border-b border-default-200">
+    <div className="sticky top-0 z-10 bg-card -mx-4 px-4 md:-mx-8 md:px-8 pb-4 mb-6 border-b border-default-200">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-dark">{title}</h1>

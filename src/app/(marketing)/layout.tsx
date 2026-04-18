@@ -19,7 +19,7 @@ import ThemeProvider from '@components/theme'
 // Util Imports
 import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
 
-import ToastMount from './ToastMount'
+import ToastMount from '@/components/ToastMount'
 
 import './marketing.css'
 
