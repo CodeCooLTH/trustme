@@ -34,11 +34,34 @@ export async function createOrder(shopId: string, data: {
 export async function confirmOrder(publicToken: string, buyerContact: string, buyerUserId?: string) {
   const order = await prisma.order.findUnique({ where: { publicToken } });
   if (!order) throw new Error("Order not found");
+  // เบอร์ต้องตรงกับที่ seller ใส่ไว้ตอนสร้าง หรือถ้า order ยังว่าง buyer
+  // รายแรกเป็นคน claim (เก็บ buyerContact ตอน transition CREATED → CONFIRMED)
+  if (order.buyerContact && order.buyerContact !== buyerContact) {
+    throw new Error("Phone ไม่ตรงกับคำสั่งซื้อนี้");
+  }
   assertTransition(order.status, "CONFIRMED");
   return prisma.order.update({
     where: { publicToken },
     data: { status: "CONFIRMED", buyerContact, buyerUserId },
   });
+}
+
+/**
+ * Lock screen check — ตรวจเบอร์ที่ buyer กรอกว่าตรงกับ order หรือไม่
+ * ไม่เปลี่ยน state. ใช้ก่อนเข้าหน้า order detail
+ *
+ * Return true ถ้า:
+ * - order.buyerContact ตรงกับ phone ที่กรอก (กรณี confirmed แล้ว หรือ seller pre-set)
+ * - order.buyerContact ยังว่าง + order status = CREATED (first-time unlock; phone จะถูก claim ตอน confirm)
+ */
+export async function checkOrderPhone(publicToken: string, phone: string): Promise<boolean> {
+  const order = await prisma.order.findUnique({
+    where: { publicToken },
+    select: { buyerContact: true, status: true },
+  });
+  if (!order) return false;
+  if (order.buyerContact) return order.buyerContact === phone;
+  return order.status === "CREATED";
 }
 
 export async function shipOrder(publicToken: string, data: { provider: string; trackingNo: string }) {

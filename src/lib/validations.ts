@@ -40,10 +40,17 @@ export const CreateOrderSchema = v.object({
   type: v.picklist(["PHYSICAL", "DIGITAL", "SERVICE"]),
 });
 
+// ConfirmOrderSchema — OTP ถูกถอดออกตาม UX ใหม่ (2026-04-18) buyer เปิดลิงก์
+// และพิสูจน์ตัวตนด้วยการกรอกเบอร์ที่ตรงกับ order.buyerContact (ถ้า seller ใส่
+// เบอร์ไว้ตอนสร้าง order) หรือถ้า buyerContact ยังว่าง — เบอร์แรกที่กรอกจะ
+// claim order นั้น. ดูเพิ่มใน order.service.confirmOrder + /api/orders/[token]/unlock
 export const ConfirmOrderSchema = v.object({
   contact: v.pipe(v.string(), v.minLength(1)),
-  contactType: v.picklist(["phone", "email", "PHONE", "EMAIL"]),
-  otp: v.pipe(v.string(), v.length(6)),
+  contactType: v.optional(v.picklist(["phone", "email", "PHONE", "EMAIL"])),
+});
+
+export const UnlockOrderSchema = v.object({
+  phone: v.pipe(v.string(), v.regex(/^0[0-9]{9}$/)),
 });
 
 export const CreateReviewSchema = v.object({
