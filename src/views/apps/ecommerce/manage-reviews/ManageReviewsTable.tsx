@@ -9,8 +9,8 @@ import Link from 'next/link'
 // MUI Imports
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
 import MenuItem from '@mui/material/MenuItem'
+import Rating from '@mui/material/Rating'
 import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
 import type { TextFieldProps } from '@mui/material/TextField'
@@ -21,13 +21,13 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  useReactTable,
   getFilteredRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
   getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable
+  getSortedRowModel
 } from '@tanstack/react-table'
 import type { ColumnDef } from '@tanstack/react-table'
 
@@ -39,50 +39,27 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import tableStyles from '@core/styles/table.module.css'
 
 /**
- * Buyer order row shape — mirrors the projection returned by
- * `getOrdersByBuyer` in `src/services/order.service.ts`.
+ * Buyer-authored review row — server page must pass `createdAt` already as an
+ * ISO string (Date is not JSON-serialisable across the RSC boundary).
  */
-export type BuyerOrderRow = {
+export type BuyerReviewRow = {
   id: string
-  publicToken: string
-  status: string
-  totalAmount: number | string
-  createdAt: Date | string
-  items: { id: string; name: string }[]
-  shop: {
-    id: string
-    shopName: string
-    user: { username: string; displayName: string }
+  rating: number
+  comment: string | null
+  createdAt: string
+  order: {
+    publicToken: string
+    items: { id: string; name: string }[]
+    shop: {
+      user: {
+        displayName: string
+        username: string
+      }
+    }
   }
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  CREATED: 'รอยืนยัน',
-  CONFIRMED: 'ยืนยันแล้ว',
-  SHIPPED: 'จัดส่งแล้ว',
-  COMPLETED: 'สำเร็จ',
-  CANCELLED: 'ยกเลิก'
-}
-
-const STATUS_COLOR: Record<string, 'default' | 'info' | 'warning' | 'success' | 'error'> = {
-  CREATED: 'warning',
-  CONFIRMED: 'info',
-  SHIPPED: 'info',
-  COMPLETED: 'success',
-  CANCELLED: 'error'
-}
-
-const baht = new Intl.NumberFormat('th-TH', {
-  style: 'currency',
-  currency: 'THB',
-  minimumFractionDigits: 0
-})
-
-const dateFmt = new Intl.DateTimeFormat('th-TH', {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric'
-})
+type RowWithAction = BuyerReviewRow & { action?: string }
 
 const DebouncedInput = ({
   value: initialValue,
@@ -94,7 +71,6 @@ const DebouncedInput = ({
   onChange: (value: string | number) => void
   debounce?: number
 } & Omit<TextFieldProps, 'onChange'>) => {
-  // States
   const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
@@ -102,7 +78,9 @@ const DebouncedInput = ({
   }, [initialValue])
 
   useEffect(() => {
-    const timeout = setTimeout(() => onChange(value), debounce)
+    const timeout = setTimeout(() => {
+      onChange(value)
+    }, debounce)
 
     return () => clearTimeout(timeout)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,31 +89,65 @@ const DebouncedInput = ({
   return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
 }
 
-type RowWithAction = BuyerOrderRow & { action?: string }
+const dateFmt = new Intl.DateTimeFormat('th-TH', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric'
+})
 
 const columnHelper = createColumnHelper<RowWithAction>()
 
 /**
- * Buyer-side orders table.
+ * Buyer "My Reviews" table.
  *
- * Base: theme/vuexy/typescript-version/full-version/src/views/apps/ecommerce/orders/list/OrderListTable.tsx
- * Adapted columns to SafePay buyer view (สินค้า, ร้าน, ยอดรวม, สถานะ, วันที่, action).
- * Dropped: row checkbox, payment status column, payment method column, OptionMenu (replaced
- * with single "ดู" link), Export button.
+ * Base: theme/vuexy/typescript-version/full-version/src/views/apps/ecommerce/manage-reviews/ManageReviewsTable.tsx
+ * Adapted columns to the buyer-authored view:
+ *   ร้านค้า / สินค้า / คะแนน / ความคิดเห็น / วันที่ / ดู
+ * Dropped: product image column (not captured on review), seller reply, status/
+ *   approval chip, row checkbox, Export button, OptionMenu (delete) — these are
+ *   seller-review-management concepts, not applicable to a buyer-authored view.
  */
-const OrderListTable = ({ orderData }: { orderData: BuyerOrderRow[] }) => {
+const ManageReviewsTable = ({ reviewsData }: { reviewsData: BuyerReviewRow[] }) => {
   // States
-  const [data] = useState<BuyerOrderRow[]>(orderData)
+  const [data] = useState<BuyerReviewRow[]>(reviewsData)
   const [globalFilter, setGlobalFilter] = useState('')
+  const [ratingFilter, setRatingFilter] = useState<string>('All')
+
+  const filteredData = useMemo(() => {
+    if (ratingFilter === 'All') return data
+
+    return data.filter(r => r.rating === Number(ratingFilter))
+  }, [data, ratingFilter])
 
   const columns = useMemo<ColumnDef<RowWithAction, any>[]>(
     () => [
-      columnHelper.accessor(row => row.items[0]?.name ?? '', {
+      columnHelper.accessor(row => row.order.shop.user.displayName, {
+        id: 'shop',
+        header: 'ร้านค้า',
+        cell: ({ row }) => {
+          const seller = row.original.order.shop.user
+
+          return (
+            <div className='flex flex-col'>
+              <Link
+                href={`/u/${seller.username}`}
+                className='font-medium text-[var(--mui-palette-primary-main)] hover:underline'
+              >
+                {seller.displayName}
+              </Link>
+              <Typography variant='body2' color='text.secondary'>
+                @{seller.username}
+              </Typography>
+            </div>
+          )
+        }
+      }),
+      columnHelper.accessor(row => row.order.items[0]?.name ?? '', {
         id: 'product',
         header: 'สินค้า',
         cell: ({ row }) => {
-          const first = row.original.items[0]
-          const extra = row.original.items.length - 1
+          const first = row.original.order.items[0]
+          const extra = row.original.order.items.length - 1
 
           return (
             <div className='flex flex-col'>
@@ -151,37 +163,40 @@ const OrderListTable = ({ orderData }: { orderData: BuyerOrderRow[] }) => {
           )
         }
       }),
-      columnHelper.accessor(row => row.shop.shopName, {
-        id: 'shop',
-        header: 'ร้าน',
+      columnHelper.accessor('rating', {
+        header: 'คะแนน',
+        sortingFn: (rowA, rowB) => rowA.original.rating - rowB.original.rating,
         cell: ({ row }) => (
-          <Link
-            href={`/u/${row.original.shop.user.username}`}
-            className='text-[var(--mui-palette-primary-main)] hover:underline'
-          >
-            {row.original.shop.shopName}
-          </Link>
-        )
-      }),
-      columnHelper.accessor(row => Number(row.totalAmount), {
-        id: 'total',
-        header: 'ยอดรวม',
-        cell: ({ row }) => (
-          <Typography color='text.primary' className='font-medium'>
-            {baht.format(Number(row.original.totalAmount))}
-          </Typography>
-        )
-      }),
-      columnHelper.accessor('status', {
-        header: 'สถานะ',
-        cell: ({ row }) => (
-          <Chip
-            size='small'
-            variant='tonal'
-            color={STATUS_COLOR[row.original.status] ?? 'default'}
-            label={STATUS_LABEL[row.original.status] ?? row.original.status}
+          <Rating
+            name='buyer-review'
+            readOnly
+            value={row.original.rating}
+            emptyIcon={<i className='tabler-star-filled' />}
           />
         )
+      }),
+      columnHelper.accessor('comment', {
+        header: 'ความคิดเห็น',
+        cell: ({ row }) => {
+          const c = row.original.comment
+
+          if (!c) {
+            return (
+              <Typography variant='body2' color='text.disabled'>
+                —
+              </Typography>
+            )
+          }
+
+          const truncated = c.length > 80 ? `${c.slice(0, 80)}…` : c
+
+          return (
+            <Typography className='text-wrap max-is-[360px]' title={c}>
+              {truncated}
+            </Typography>
+          )
+        },
+        enableSorting: false
       }),
       columnHelper.accessor(row => new Date(row.createdAt).getTime(), {
         id: 'date',
@@ -196,7 +211,7 @@ const OrderListTable = ({ orderData }: { orderData: BuyerOrderRow[] }) => {
         header: '',
         cell: ({ row }) => (
           <Link
-            href={`/o/${row.original.publicToken}`}
+            href={`/o/${row.original.order.publicToken}`}
             className='inline-flex items-center gap-1 text-sm text-[var(--mui-palette-primary-main)] hover:underline'
           >
             ดู
@@ -210,8 +225,8 @@ const OrderListTable = ({ orderData }: { orderData: BuyerOrderRow[] }) => {
   )
 
   const table = useReactTable({
-    data,
-    columns: columns as ColumnDef<BuyerOrderRow, any>[],
+    data: filteredData,
+    columns: columns as ColumnDef<BuyerReviewRow, any>[],
     filterFns: {},
     state: { globalFilter },
     initialState: { pagination: { pageSize: 10 } },
@@ -228,24 +243,38 @@ const OrderListTable = ({ orderData }: { orderData: BuyerOrderRow[] }) => {
 
   return (
     <Card>
-      <CardContent className='flex justify-between max-sm:flex-col sm:items-center gap-4'>
+      <CardContent className='flex flex-wrap justify-between gap-4'>
         <DebouncedInput
           value={globalFilter ?? ''}
           onChange={value => setGlobalFilter(String(value))}
-          placeholder='ค้นหาคำสั่งซื้อ'
-          className='sm:is-auto'
+          placeholder='ค้นหาร้าน / สินค้า'
+          className='max-sm:is-full'
         />
-        <CustomTextField
-          select
-          value={table.getState().pagination.pageSize}
-          onChange={e => table.setPageSize(Number(e.target.value))}
-          className='is-[70px] max-sm:is-full'
-        >
-          <MenuItem value='10'>10</MenuItem>
-          <MenuItem value='25'>25</MenuItem>
-          <MenuItem value='50'>50</MenuItem>
-          <MenuItem value='100'>100</MenuItem>
-        </CustomTextField>
+        <div className='flex max-sm:flex-col sm:items-center gap-4 max-sm:is-full'>
+          <CustomTextField
+            select
+            value={table.getState().pagination.pageSize}
+            onChange={e => table.setPageSize(Number(e.target.value))}
+            className='sm:is-[140px] flex-auto is-full'
+          >
+            <MenuItem value='10'>10</MenuItem>
+            <MenuItem value='25'>25</MenuItem>
+            <MenuItem value='50'>50</MenuItem>
+          </CustomTextField>
+          <CustomTextField
+            select
+            value={ratingFilter}
+            onChange={e => setRatingFilter(e.target.value)}
+            className='is-full sm:is-[140px] flex-auto'
+          >
+            <MenuItem value='All'>ทุกคะแนน</MenuItem>
+            <MenuItem value='5'>5 ดาว</MenuItem>
+            <MenuItem value='4'>4 ดาว</MenuItem>
+            <MenuItem value='3'>3 ดาว</MenuItem>
+            <MenuItem value='2'>2 ดาว</MenuItem>
+            <MenuItem value='1'>1 ดาว</MenuItem>
+          </CustomTextField>
+        </div>
       </CardContent>
       <div className='overflow-x-auto'>
         <table className={tableStyles.table}>
@@ -278,19 +307,19 @@ const OrderListTable = ({ orderData }: { orderData: BuyerOrderRow[] }) => {
             <tbody>
               <tr>
                 <td colSpan={table.getVisibleFlatColumns().length} className='text-center py-10'>
-                  ไม่มีคำสั่งซื้อในหมวดนี้
+                  ยังไม่มีรีวิวที่ให้
                 </td>
               </tr>
             </tbody>
           ) : (
             <tbody>
               {table.getRowModel().rows.map(row => (
-                <tr key={row.id}>
+                <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
                   {row.getVisibleCells().map(cell => (
                     <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
                   ))}
                 </tr>
-              ))}
+                ))}
             </tbody>
           )}
         </table>
@@ -310,4 +339,4 @@ const OrderListTable = ({ orderData }: { orderData: BuyerOrderRow[] }) => {
   )
 }
 
-export default OrderListTable
+export default ManageReviewsTable
