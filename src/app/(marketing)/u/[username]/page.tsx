@@ -194,7 +194,7 @@ export default async function PublicProfilePage({ params }: Props) {
   }
 
   return (
-    <div className='p-6 lg:p-10 min-bs-[100dvh] bg-[var(--mui-palette-background-default)]'>
+    <div className='p-4 sm:p-6 lg:p-10 min-bs-[100dvh] bg-[var(--mui-palette-background-default)]'>
       <div className='mx-auto max-w-6xl'>
         <UserProfile profileHeader={profileHeader} profileTab={profileTab} />
       </div>

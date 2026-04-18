@@ -30,9 +30,9 @@ export type ProfileHeaderData = {
 const UserProfileHeader = ({ data }: { data: ProfileHeaderData }) => {
   return (
     <Card>
-      <CardMedia image={data.coverImg} className='bs-[250px]' />
+      <CardMedia image={data.coverImg} className='bs-[150px] sm:bs-[200px] md:bs-[250px]' />
       <CardContent className='flex gap-5 justify-center flex-col items-center md:items-end md:flex-row !pt-0 md:justify-start'>
-        <div className='flex rounded-bs-md mbs-[-40px] border-[5px] mis-[-5px] border-be-0 border-backgroundPaper bg-backgroundPaper'>
+        <div className='flex rounded-bs-md mbs-[-24px] sm:mbs-[-40px] border-[5px] mis-[-5px] border-be-0 border-backgroundPaper bg-backgroundPaper'>
           <Avatar
             src={data.profileImg ?? undefined}
             alt={data.fullName}
@@ -42,7 +42,7 @@ const UserProfileHeader = ({ data }: { data: ProfileHeaderData }) => {
             {data.fullName.slice(0, 1)}
           </Avatar>
         </div>
-        <div className='flex is-full justify-start self-end flex-col items-center gap-6 sm-gap-0 sm:flex-row sm:justify-between sm:items-end'>
+        <div className='flex is-full justify-start self-end flex-col items-center gap-6 sm:gap-0 sm:flex-row sm:justify-between sm:items-end'>
           <div className='flex flex-col items-center sm:items-start gap-2'>
             <div className='flex items-center gap-2 flex-wrap justify-center sm:justify-start'>
               <Typography variant='h4'>{data.fullName}</Typography>
@@ -55,7 +55,7 @@ const UserProfileHeader = ({ data }: { data: ProfileHeaderData }) => {
               )}
             </div>
             <Typography color='text.secondary'>@{data.username}</Typography>
-            <div className='flex flex-wrap gap-6 justify-center sm:justify-normal'>
+            <div className='flex flex-wrap gap-4 sm:gap-6 justify-center sm:justify-normal'>
               {data.shopName && (
                 <div className='flex items-center gap-2'>
                   <i className='tabler-building-store' />
@@ -67,7 +67,7 @@ const UserProfileHeader = ({ data }: { data: ProfileHeaderData }) => {
                 <Typography className='font-medium'>สมาชิกตั้งแต่ {data.memberSince}</Typography>
               </div>
             </div>
-            <div className='flex flex-wrap gap-4 justify-center sm:justify-normal mt-2'>
+            <div className='flex flex-wrap gap-4 sm:gap-6 justify-center sm:justify-normal mt-2'>
               <div className='flex items-center gap-1.5'>
                 <i className='tabler-shopping-bag text-[var(--mui-palette-text-secondary)]' />
                 <Typography className='font-medium'>{data.stats.completedOrders}</Typography>
@@ -91,7 +91,7 @@ const UserProfileHeader = ({ data }: { data: ProfileHeaderData }) => {
               </div>
             </div>
           </div>
-          <div className='flex flex-col items-center text-center gap-1 bg-[var(--mui-palette-action-hover)] rounded-xl p-5 min-is-[180px]'>
+          <div className='flex flex-col items-center text-center gap-1 bg-[var(--mui-palette-action-hover)] rounded-xl p-5 w-full sm:w-auto sm:min-is-[180px]'>
             <Typography color='text.secondary' className='text-xs'>
               Trust Score
             </Typography>

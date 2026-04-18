@@ -38,10 +38,10 @@ export type ProfileTabData = {
 const ProfileTab = ({ data }: { data: ProfileTabData }) => {
   return (
     <Grid container spacing={6}>
-      <Grid size={{ xs: 12, md: 5, lg: 4 }}>
+      <Grid size={{ xs: 12, md: 5, lg: 4 }} className='order-last md:order-first'>
         <AboutOverview data={data.about} />
       </Grid>
-      <Grid size={{ xs: 12, md: 7, lg: 8 }}>
+      <Grid size={{ xs: 12, md: 7, lg: 8 }} className='order-first md:order-last'>
         <Grid container spacing={6}>
           <Grid size={{ xs: 12 }}>
             <VerificationBadges items={data.verification} />

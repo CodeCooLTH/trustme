@@ -20,11 +20,11 @@ const VerificationBadges = ({ items }: { items: VerifyItem[] }) => {
         <Typography className='uppercase' variant='body2' color='text.disabled'>
           การยืนยันตัวตน
         </Typography>
-        <div className='flex flex-wrap gap-3'>
+        <div className='flex flex-col sm:flex-row sm:flex-wrap gap-3'>
           {items.map((item) => (
             <div
               key={item.level}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg border w-full sm:w-auto ${
                 item.active
                   ? 'border-[var(--mui-palette-success-main)] bg-[var(--mui-palette-success-lightOpacity)]'
                   : 'border-[var(--mui-palette-divider)] opacity-60'
