@@ -31,6 +31,23 @@ export async function createReview(orderToken: string, data: {
   return review;
 }
 
+export async function getReviewsByBuyer(userId: string, take?: number) {
+  return prisma.review.findMany({
+    where: { reviewerUserId: userId },
+    include: {
+      order: {
+        select: {
+          publicToken: true,
+          items: { take: 1 },
+          shop: { select: { user: { select: { displayName: true, username: true } } } },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    ...(take ? { take } : {}),
+  });
+}
+
 export async function getReviewsByShopUser(userId: string) {
   return prisma.review.findMany({
     where: { order: { shop: { userId } } },

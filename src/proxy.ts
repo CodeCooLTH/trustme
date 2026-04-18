@@ -24,10 +24,10 @@ export async function proxy(request: NextRequest) {
     }
     // Authed user landing on / → send them to their account
     if (pathname === '/' && isAuthed) {
-      return NextResponse.redirect(new URL('/my-account', request.url))
+      return NextResponse.redirect(new URL('/dashboard', request.url))
     }
-    // /my-account (and any nested /my-account/*) requires login
-    if (pathname.startsWith('/my-account') && !isAuthed) {
+    // /dashboard (and any nested /dashboard/*) requires login
+    if (pathname.startsWith('/dashboard') && !isAuthed) {
       const signIn = new URL('/auth/sign-in', request.url)
       signIn.searchParams.set('callbackUrl', pathname)
       return NextResponse.redirect(signIn)

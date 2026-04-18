@@ -50,6 +50,9 @@ export const authOptions: NextAuthOptions = {
                 },
               },
             });
+            // Auto-link any orders/reviews placed as a guest with this phone (PRD FR-8, B-4)
+            const { linkBuyerHistory } = await import("@/services/user.service");
+            await linkBuyerHistory(user.id, credentials.phone);
           } catch (err: unknown) {
             // P2002 = unique constraint on username or phone; surface as auth failure
             if (err && typeof err === "object" && "code" in err && err.code === "P2002") return null;
@@ -102,6 +105,7 @@ export const authOptions: NextAuthOptions = {
               displayName: user?.name || "User",
               username: `user_${Date.now()}`,
               avatar: user?.image,
+              email: user?.email || undefined,
               authAccounts: {
                 create: {
                   provider: "FACEBOOK",
@@ -111,6 +115,11 @@ export const authOptions: NextAuthOptions = {
               },
             },
           });
+          // Auto-link any guest history that used this email (PRD FR-8)
+          if (dbUser.email) {
+            const { linkBuyerHistory } = await import("@/services/user.service");
+            await linkBuyerHistory(dbUser.id, undefined, dbUser.email);
+          }
         }
         token.userId = dbUser.id;
       }
