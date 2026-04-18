@@ -130,11 +130,11 @@ export default function OrderDetailMobile({ order, unlockedPhone, onConfirmActio
   return (
     <div className='min-bs-[100dvh] bg-[var(--mui-palette-background-default)] flex flex-col'>
       {/* Scrollable body — pb สำหรับเว้นที่ให้ fixed bottom CTA */}
-      <div className='flex-1 overflow-y-auto px-4 pt-4 pb-32 flex flex-col gap-4 max-w-xl mx-auto w-full'>
+      <div className='flex-1 overflow-y-auto px-4 pt-4 pb-[calc(8rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-4 max-w-xl mx-auto w-full'>
         {/* Seller hero */}
         <Card>
           <CardContent className='flex items-center gap-4 !p-4'>
-            <Avatar sx={{ width: 48, height: 48 }}>{avatarLetter}</Avatar>
+            <Avatar sx={{ width: 48, height: 48 }} className='shrink-0'>{avatarLetter}</Avatar>
             <div className='flex-1 min-w-0'>
               <Typography className='font-semibold truncate'>{order.shop.user.displayName}</Typography>
               <Typography color='text.secondary' className='text-sm truncate'>
@@ -263,15 +263,18 @@ export default function OrderDetailMobile({ order, unlockedPhone, onConfirmActio
 
       {/* Fixed bottom CTA — เฉพาะ CREATED state */}
       {canConfirm && (
-        <div className='fixed inset-x-0 bottom-0 z-30 border-t border-[var(--mui-palette-divider)] bg-[var(--mui-palette-background-paper)] shadow-[0_-4px_12px_rgba(0,0,0,0.06)]'>
-          <div className='max-w-xl mx-auto p-4'>
+        <div
+          className='fixed inset-x-0 bottom-0 z-30 border-t border-[var(--mui-palette-divider)] bg-[var(--mui-palette-background-paper)] shadow-[0_-4px_12px_rgba(0,0,0,0.06)]'
+          style={{ paddingBottom: 'max(0px, env(safe-area-inset-bottom))' }}
+        >
+          <div className='max-w-xl mx-auto px-4 pt-4 pb-4'>
             <Button
               fullWidth
               variant='contained'
               size='large'
               disabled={submitting}
               onClick={handleConfirm}
-              className='!py-3'
+              className='!min-h-[3.5rem]'
             >
               {submitting ? 'กำลังยืนยัน…' : 'ยืนยันคำสั่งซื้อ'}
             </Button>

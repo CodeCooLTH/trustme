@@ -16,6 +16,7 @@ import { useState, type FormEvent } from 'react'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
@@ -57,10 +58,10 @@ export default function PhoneUnlock({ orderHint, onUnlock }: Props) {
   }
 
   return (
-    <div className='flex min-bs-[100dvh] justify-center items-center p-6'>
+    <div className='flex min-bs-[100dvh] flex-col justify-start sm:justify-center items-start sm:items-center overflow-y-auto p-4 sm:p-6 pt-10 sm:pt-0'>
       <AuthIllustrationWrapper>
         <Card className='flex flex-col sm:is-[450px]'>
-          <CardContent className='sm:!p-12'>
+          <CardContent className='!p-6 sm:!p-12'>
             <div className='flex justify-center mbe-6'>
               <Logo />
             </div>
@@ -90,6 +91,7 @@ export default function PhoneUnlock({ orderHint, onUnlock }: Props) {
                 fullWidth
                 variant='contained'
                 disabled={loading || phone.length !== 10}
+                startIcon={loading ? <CircularProgress size={18} color='inherit' /> : undefined}
               >
                 {loading ? 'กำลังตรวจสอบ…' : 'เข้าดูคำสั่งซื้อ'}
               </Button>

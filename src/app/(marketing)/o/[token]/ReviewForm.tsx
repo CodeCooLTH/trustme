@@ -61,7 +61,7 @@ export default function ReviewForm({ token }: Props) {
 
   return (
     <Card>
-      <CardContent className='flex flex-col gap-6 sm:!p-10'>
+      <CardContent className='flex flex-col gap-6 !p-5 sm:!p-10'>
         <div className='flex flex-col gap-1'>
           <Typography variant='h5'>รีวิวร้านค้า ⭐</Typography>
           <Typography color='text.secondary'>
@@ -76,7 +76,7 @@ export default function ReviewForm({ token }: Props) {
               value={rating}
               onChange={(_e, v) => setRating(v ?? 0)}
               size='large'
-              className='!text-4xl'
+              className='!text-5xl sm:!text-4xl'
             />
             <Typography color='text.disabled' className='text-xs'>
               {rating ? `${rating}/5` : 'แตะเพื่อให้คะแนน'}
