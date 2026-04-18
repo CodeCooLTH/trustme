@@ -16,13 +16,27 @@ import { toast } from 'react-toastify'
 
 type Props = {
   recordId: string
+  /** True เมื่อ admin กำลังดู verification record ของตัวเอง (self-review guard). */
+  isSelfRecord?: boolean
 }
 
-export default function ReviewActions({ recordId }: Props) {
+export default function ReviewActions({ recordId, isSelfRecord = false }: Props) {
   const router = useRouter()
   const [mode, setMode] = useState<'idle' | 'rejecting'>('idle')
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  if (isSelfRecord) {
+    return (
+      <div className="rounded-md border border-warning/30 bg-warning/10 p-4 text-sm flex items-start gap-2">
+        <Icon icon="tabler:alert-triangle" className="text-warning text-lg shrink-0 mt-0.5" />
+        <div>
+          <strong className="font-semibold">ไม่สามารถตรวจสอบคำขอของตนเอง</strong>{' '}
+          เพื่อป้องกันผลประโยชน์ทับซ้อน admin อื่นต้องเป็นผู้อนุมัติ/ปฏิเสธ record นี้
+        </div>
+      </div>
+    )
+  }
 
   async function submit(body: { status: 'APPROVED' | 'REJECTED'; rejectedReason?: string }) {
     setSubmitting(true)

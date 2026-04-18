@@ -9,10 +9,12 @@
  * and the approve/reject ReviewActions client component.
  */
 import type { Metadata } from 'next'
+import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Icon from '@/components/wrappers/Icon'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import ReviewActions from './ReviewActions'
 
@@ -70,6 +72,9 @@ function formatDate(d: Date | string | null | undefined): string {
 
 export default async function VerificationDetailPage({ params }: PageProps) {
   const { id } = await params
+
+  const session = await getServerSession(authOptions)
+  const adminId = (session?.user as { id?: string } | undefined)?.id
 
   const record = await prisma.verificationRecord.findUnique({
     where: { id },
@@ -231,7 +236,9 @@ export default async function VerificationDetailPage({ params }: PageProps) {
           </div>
 
           {/* Review actions — only for PENDING records */}
-          {record.status === 'PENDING' && <ReviewActions recordId={record.id} />}
+          {record.status === 'PENDING' && (
+            <ReviewActions recordId={record.id} isSelfRecord={adminId === record.userId} />
+          )}
 
           {record.status !== 'PENDING' && (
             <div className="card p-5">
