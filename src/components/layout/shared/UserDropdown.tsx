@@ -134,25 +134,13 @@ const UserDropdown = () => {
                     </div>
                   </div>
                   <Divider className='mlb-1' />
-                  {user.username && (
-                    <MenuItem
-                      className='mli-2 gap-3'
-                      onClick={(e) => handleDropdownClose(e, `/u/${user.username}`)}
-                    >
-                      <i className='tabler-user' />
-                      <Typography color='text.primary'>โปรไฟล์สาธารณะ</Typography>
-                    </MenuItem>
-                  )}
-                  <MenuItem className='mli-2 gap-3' onClick={(e) => handleDropdownClose(e, '/settings/profile')}>
-                    <i className='tabler-settings' />
-                    <Typography color='text.primary'>ตั้งค่าบัญชี</Typography>
+                  <MenuItem className='mli-2 gap-3' onClick={(e) => handleDropdownClose(e, '/dashboard')}>
+                    <i className='tabler-user' />
+                    <Typography color='text.primary'>บัญชีของฉัน</Typography>
                   </MenuItem>
-                  <MenuItem
-                    className='mli-2 gap-3'
-                    onClick={(e) => handleDropdownClose(e, '/settings/verification')}
-                  >
-                    <i className='tabler-shield-check' />
-                    <Typography color='text.primary'>ยืนยันตัวตน</Typography>
+                  <MenuItem className='mli-2 gap-3' onClick={(e) => handleDropdownClose(e, '/orders')}>
+                    <i className='tabler-shopping-bag' />
+                    <Typography color='text.primary'>การซื้อของฉัน</Typography>
                   </MenuItem>
                   <div className='flex items-center plb-2 pli-3'>
                     <Button
