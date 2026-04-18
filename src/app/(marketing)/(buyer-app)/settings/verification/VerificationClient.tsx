@@ -1,9 +1,20 @@
 'use client'
 
+// Base (composed from multiple account-settings primitives — no single template):
+//   - theme/vuexy/typescript-version/full-version/src/views/pages/account-settings/security/TwoFactorAuthenticationCard.tsx
+//     → Card + CardHeader + CardContent + "description + action" pattern (L1 phone/email tiles)
+//   - theme/vuexy/typescript-version/full-version/src/views/pages/account-settings/connections/index.tsx
+//     → item row pattern: icon/thumbnail + title/subtitle + status chip + action button (L1 tiles, L2/L3 upload rows)
+//   - theme/vuexy/typescript-version/full-version/src/views/pages/account-settings/security/ChangePasswordCard.tsx
+//     → Grid-based form with `mbs-*`/`mbe-*` logical-property utility classes
+// Dropped: Switch toggles, OpenDialogOnElementClick, CustomTextField password fields.
+
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
+import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
@@ -15,13 +26,15 @@ type VerificationRecord = {
   level: number
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
   rejectedReason: string | null
-  createdAt: string | Date
+  createdAt: string
 }
 
 type Props = {
   phoneVerified: boolean
   records: VerificationRecord[]
 }
+
+type LevelState = 'APPROVED' | 'PENDING' | 'REJECTED' | 'NONE'
 
 function levelStatus(records: VerificationRecord[], level: number) {
   const list = records.filter((r) => r.level === level)
@@ -128,7 +141,10 @@ export default function VerificationClient({ phoneVerified, records }: Props) {
   }
 
   const validateFile = (f: File): boolean => {
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(f.type) && f.type !== 'application/pdf') {
+    if (
+      !['image/jpeg', 'image/png', 'image/webp'].includes(f.type) &&
+      f.type !== 'application/pdf'
+    ) {
       toast.error('รองรับเฉพาะ JPG, PNG, WEBP, PDF')
       return false
     }
@@ -140,180 +156,220 @@ export default function VerificationClient({ phoneVerified, records }: Props) {
   }
 
   return (
-    <div className='flex flex-col gap-5'>
-      {/* Level 1 */}
-      <Card>
-        <CardContent>
-          <div className='flex items-center justify-between gap-3 flex-wrap'>
-            <div>
-              <div className='flex items-center gap-2'>
-                <Typography variant='h6'>ระดับ 1 — ยืนยันตัวตนพื้นฐาน</Typography>
-                <Chip size='small' label='L1' color='info' variant='outlined' />
-              </div>
-              <Typography color='text.secondary' className='text-sm mt-1'>
-                ยืนยันเบอร์โทรและอีเมลเพื่อเริ่มต้น
-              </Typography>
-            </div>
-          </div>
-
-          <div className='mt-4 flex flex-col gap-3'>
-            <div className='flex items-center justify-between gap-3 p-3 rounded-md border border-[var(--mui-palette-divider)]'>
-              <div className='flex items-center gap-3'>
-                <i className='tabler-phone text-xl text-[var(--mui-palette-primary-main)]' />
-                <Typography className='text-sm'>เบอร์โทรศัพท์</Typography>
+    <Grid container spacing={6}>
+      {/* Level 1 — base: security/TwoFactorAuthenticationCard.tsx + connections/index.tsx row pattern */}
+      <Grid size={{ xs: 12 }}>
+        <Card>
+          <CardHeader
+            title='ระดับ 1 — ยืนยันตัวตนพื้นฐาน'
+            subheader='ยืนยันเบอร์โทรและอีเมลเพื่อเริ่มต้น'
+            action={<Chip size='small' label='L1' color='info' variant='tonal' />}
+          />
+          <CardContent className='flex flex-col gap-4'>
+            <div className='flex items-center justify-between gap-4'>
+              <div className='flex grow items-center gap-4'>
+                <div className='flex is-[40px] bs-[40px] items-center justify-center rounded bg-[var(--mui-palette-primary-lightOpacity)]'>
+                  <i className='tabler-phone text-xl text-[var(--mui-palette-primary-main)]' />
+                </div>
+                <div className='grow'>
+                  <Typography className='text-textPrimary font-medium'>เบอร์โทรศัพท์</Typography>
+                  <Typography variant='body2'>
+                    {phoneVerified ? 'ยืนยันแล้วผ่าน OTP' : 'ยังไม่ได้ยืนยันเบอร์'}
+                  </Typography>
+                </div>
               </div>
               <Chip
                 size='small'
                 color={phoneVerified ? 'success' : 'default'}
                 label={phoneVerified ? 'ยืนยันแล้ว' : 'ยังไม่ยืนยัน'}
+                variant={phoneVerified ? 'tonal' : 'outlined'}
               />
             </div>
-            <div className='flex items-center justify-between gap-3 p-3 rounded-md border border-[var(--mui-palette-divider)]'>
-              <div className='flex items-center gap-3'>
-                <i className='tabler-mail text-xl text-[var(--mui-palette-primary-main)]' />
-                <Typography className='text-sm'>อีเมล</Typography>
+
+            <div className='flex items-center justify-between gap-4'>
+              <div className='flex grow items-center gap-4'>
+                <div className='flex is-[40px] bs-[40px] items-center justify-center rounded bg-[var(--mui-palette-primary-lightOpacity)]'>
+                  <i className='tabler-mail text-xl text-[var(--mui-palette-primary-main)]' />
+                </div>
+                <div className='grow'>
+                  <Typography className='text-textPrimary font-medium'>อีเมล</Typography>
+                  <Typography variant='body2'>ยังไม่เปิดให้ยืนยันในเวอร์ชันนี้</Typography>
+                </div>
               </div>
               <Chip size='small' label='เร็วๆ นี้' variant='outlined' />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </Grid>
 
-      {/* Level 2 */}
-      <Card>
-        <CardContent>
-          <div className='flex items-center justify-between gap-3 flex-wrap mb-3'>
-            <div>
+      {/* Level 2 — base: security/TwoFactorAuthenticationCard.tsx header + ChangePasswordCard.tsx grid form */}
+      <Grid size={{ xs: 12 }}>
+        <Card>
+          <CardHeader
+            title='ระดับ 2 — บัตรประชาชน + เซลฟี่'
+            subheader='ส่งรูปบัตรประชาชนและเซลฟี่คู่กับบัตร ทีมงานจะตรวจสอบภายใน 1-2 วัน'
+            action={
               <div className='flex items-center gap-2'>
-                <Typography variant='h6'>ระดับ 2 — บัตรประชาชน + เซลฟี่</Typography>
-                <Chip size='small' label='L2' color='info' variant='outlined' />
+                <Chip size='small' label='L2' color='info' variant='tonal' />
+                <StatusChip state={l2.state} />
               </div>
-              <Typography color='text.secondary' className='text-sm mt-1'>
-                ส่งรูปบัตรประชาชนและเซลฟี่คู่กับบัตร ทีมงานจะตรวจสอบภายใน 1-2 วัน
+            }
+          />
+          <CardContent className='flex flex-col gap-4'>
+            {l2.state === 'REJECTED' && l2.record?.rejectedReason && (
+              <Typography color='error.main' className='text-sm'>
+                เหตุผลที่ปฏิเสธ: {l2.record.rejectedReason}
               </Typography>
-            </div>
-            <StatusChip state={l2.state} />
-          </div>
+            )}
 
-          {l2.state === 'REJECTED' && l2.record?.rejectedReason && (
-            <Typography color='error.main' className='text-sm mb-3'>
-              เหตุผลที่ปฏิเสธ: {l2.record.rejectedReason}
-            </Typography>
-          )}
+            {(l2.state === 'NONE' || l2.state === 'REJECTED') && (
+              <>
+                <Grid container spacing={4}>
+                  <Grid size={{ xs: 12 }}>
+                    <UploadRow
+                      label='บัตรประชาชน (ด้านหน้า)'
+                      file={idCardFile}
+                      onPick={() => idCardInput.current?.click()}
+                      onClear={() => setIdCardFile(null)}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <UploadRow
+                      label='เซลฟี่คู่กับบัตร'
+                      file={selfieFile}
+                      onPick={() => selfieInput.current?.click()}
+                      onClear={() => setSelfieFile(null)}
+                    />
+                  </Grid>
+                </Grid>
 
-          {(l2.state === 'NONE' || l2.state === 'REJECTED') && (
-            <div className='flex flex-col gap-3'>
-              <UploadRow
-                label='บัตรประชาชน (ด้านหน้า)'
-                file={idCardFile}
-                onPick={() => idCardInput.current?.click()}
-                onClear={() => setIdCardFile(null)}
-              />
-              <UploadRow
-                label='เซลฟี่คู่กับบัตร'
-                file={selfieFile}
-                onPick={() => selfieInput.current?.click()}
-                onClear={() => setSelfieFile(null)}
-              />
-              <input
-                ref={idCardInput}
-                type='file'
-                accept='image/jpeg,image/png,image/webp'
-                hidden
-                onChange={(e) => {
-                  const f = e.target.files?.[0]
-                  if (f && validateFile(f)) setIdCardFile(f)
-                  e.target.value = ''
-                }}
-              />
-              <input
-                ref={selfieInput}
-                type='file'
-                accept='image/jpeg,image/png,image/webp'
-                hidden
-                onChange={(e) => {
-                  const f = e.target.files?.[0]
-                  if (f && validateFile(f)) setSelfieFile(f)
-                  e.target.value = ''
-                }}
-              />
-              <div className='flex justify-end'>
-                <Button
-                  variant='contained'
-                  onClick={submitL2}
-                  disabled={submittingL2 || !idCardFile || !selfieFile}
-                >
-                  {submittingL2 ? 'กำลังส่ง…' : 'ส่งเอกสารตรวจสอบ'}
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <input
+                  ref={idCardInput}
+                  type='file'
+                  accept='image/jpeg,image/png,image/webp'
+                  hidden
+                  onChange={(e) => {
+                    const f = e.target.files?.[0]
+                    if (f && validateFile(f)) setIdCardFile(f)
+                    e.target.value = ''
+                  }}
+                />
+                <input
+                  ref={selfieInput}
+                  type='file'
+                  accept='image/jpeg,image/png,image/webp'
+                  hidden
+                  onChange={(e) => {
+                    const f = e.target.files?.[0]
+                    if (f && validateFile(f)) setSelfieFile(f)
+                    e.target.value = ''
+                  }}
+                />
 
-      {/* Level 3 */}
-      <Card>
-        <CardContent>
-          <div className='flex items-center justify-between gap-3 flex-wrap mb-3'>
-            <div>
+                <div className='flex justify-end mbs-2'>
+                  <Button
+                    variant='contained'
+                    onClick={submitL2}
+                    disabled={submittingL2 || !idCardFile || !selfieFile}
+                  >
+                    {submittingL2 ? 'กำลังส่ง…' : 'ส่งเอกสารตรวจสอบ'}
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {l2.state === 'PENDING' && (
+              <Typography color='text.secondary' className='text-sm'>
+                เอกสารของคุณอยู่ระหว่างตรวจสอบ ทีมงานจะแจ้งผลภายใน 1-2 วัน
+              </Typography>
+            )}
+
+            {l2.state === 'APPROVED' && (
+              <Typography color='text.secondary' className='text-sm'>
+                ยืนยันตัวตนระดับ 2 สำเร็จแล้ว
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* Level 3 — same composition as L2 with a single upload row */}
+      <Grid size={{ xs: 12 }}>
+        <Card>
+          <CardHeader
+            title='ระดับ 3 — จดทะเบียนธุรกิจ'
+            subheader='สำหรับผู้ประกอบการที่จดทะเบียนธุรกิจ ส่งเอกสารทางราชการเพื่อยืนยัน'
+            action={
               <div className='flex items-center gap-2'>
-                <Typography variant='h6'>ระดับ 3 — จดทะเบียนธุรกิจ</Typography>
-                <Chip size='small' label='L3' color='info' variant='outlined' />
+                <Chip size='small' label='L3' color='info' variant='tonal' />
+                <StatusChip state={l3.state} />
               </div>
-              <Typography color='text.secondary' className='text-sm mt-1'>
-                สำหรับผู้ประกอบการที่จดทะเบียนธุรกิจ ส่งเอกสารทางราชการเพื่อยืนยัน
+            }
+          />
+          <CardContent className='flex flex-col gap-4'>
+            {l3.state === 'REJECTED' && l3.record?.rejectedReason && (
+              <Typography color='error.main' className='text-sm'>
+                เหตุผลที่ปฏิเสธ: {l3.record.rejectedReason}
               </Typography>
-            </div>
-            <StatusChip state={l3.state} />
-          </div>
+            )}
 
-          {l3.state === 'REJECTED' && l3.record?.rejectedReason && (
-            <Typography color='error.main' className='text-sm mb-3'>
-              เหตุผลที่ปฏิเสธ: {l3.record.rejectedReason}
-            </Typography>
-          )}
+            {(l3.state === 'NONE' || l3.state === 'REJECTED') && (
+              <>
+                <UploadRow
+                  label='เอกสารจดทะเบียนธุรกิจ (ภพ.20 / ทะเบียนพาณิชย์)'
+                  file={bizFile}
+                  onPick={() => bizInput.current?.click()}
+                  onClear={() => setBizFile(null)}
+                />
+                <input
+                  ref={bizInput}
+                  type='file'
+                  accept='image/jpeg,image/png,image/webp,application/pdf'
+                  hidden
+                  onChange={(e) => {
+                    const f = e.target.files?.[0]
+                    if (f && validateFile(f)) setBizFile(f)
+                    e.target.value = ''
+                  }}
+                />
+                <div className='flex justify-end mbs-2'>
+                  <Button
+                    variant='contained'
+                    onClick={submitL3}
+                    disabled={submittingL3 || !bizFile}
+                  >
+                    {submittingL3 ? 'กำลังส่ง…' : 'ส่งเอกสารตรวจสอบ'}
+                  </Button>
+                </div>
+              </>
+            )}
 
-          {(l3.state === 'NONE' || l3.state === 'REJECTED') && (
-            <div className='flex flex-col gap-3'>
-              <UploadRow
-                label='เอกสารจดทะเบียนธุรกิจ (ภพ.20 / ทะเบียนพาณิชย์)'
-                file={bizFile}
-                onPick={() => bizInput.current?.click()}
-                onClear={() => setBizFile(null)}
-              />
-              <input
-                ref={bizInput}
-                type='file'
-                accept='image/jpeg,image/png,image/webp,application/pdf'
-                hidden
-                onChange={(e) => {
-                  const f = e.target.files?.[0]
-                  if (f && validateFile(f)) setBizFile(f)
-                  e.target.value = ''
-                }}
-              />
-              <div className='flex justify-end'>
-                <Button
-                  variant='contained'
-                  onClick={submitL3}
-                  disabled={submittingL3 || !bizFile}
-                >
-                  {submittingL3 ? 'กำลังส่ง…' : 'ส่งเอกสารตรวจสอบ'}
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            {l3.state === 'PENDING' && (
+              <Typography color='text.secondary' className='text-sm'>
+                เอกสารของคุณอยู่ระหว่างตรวจสอบ ทีมงานจะแจ้งผลภายใน 1-2 วัน
+              </Typography>
+            )}
+
+            {l3.state === 'APPROVED' && (
+              <Typography color='text.secondary' className='text-sm'>
+                ยืนยันตัวตนระดับ 3 สำเร็จแล้ว
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   )
 }
 
-function StatusChip({ state }: { state: 'APPROVED' | 'PENDING' | 'REJECTED' | 'NONE' }) {
-  if (state === 'APPROVED') return <Chip size='small' color='success' label='ยืนยันแล้ว' />
-  if (state === 'PENDING') return <Chip size='small' color='warning' label='กำลังตรวจสอบ' />
-  if (state === 'REJECTED') return <Chip size='small' color='error' label='ถูกปฏิเสธ — ส่งใหม่ได้' />
-  return <Chip size='small' label='ยังไม่ยืนยัน' />
+function StatusChip({ state }: { state: LevelState }) {
+  if (state === 'APPROVED')
+    return <Chip size='small' color='success' label='ยืนยันแล้ว' variant='tonal' />
+  if (state === 'PENDING')
+    return <Chip size='small' color='warning' label='กำลังตรวจสอบ' variant='tonal' />
+  if (state === 'REJECTED')
+    return <Chip size='small' color='error' label='ถูกปฏิเสธ — ส่งใหม่ได้' variant='tonal' />
+  return <Chip size='small' label='ยังไม่ยืนยัน' variant='outlined' />
 }
 
 function UploadRow({
@@ -327,20 +383,26 @@ function UploadRow({
   onPick: () => void
   onClear: () => void
 }) {
+  // Base: connections/index.tsx item row pattern (thumbnail + title/subtitle + action buttons)
   return (
-    <div className='flex items-center justify-between gap-3 p-3 rounded-md border border-[var(--mui-palette-divider)] flex-wrap'>
-      <div className='flex-1 min-w-0'>
-        <Typography className='text-sm font-medium'>{label}</Typography>
-        <Typography color='text.secondary' className='text-xs truncate'>
-          {file ? file.name : 'ยังไม่ได้เลือกไฟล์'}
-        </Typography>
+    <div className='flex items-center justify-between gap-4 flex-wrap is-full p-3 rounded-md border border-[var(--mui-palette-divider)]'>
+      <div className='flex grow items-center gap-4 min-is-0'>
+        <div className='flex is-[40px] bs-[40px] items-center justify-center rounded bg-[var(--mui-palette-action-hover)]'>
+          <i className='tabler-file-upload text-xl text-[var(--mui-palette-text-secondary)]' />
+        </div>
+        <div className='grow min-is-0'>
+          <Typography className='text-textPrimary font-medium'>{label}</Typography>
+          <Typography variant='body2' className='truncate'>
+            {file ? file.name : 'ยังไม่ได้เลือกไฟล์'}
+          </Typography>
+        </div>
       </div>
       <div className='flex gap-2'>
-        <Button variant='outlined' size='small' onClick={onPick}>
+        <Button variant='tonal' size='small' onClick={onPick}>
           เลือกไฟล์
         </Button>
         {file && (
-          <Button variant='text' color='error' size='small' onClick={onClear}>
+          <Button variant='tonal' color='error' size='small' onClick={onClear}>
             ล้าง
           </Button>
         )}
