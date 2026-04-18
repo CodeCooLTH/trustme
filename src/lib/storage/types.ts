@@ -1,5 +1,13 @@
 export const MAX_SIZE = 5 * 1024 * 1024;
-export const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+// รองรับไฟล์รูปภาพ + PDF (PRD FR-2.5: L3 business registration รับ PDF ได้)
+// Client validation ใน VerificationClient.tsx ยอมรับ application/pdf สำหรับ L3
+// อยู่แล้ว — นี่คือ server-side match เพื่อให้ upload ไม่ silently drop
+export const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+];
 
 export type GetFileUrlOptions = {
   signed?: boolean;

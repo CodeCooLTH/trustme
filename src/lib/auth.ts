@@ -48,6 +48,19 @@ export const authOptions: NextAuthOptions = {
                     providerAccountId: credentials.phone,
                   },
                 },
+                // PRD FR-2.2: phone OTP = L1 auto-approved. สร้าง
+                // VerificationRecord เลยเพื่อให้ calcVerificationScore +
+                // BADGE_CHECKS.Fully_Verified เจอ L1 ได้ (ก่อนหน้านี้ UI
+                // fake L1 chip ด้วย user.phone truthy แต่ไม่มี record →
+                // Fully Verified badge เป็นไปไม่ได้)
+                verifications: {
+                  create: {
+                    type: "PHONE_OTP",
+                    level: 1,
+                    status: "APPROVED",
+                    reviewedAt: new Date(),
+                  },
+                },
               },
             });
             // Auto-link any orders/reviews placed as a guest with this phone (PRD FR-8, B-4)
