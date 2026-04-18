@@ -93,7 +93,11 @@ export async function getOrdersByShop(shopId: string, status?: string) {
 export async function getOrdersByBuyer(userId: string) {
   return prisma.order.findMany({
     where: { buyerUserId: userId },
-    include: { items: true, shop: true, review: true },
+    include: {
+      items: true,
+      shop: { include: { user: { select: { username: true, displayName: true } } } },
+      review: true,
+    },
     orderBy: { createdAt: "desc" },
   });
 }
