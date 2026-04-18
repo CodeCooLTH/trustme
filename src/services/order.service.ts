@@ -63,8 +63,18 @@ export async function completeOrder(publicToken: string) {
   if (!order) throw new Error("Order not found");
   assertTransition(order.status, "COMPLETED");
   const updated = await prisma.order.update({ where: { publicToken }, data: { status: "COMPLETED" } });
-  await evaluateBadges(order.shop.userId);
-  await recalculateTrustScore(order.shop.userId);
+  // Post-operation recalc เป็น best-effort — ถ้า dev pool timeout หรือ error
+  // อื่นใน badges/trust-score ไม่ควร fail order completion (ข้อมูลหลัก save
+  // แล้ว). Log ให้เห็นชัดถ้าล้ม. Pattern เดียวกับ createReview
+  try {
+    await evaluateBadges(order.shop.userId);
+    await recalculateTrustScore(order.shop.userId);
+  } catch (err) {
+    console.error(
+      `[order] post-complete recalc ล้มเหลวสำหรับ shop owner ${order.shop.userId}; order ${updated.publicToken} persisted but trust/badges อาจไม่ update`,
+      err,
+    );
+  }
   return updated;
 }
 

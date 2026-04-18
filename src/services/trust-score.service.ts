@@ -67,16 +67,23 @@ export async function recalculateTrustScore(userId: string): Promise<number> {
   const age = calcAgeScore(user.createdAt);
   const badges = await calcBadgeScore(userId);
 
-  const score = verification + orders + rating + age + badges;
+  const computed = verification + orders + rating + age + badges;
 
-  await prisma.user.update({ where: { id: userId }, data: { trustScore: score } });
+  // PRD FR-3.5: MVP "มีแต่ขึ้น" (monotonic-increasing) — trust score ที่
+  // แสดงบน User ต้องไม่ลดลง แม้ formula จะคำนวณต่ำกว่าของเดิม (เช่น
+  // average rating ลดเพราะมีรีวิวแย่ ทำให้ rating term ตก) ใช้ max เพื่อกัน
+  // drop. TrustScoreHistory ยัง snapshot ค่าที่คำนวณ (computed) + breakdown
+  // ให้ดู trend จริง ได้ — ไม่ซ่อนประวัติ
+  const persisted = Math.max(user.trustScore, computed);
+
+  await prisma.user.update({ where: { id: userId }, data: { trustScore: persisted } });
   await prisma.trustScoreHistory.create({
     data: {
       userId,
-      score,
+      score: computed,
       breakdown: { verification, orders, rating, age, badges },
     },
   });
 
-  return score;
+  return persisted;
 }
