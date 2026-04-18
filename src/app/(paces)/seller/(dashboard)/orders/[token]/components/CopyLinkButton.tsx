@@ -1,13 +1,34 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
 import { toast } from 'react-toastify'
 
 interface CopyLinkButtonProps {
   publicToken: string
 }
 
+// Resolve the buyer-facing URL at runtime so it tracks whatever port the dev
+// server is using today (4000 in dev, deepthailand.app in prod) instead of
+// baking a stale hostname into the bundle.
+function resolveBuyerBaseUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_BUYER_URL
+  if (envUrl) return envUrl.replace(/\/$/, '')
+  if (typeof window !== 'undefined') {
+    const { protocol, host } = window.location
+    // Seller is on `seller.<buyerHost>`; strip the prefix.
+    const buyerHost = host.replace(/^seller\./, '')
+    return `${protocol}//${buyerHost}`
+  }
+  return 'https://deepthailand.app'
+}
+
 export default function CopyLinkButton({ publicToken }: CopyLinkButtonProps) {
-  const publicUrl = `http://deepth.local:3003/o/${publicToken}`
+  const [publicUrl, setPublicUrl] = useState(`/o/${publicToken}`)
+
+  useEffect(() => {
+    setPublicUrl(`${resolveBuyerBaseUrl()}/o/${publicToken}`)
+  }, [publicToken])
 
   const handleCopy = async () => {
     try {
