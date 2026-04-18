@@ -13,6 +13,7 @@
 | **Explorer** | `Explore` | When unsure which theme file to copy or how an existing piece of code works — use BEFORE writing |
 | **Developer** | `general-purpose` (or `feature-dev:code-architect` for design work) | Per independent task; can be run in parallel for independent tasks |
 | **Reviewer** | `feature-dev:code-reviewer` or `superpowers:code-reviewer` | After EACH developer agent reports back, before the Controller marks a task complete |
+| **QA** | `general-purpose` (uses `mcp__chrome-devtools__*` tools) | After Reviewer passes, for any user-facing page task; also after each batch for integration; also at end-of-phase. See the 3-level cadence below. |
 | **Architect sweep** | `feature-dev:code-architect` | End of phase — sanity-check the whole phase for structural coherence |
 
 The Controller is the only role that may commit, update task state, or claim a task complete. Developer agents *propose* work; Reviewers *flag* issues; the Controller *decides*.
@@ -26,7 +27,7 @@ The Controller is the only role that may commit, update task state, or claim a t
 
 ## Mandatory checkpoints
 
-Every task passes through four gates before being marked complete:
+Every task passes through five gates before being marked complete:
 
 1. **Plan** — a named theme source file path + target path + scope (one or two sentences). No plan → don't dispatch.
 2. **Develop** — Developer agent executes; reports file diffs + commands run + any blockers.
@@ -35,8 +36,23 @@ Every task passes through four gates before being marked complete:
    - Did the developer actually `Read` that theme file before writing? (hard rule 1)
    - Is the output sourced from the theme, or recomposed from primitives?
    - Does it honor RSC navigation rules? (hard rule 2)
-   - TypeScript clean? Browser renders?
-4. **Integrate** — Controller reads the review, decides pass/fail. On fail, re-dispatch Developer with the review's findings. On pass, commit and mark task complete.
+   - TypeScript clean?
+4. **QA** — QA agent exercises the page in a real browser via the Chrome DevTools MCP. See the 3-level cadence below. Required for any task that produces a user-facing page or flow; skipped only for pure-infrastructure tasks (e.g. R1 shell copies that have no standalone URL).
+5. **Integrate** — Controller reads the review + QA findings, decides pass/fail. On fail, re-dispatch Developer with the review + QA findings. On pass, commit and mark task complete.
+
+## 3-level QA cadence (required)
+
+Type-check and code review alone do NOT prove a page works. QA via Chrome DevTools MCP is mandatory at three levels:
+
+| Level | When | Scope | Agent prompt hint |
+|---|---|---|---|
+| **Per-task smoke** | After Reviewer pass on a user-facing task | Visit the new page URL, assert key elements render (headings, forms, widgets), no runtime error in console. Under ~60 seconds of exercise. | "Navigate to `http://deepth.local:4000/<path>`, take a snapshot, verify these elements appear: …, list any console errors." |
+| **Batch integration** | After a batch of 3 tasks | Golden path across the batch — e.g. after R3/R4/R5 (dashboard/orders/reviews), walk sign-in → dashboard → click sidebar into orders → click an order → back to reviews, confirm no broken links or dead ends. | "Walk this sequence as a logged-in buyer: …" |
+| **End-of-phase** | Last task of the phase | Full PRD FR-table walk with seeded data, including cross-subdomain behavior if relevant. Produces a PASS/FAIL row per PRD feature. | "Execute every PRD feature flow for the buyer side; report per-FR status." |
+
+The QA agent always uses the real dev subdomains (`http://deepth.local:4000`, `seller.deepth.local:4000`, `admin.deepth.local:4000`) — NOT `localhost` — because `src/proxy.ts` routes by subdomain and cookies are per-host. See `feedback_qa_domains.md` memory.
+
+**The user runs the dev server themselves on port 4000.** QA agents must NOT start a server; if `curl http://deepth.local:4000/` fails, the agent reports back to the Controller instead of starting one.
 
 No skipping gates — even "obviously trivial" tasks get a reviewer pass. Trivial tasks return fast reviews; cost is low.
 

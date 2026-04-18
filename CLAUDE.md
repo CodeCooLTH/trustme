@@ -47,7 +47,16 @@ Dropped: InvoiceListTable.
 
 ### 4. Multi-step phases run as an agent team, not single-threaded
 
-Any phase with ≥3 tasks (e.g. P1, P2, R1-R11) MUST be executed with the agent-team workflow: Planner → (parallel Developers) → independent Reviewer per task → Controller integrates → per-phase Retro. The Controller (this main session) is the only one who commits or marks tasks complete. Reviewers must be independent agents, not the same agent that wrote the code.
+Any phase with ≥3 tasks (e.g. P1, P2, R1-R11) MUST be executed with the agent-team workflow: Planner → (parallel Developers) → independent Reviewer per task → **QA agent via Chrome DevTools MCP per user-facing task + per batch + end-of-phase** → Controller integrates → per-phase Retro.
+
+**Five gates per task: Plan → Develop → Review → QA → Integrate.** The Controller (this main session) is the only one who commits or marks tasks complete. Reviewers and QA agents must be independent from the Developer.
+
+**3-level QA cadence (required):**
+1. Per-task smoke — after Reviewer pass, exercise the new page in browser via Chrome DevTools MCP at `http://deepth.local:4000/...`.
+2. Batch integration — after a batch of 3 tasks, walk a golden path across all of them.
+3. End-of-phase — full PRD FR walk with seeded data.
+
+Code review + type-check ≠ working feature. If no QA step runs, the task is not done.
 
 After every phase: write `docs/retro/YYYY-MM-DD-<phase>.md` covering problems, root causes, conventions to adopt, action items. Promote durable conventions to `CLAUDE.md` + `docs/conventions/`; personal reminders to `~/.claude/.../memory/`.
 
