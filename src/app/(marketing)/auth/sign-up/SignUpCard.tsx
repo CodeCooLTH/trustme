@@ -1,0 +1,222 @@
+'use client'
+
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Divider from '@mui/material/Divider'
+import Typography from '@mui/material/Typography'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { signIn } from 'next-auth/react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import * as Yup from 'yup'
+
+import CustomTextField from '@core/components/mui/TextField'
+import Logo from '@components/layout/shared/Logo'
+
+import { currentYear, META_DATA } from '@/config/constants'
+
+const schema = Yup.object({
+  phone: Yup.string()
+    .matches(/^0[0-9]{9}$/, 'เบอร์ต้องขึ้นต้นด้วย 0 และมี 10 หลัก')
+    .required('กรุณากรอกเบอร์โทร'),
+  displayName: Yup.string()
+    .min(2, 'อย่างน้อย 2 ตัวอักษร')
+    .max(50, 'ไม่เกิน 50 ตัวอักษร')
+    .required('กรุณากรอกชื่อที่แสดง'),
+  username: Yup.string()
+    .matches(/^[a-zA-Z0-9_]{3,30}$/, 'ใช้ a-z, 0-9, _ ได้ 3-30 ตัว')
+    .required('กรุณาตั้งชื่อผู้ใช้'),
+})
+
+type FormValues = Yup.InferType<typeof schema>
+
+type UsernameStatus =
+  | { state: 'idle' }
+  | { state: 'checking' }
+  | { state: 'ok' }
+  | { state: 'error'; reason: 'taken' | 'reserved' | 'invalid' | 'network' }
+
+const REASON_MESSAGE: Record<'taken' | 'reserved' | 'invalid' | 'network', string> = {
+  taken: 'ชื่อผู้ใช้นี้ถูกใช้แล้ว',
+  reserved: 'ชื่อผู้ใช้นี้สงวนไว้',
+  invalid: 'รูปแบบชื่อผู้ใช้ไม่ถูกต้อง',
+  network: 'ตรวจสอบชื่อผู้ใช้ไม่สำเร็จ ลองใหม่อีกครั้ง',
+}
+
+export default function SignUpCard() {
+  const router = useRouter()
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: yupResolver(schema),
+    defaultValues: { phone: '', displayName: '', username: '' },
+  })
+
+  const username = watch('username')
+  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>({ state: 'idle' })
+  const reqId = useRef(0)
+
+  useEffect(() => {
+    if (!username) {
+      setUsernameStatus({ state: 'idle' })
+      return
+    }
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+      setUsernameStatus({ state: 'idle' })
+      return
+    }
+    setUsernameStatus({ state: 'checking' })
+    const t = setTimeout(async () => {
+      const id = ++reqId.current
+      try {
+        const res = await fetch(`/api/users/check-username?u=${encodeURIComponent(username)}`)
+        const data: { available: boolean; reason?: 'taken' | 'reserved' | 'invalid' } = await res.json()
+        if (reqId.current !== id) return
+        if (data.available) setUsernameStatus({ state: 'ok' })
+        else setUsernameStatus({ state: 'error', reason: data.reason ?? 'invalid' })
+      } catch {
+        if (reqId.current !== id) return
+        setUsernameStatus({ state: 'error', reason: 'network' })
+      }
+    }, 400)
+    return () => clearTimeout(t)
+  }, [username])
+
+  const onSubmit = async (values: FormValues) => {
+    if (usernameStatus.state !== 'ok') {
+      if (usernameStatus.state === 'error') toast.error(REASON_MESSAGE[usernameStatus.reason])
+      return
+    }
+    try {
+      const res = await fetch('/api/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contact: values.phone, type: 'PHONE' }),
+      })
+      if (!res.ok) {
+        toast.error('ส่ง OTP ไม่สำเร็จ กรุณาลองใหม่')
+        return
+      }
+      const params = new URLSearchParams({
+        mode: 'signup',
+        phone: values.phone,
+        name: values.displayName,
+        username: values.username,
+      })
+      router.push(`/auth/verify-otp?${params.toString()}`)
+    } catch {
+      toast.error('ส่ง OTP ไม่สำเร็จ กรุณาลองใหม่')
+    }
+  }
+
+  const usernameHint = (() => {
+    if (errors.username) return { text: errors.username.message, color: 'error' as const }
+    if (usernameStatus.state === 'checking') return { text: 'กำลังตรวจสอบ…', color: 'textSecondary' as const }
+    if (usernameStatus.state === 'ok') return { text: 'ใช้ชื่อนี้ได้', color: 'success' as const }
+    if (usernameStatus.state === 'error') return { text: REASON_MESSAGE[usernameStatus.reason], color: 'error' as const }
+    return null
+  })()
+
+  const submitDisabled =
+    isSubmitting ||
+    usernameStatus.state === 'checking' ||
+    usernameStatus.state === 'error' ||
+    (!!username && /^[a-zA-Z0-9_]{3,30}$/.test(username) && usernameStatus.state === 'idle')
+
+  return (
+    <div className='flex min-bs-[100dvh] justify-center items-center p-6'>
+      <Card className='flex flex-col sm:is-[480px]'>
+        <CardContent className='sm:!p-12'>
+          <Link href='/' className='flex justify-center mbe-6'>
+            <Logo />
+          </Link>
+          <div className='flex flex-col gap-1 mbe-6'>
+            <Typography variant='h4'>เริ่มต้นใช้งาน {META_DATA.name} 🚀</Typography>
+            <Typography>กรอกข้อมูลด้านล่างเพื่อสร้างบัญชี</Typography>
+          </div>
+
+          <Button
+            fullWidth
+            variant='outlined'
+            color='inherit'
+            startIcon={<i className='tabler-brand-facebook-filled text-[#1877F2]' />}
+            onClick={() => signIn('facebook', { callbackUrl: '/' })}
+          >
+            สมัครด้วย Facebook
+          </Button>
+
+          <Divider className='gap-2 text-textPrimary my-6'>หรือ</Divider>
+
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className='flex flex-col gap-5'>
+            <CustomTextField
+              fullWidth
+              label='เบอร์โทรศัพท์'
+              placeholder='08xxxxxxxx'
+              type='tel'
+              slotProps={{ htmlInput: { inputMode: 'numeric', autoComplete: 'tel' } }}
+              error={!!errors.phone}
+              helperText={errors.phone?.message}
+              {...register('phone')}
+            />
+            <CustomTextField
+              fullWidth
+              label='ชื่อที่แสดง'
+              placeholder='ชื่อ-นามสกุล หรือชื่อเล่น'
+              error={!!errors.displayName}
+              helperText={errors.displayName?.message}
+              {...register('displayName')}
+            />
+            <div>
+              <CustomTextField
+                fullWidth
+                label='ชื่อผู้ใช้ (username)'
+                placeholder='a-z, 0-9, _ เท่านั้น'
+                slotProps={{ htmlInput: { autoComplete: 'off' } }}
+                error={
+                  !!errors.username ||
+                  usernameStatus.state === 'error' ||
+                  (usernameStatus.state === 'ok' ? false : false)
+                }
+                {...register('username')}
+              />
+              {usernameHint && (
+                <Typography
+                  className='mt-1 text-sm'
+                  color={
+                    usernameHint.color === 'success'
+                      ? 'success.main'
+                      : usernameHint.color === 'error'
+                        ? 'error.main'
+                        : 'text.secondary'
+                  }
+                >
+                  {usernameHint.text}
+                </Typography>
+              )}
+            </div>
+            <Button fullWidth variant='contained' type='submit' disabled={submitDisabled}>
+              {isSubmitting ? 'กำลังส่งรหัส…' : 'สร้างบัญชีและรับรหัส OTP'}
+            </Button>
+            <div className='flex justify-center items-center flex-wrap gap-2'>
+              <Typography>มีบัญชีอยู่แล้ว?</Typography>
+              <Typography component={Link} href='/auth/sign-in' color='primary.main'>
+                เข้าสู่ระบบ
+              </Typography>
+            </div>
+          </form>
+
+          <Typography className='mt-7 text-center text-sm' color='text.disabled'>
+            &copy; {currentYear} {META_DATA.name} — by {META_DATA.author}
+          </Typography>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
