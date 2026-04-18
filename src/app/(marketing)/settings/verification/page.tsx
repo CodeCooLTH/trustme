@@ -11,6 +11,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserVerifications } from '@/services/verification.service'
 
+import { LinkButton } from '../../_components/mui-link'
 import VerificationClient from './VerificationClient'
 
 export const metadata: Metadata = { title: 'ยืนยันตัวตน' }
@@ -38,14 +39,13 @@ export default async function VerificationSettingsPage() {
               ยิ่งยืนยันหลายระดับ ยิ่งได้ Trust Score สูงขึ้น
             </Typography>
           </div>
-          <Button
-            component={Link}
+          <LinkButton
             href='/dashboard'
             variant='outlined'
             startIcon={<i className='tabler-arrow-left' />}
           >
             กลับหน้าหลัก
-          </Button>
+          </LinkButton>
         </div>
 
         <VerificationClient

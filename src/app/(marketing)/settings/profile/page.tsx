@@ -10,6 +10,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
+import { LinkButton } from '../../_components/mui-link'
 import ProfileForm from './ProfileForm'
 
 export const metadata: Metadata = { title: 'แก้ไขโปรไฟล์' }
@@ -42,14 +43,13 @@ export default async function ProfileSettingsPage() {
               จัดการข้อมูลส่วนตัวของคุณ
             </Typography>
           </div>
-          <Button
-            component={Link}
+          <LinkButton
             href='/dashboard'
             variant='outlined'
             startIcon={<i className='tabler-arrow-left' />}
           >
             กลับหน้าหลัก
-          </Button>
+          </LinkButton>
         </div>
 
         <ProfileForm user={user} />

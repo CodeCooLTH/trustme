@@ -18,6 +18,7 @@ import { getOrdersByBuyer } from '@/services/order.service'
 import { getReviewsByBuyer } from '@/services/review.service'
 import { getTrustLevel } from '@/services/trust-score.service'
 
+import { LinkButton, LinkChip } from '../_components/mui-link'
 import SignOutButton from './SignOutButton'
 
 export const metadata: Metadata = { title: 'หน้าหลักของฉัน' }
@@ -113,14 +114,13 @@ export default async function BuyerDashboardPage() {
               </Button>
             )}
             {!user.isShop && (
-              <Button
-                component={Link}
+              <LinkButton
                 href='/settings/profile'
                 variant='outlined'
                 startIcon={<i className='tabler-user-cog' />}
               >
                 เปิดร้านค้า
-              </Button>
+              </LinkButton>
             )}
             <SignOutButton />
           </div>
@@ -152,11 +152,9 @@ export default async function BuyerDashboardPage() {
                   {user.isShop && (
                     <Chip size='small' color='warning' label='ร้านค้า' icon={<i className='tabler-building-store' />} />
                   )}
-                  <Chip
+                  <LinkChip
                     size='small'
-                    component={Link as any}
                     href={`/u/${user.username}`}
-                    clickable
                     variant='outlined'
                     label='ดูโปรไฟล์สาธารณะ'
                     icon={<i className='tabler-external-link' />}
@@ -188,15 +186,14 @@ export default async function BuyerDashboardPage() {
           <CardContent>
             <div className='flex items-center justify-between gap-3 mb-4 flex-wrap'>
               <Typography variant='h6'>สถานะการยืนยันตัวตน</Typography>
-              <Button
-                component={Link}
+              <LinkButton
                 href='/settings/verification'
                 variant='text'
                 size='small'
                 endIcon={<i className='tabler-chevron-right' />}
               >
                 จัดการการยืนยัน
-              </Button>
+              </LinkButton>
             </div>
             <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
               <VerifyTile
@@ -240,15 +237,14 @@ export default async function BuyerDashboardPage() {
             <CardContent>
               <div className='flex items-center justify-between mb-3'>
                 <Typography variant='h6'>คำสั่งซื้อล่าสุด</Typography>
-                <Button
-                  component={Link}
+                <LinkButton
                   href='/orders'
                   variant='text'
                   size='small'
                   endIcon={<i className='tabler-chevron-right' />}
                 >
                   ทั้งหมด
-                </Button>
+                </LinkButton>
               </div>
               {recentOrders.length === 0 ? (
                 <Typography color='text.secondary' className='text-sm py-6 text-center'>
@@ -291,15 +287,14 @@ export default async function BuyerDashboardPage() {
             <CardContent>
               <div className='flex items-center justify-between mb-3'>
                 <Typography variant='h6'>รีวิวที่ให้ล่าสุด</Typography>
-                <Button
-                  component={Link}
+                <LinkButton
                   href='/reviews'
                   variant='text'
                   size='small'
                   endIcon={<i className='tabler-chevron-right' />}
                 >
                   ทั้งหมด
-                </Button>
+                </LinkButton>
               </div>
               {recentReviews.length === 0 ? (
                 <Typography color='text.secondary' className='text-sm py-6 text-center'>

@@ -19,6 +19,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getOrdersByBuyer } from '@/services/order.service'
 
+import { LinkButton, LinkChip } from '../_components/mui-link'
+
 export const metadata: Metadata = { title: 'คำสั่งซื้อของฉัน' }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -82,14 +84,13 @@ export default async function MyOrdersPage({
               รวม {all.length} รายการ
             </Typography>
           </div>
-          <Button
-            component={Link}
+          <LinkButton
             href='/dashboard'
             variant='outlined'
             startIcon={<i className='tabler-arrow-left' />}
           >
             กลับหน้าหลัก
-          </Button>
+          </LinkButton>
         </div>
 
         <Card>
@@ -98,11 +99,9 @@ export default async function MyOrdersPage({
               {FILTERS.map((f) => {
                 const active = status === f.key
                 return (
-                  <Chip
+                  <LinkChip
                     key={f.key}
-                    component={Link as any}
                     href={f.key === 'ALL' ? '/orders' : `/orders?status=${f.key}`}
-                    clickable
                     label={f.label}
                     color={active ? 'primary' : 'default'}
                     variant={active ? 'filled' : 'outlined'}
@@ -164,15 +163,14 @@ export default async function MyOrdersPage({
                             </Typography>
                           </TableCell>
                           <TableCell align='right'>
-                            <Button
-                              component={Link}
+                            <LinkButton
                               href={`/o/${o.publicToken}`}
                               variant='text'
                               size='small'
                               endIcon={<i className='tabler-chevron-right' />}
                             >
                               ดู
-                            </Button>
+                            </LinkButton>
                           </TableCell>
                         </TableRow>
                       )

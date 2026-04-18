@@ -13,6 +13,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getReviewsByBuyer } from '@/services/review.service'
 
+import { LinkButton } from '../_components/mui-link'
+
 export const metadata: Metadata = { title: 'รีวิวที่ให้' }
 
 const dateFmt = new Intl.DateTimeFormat('th-TH', {
@@ -38,14 +40,13 @@ export default async function MyReviewsPage() {
               รวม {reviews.length} รีวิว
             </Typography>
           </div>
-          <Button
-            component={Link}
+          <LinkButton
             href='/dashboard'
             variant='outlined'
             startIcon={<i className='tabler-arrow-left' />}
           >
             กลับหน้าหลัก
-          </Button>
+          </LinkButton>
         </div>
 
         <Card>

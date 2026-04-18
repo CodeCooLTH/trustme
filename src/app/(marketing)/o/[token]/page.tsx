@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography'
 import { getOrderByToken } from '@/services/order.service'
 import { getTrustLevel } from '@/services/trust-score.service'
 
+import { LinkButton } from '../../_components/mui-link'
 import ConfirmFlow from './ConfirmFlow'
 import ReviewForm from './ReviewForm'
 
@@ -221,15 +222,14 @@ export default async function PublicOrderPage({ params }: Props) {
         )}
 
         <div className='text-center'>
-          <Button
-            component={Link}
+          <LinkButton
             href={`/u/${seller.username}`}
             variant='text'
             size='small'
             endIcon={<i className='tabler-external-link' />}
           >
             ดูโปรไฟล์ร้านค้า
-          </Button>
+          </LinkButton>
         </div>
       </div>
     </div>
