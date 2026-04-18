@@ -10,7 +10,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
-import { LinkButton } from '../../_components/mui-link'
+import { LinkButton } from '@/app/(marketing)/_components/mui-link'
 import ProfileForm from './ProfileForm'
 
 export const metadata: Metadata = { title: 'แก้ไขโปรไฟล์' }

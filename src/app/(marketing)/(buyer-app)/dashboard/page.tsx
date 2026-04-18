@@ -18,7 +18,7 @@ import { getOrdersByBuyer } from '@/services/order.service'
 import { getReviewsByBuyer } from '@/services/review.service'
 import { getTrustLevel } from '@/services/trust-score.service'
 
-import { LinkButton, LinkChip } from '../_components/mui-link'
+import { LinkButton, LinkChip } from '@/app/(marketing)/_components/mui-link'
 import SignOutButton from './SignOutButton'
 
 export const metadata: Metadata = { title: 'หน้าหลักของฉัน' }

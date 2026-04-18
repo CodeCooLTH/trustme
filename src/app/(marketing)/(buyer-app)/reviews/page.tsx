@@ -13,7 +13,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getReviewsByBuyer } from '@/services/review.service'
 
-import { LinkButton } from '../_components/mui-link'
+import { LinkButton } from '@/app/(marketing)/_components/mui-link'
 
 export const metadata: Metadata = { title: 'รีวิวที่ให้' }
 

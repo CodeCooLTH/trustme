@@ -19,7 +19,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getOrdersByBuyer } from '@/services/order.service'
 
-import { LinkButton, LinkChip } from '../_components/mui-link'
+import { LinkButton, LinkChip } from '@/app/(marketing)/_components/mui-link'
 
 export const metadata: Metadata = { title: 'คำสั่งซื้อของฉัน' }
 

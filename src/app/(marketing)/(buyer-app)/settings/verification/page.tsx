@@ -11,7 +11,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserVerifications } from '@/services/verification.service'
 
-import { LinkButton } from '../../_components/mui-link'
+import { LinkButton } from '@/app/(marketing)/_components/mui-link'
 import VerificationClient from './VerificationClient'
 
 export const metadata: Metadata = { title: 'ยืนยันตัวตน' }
