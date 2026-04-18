@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
+import Select from '@/components/wrappers/Select'
 
 const CARRIERS = [
   'Kerry Express',
@@ -165,15 +165,20 @@ export default function OrderActions({ order }: OrderActionsProps) {
                 <Controller
                   control={control}
                   name="provider"
-                  render={({ field }) => (
-                    <ChoiceSelect
-                      placeholder="-- เลือกขนส่ง --"
-                      options={CARRIERS.map((c) => ({ value: c, label: c }))}
-                      value={field.value ?? ''}
-                      onChange={(v) => field.onChange(v)}
-                      search={false}
-                    />
-                  )}
+                  render={({ field }) => {
+                    const options = CARRIERS.map((c) => ({ value: c, label: c }))
+                    return (
+                      <Select
+                        className="select2 react-select"
+                        classNamePrefix="react-select"
+                        isSearchable={false}
+                        placeholder="-- เลือกขนส่ง --"
+                        options={options}
+                        value={options.find((o) => o.value === field.value) ?? null}
+                        onChange={(opt: any) => field.onChange(opt?.value ?? '')}
+                      />
+                    )
+                  }}
                 />
                 {errors.provider && <p className="text-danger text-xs mt-1">{errors.provider.message}</p>}
               </div>

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
-import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
+import Select from '@/components/wrappers/Select'
 
 const CATEGORIES = [
   'อาหารและเครื่องดื่ม',
@@ -150,16 +150,21 @@ export default function ShopForm({ shop }: ShopFormProps) {
               <Controller
                 control={control}
                 name="category"
-                render={({ field }) => (
-                  <ChoiceSelect
-                    id="category"
-                    placeholder="-- เลือกหมวดหมู่ --"
-                    options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
-                    value={field.value ?? ''}
-                    onChange={(v) => field.onChange(v)}
-                    search={false}
-                  />
-                )}
+                render={({ field }) => {
+                  const options = CATEGORIES.map((cat) => ({ value: cat, label: cat }))
+                  return (
+                    <Select
+                      inputId="category"
+                      className="select2 react-select"
+                      classNamePrefix="react-select"
+                      isSearchable={false}
+                      placeholder="-- เลือกหมวดหมู่ --"
+                      options={options}
+                      value={options.find((o) => o.value === field.value) ?? null}
+                      onChange={(opt: any) => field.onChange(opt?.value ?? '')}
+                    />
+                  )
+                }}
               />
               {errors.category && (
                 <p className="text-danger mt-1 text-sm">{errors.category.message}</p>

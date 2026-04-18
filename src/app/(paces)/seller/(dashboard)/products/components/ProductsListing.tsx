@@ -4,7 +4,7 @@ import Rating from '@/components/Rating'
 import DataTable from '@/components/table/DataTable'
 import DeleteConfirmationModal from '@/components/table/DeleteConfirmationModal'
 import TablePagination from '@/components/table/TablePagination'
-import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
+import Select from '@/components/wrappers/Select'
 import Icon from '@/components/wrappers/Icon'
 import { cn } from '@/utils/helpers'
 import {
@@ -272,35 +272,46 @@ const ProductsListing = ({ products }: Props) => {
             <div className="flex items-center gap-2">
               <Icon icon="tag" className="text-default-400" />
               <div className="w-48">
-                <ChoiceSelect
-                  options={[
+                {(() => {
+                  const TYPE_OPTIONS = [
                     { value: 'All', label: 'ทุกประเภท' },
                     { value: 'PHYSICAL', label: 'สินค้าจับต้องได้' },
                     { value: 'DIGITAL', label: 'ดิจิทัล' },
                     { value: 'SERVICE', label: 'บริการ' },
-                  ]}
-                  value={(table.getColumn('type')?.getFilterValue() as string) ?? 'All'}
-                  onChange={(v) =>
-                    table.getColumn('type')?.setFilterValue((v as string) === 'All' ? undefined : (v as string))
-                  }
-                  search={false}
-                  sorting={false}
-                />
+                  ]
+                  const current = (table.getColumn('type')?.getFilterValue() as string) ?? 'All'
+                  return (
+                    <Select
+                      className="select2 react-select"
+                      classNamePrefix="react-select"
+                      isSearchable={false}
+                      options={TYPE_OPTIONS}
+                      value={TYPE_OPTIONS.find((o) => o.value === current) ?? null}
+                      onChange={(opt: any) =>
+                        table.getColumn('type')?.setFilterValue(opt?.value === 'All' ? undefined : opt?.value)
+                      }
+                    />
+                  )
+                })()}
               </div>
             </div>
           </div>
-          <div className="w-20">
-            <ChoiceSelect
+          <div className="w-24">
+            <Select
+              className="select2 react-select"
+              classNamePrefix="react-select"
+              isSearchable={false}
               options={[
-                { value: '5', label: '5' },
-                { value: '10', label: '10' },
-                { value: '15', label: '15' },
-                { value: '20', label: '20' },
+                { value: 5, label: '5' },
+                { value: 10, label: '10' },
+                { value: 15, label: '15' },
+                { value: 20, label: '20' },
               ]}
-              value={String(table.getState().pagination.pageSize)}
-              onChange={(v) => table.setPageSize(Number(v as string))}
-              search={false}
-              sorting={false}
+              value={{
+                value: table.getState().pagination.pageSize,
+                label: String(table.getState().pagination.pageSize),
+              }}
+              onChange={(opt: any) => table.setPageSize(Number(opt?.value ?? 10))}
             />
           </div>
         </div>

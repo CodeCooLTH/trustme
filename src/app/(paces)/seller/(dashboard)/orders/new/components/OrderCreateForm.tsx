@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
-import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
+import Select from '@/components/wrappers/Select'
 import Icon from '@/components/wrappers/Icon'
 import ProductPickerModal from './ProductPickerModal'
 
@@ -681,12 +681,15 @@ export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Pr
               control={control}
               name="channel"
               render={({ field }) => (
-                <ChoiceSelect
-                  id="order-channel"
+                <Select
+                  inputId="order-channel"
+                  className="select2 react-select"
+                  classNamePrefix="react-select"
+                  isSearchable={false}
+                  isClearable
                   options={CHANNEL_OPTIONS}
-                  value={field.value ?? ''}
-                  onChange={(v) => field.onChange(v || undefined)}
-                  search={false}
+                  value={CHANNEL_OPTIONS.find((o) => o.value === field.value) ?? null}
+                  onChange={(opt: any) => field.onChange(opt?.value || undefined)}
                   placeholder="เลือกช่องทาง"
                 />
               )}
@@ -702,12 +705,15 @@ export default function OrderCreateForm({ shopId: _shopId, catalog, formId }: Pr
               control={control}
               name="paymentMethod"
               render={({ field }) => (
-                <ChoiceSelect
-                  id="order-payment"
+                <Select
+                  inputId="order-payment"
+                  className="select2 react-select"
+                  classNamePrefix="react-select"
+                  isSearchable={false}
+                  isClearable
                   options={PAYMENT_OPTIONS}
-                  value={field.value ?? ''}
-                  onChange={(v) => field.onChange(v || undefined)}
-                  search={false}
+                  value={PAYMENT_OPTIONS.find((o) => o.value === field.value) ?? null}
+                  onChange={(opt: any) => field.onChange(opt?.value || undefined)}
                   placeholder="เลือกวิธีชำระเงิน"
                 />
               )}

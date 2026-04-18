@@ -3,7 +3,7 @@
 import DataTable from '@/components/table/DataTable'
 import TablePagination from '@/components/table/TablePagination'
 import Rating from '@/components/Rating'
-import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
+import Select from '@/components/wrappers/Select'
 import Icon from '@/components/wrappers/Icon'
 import { cn } from '@/utils/helpers'
 import ratingsImg from '@/assets/images/ratings.svg'
@@ -196,18 +196,22 @@ const ProductReviews = ({ reviews, summary }: Props) => {
         </div>
         <div className="ms-auto">
           <div className="flex items-center gap-2.5">
-            <div className="w-20">
-              <ChoiceSelect
+            <div className="w-24">
+              <Select
+                className="select2 react-select"
+                classNamePrefix="react-select"
+                isSearchable={false}
                 options={[
-                  { value: '5', label: '5' },
-                  { value: '10', label: '10' },
-                  { value: '15', label: '15' },
-                  { value: '20', label: '20' },
+                  { value: 5, label: '5' },
+                  { value: 10, label: '10' },
+                  { value: 15, label: '15' },
+                  { value: 20, label: '20' },
                 ]}
-                value={String(table.getState().pagination.pageSize)}
-                onChange={(v) => table.setPageSize(Number(v as string))}
-                search={false}
-                sorting={false}
+                value={{
+                  value: table.getState().pagination.pageSize,
+                  label: String(table.getState().pagination.pageSize),
+                }}
+                onChange={(opt: any) => table.setPageSize(Number(opt?.value ?? 10))}
               />
             </div>
             {/* Filter dropdown — visual only (MVP: no server-side filtering) */}

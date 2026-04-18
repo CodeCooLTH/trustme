@@ -2,7 +2,7 @@
 
 import DataTable from '@/components/table/DataTable'
 import TablePagination from '@/components/table/TablePagination'
-import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
+import Select from '@/components/wrappers/Select'
 import Icon from '@/components/wrappers/Icon'
 import { cn } from '@/utils/helpers'
 import {
@@ -211,6 +211,50 @@ const OrdersList = ({ orders, activeStatus }: Props) => {
 
   return (
     <div className="card">
+      {/* Toolbar */}
+      <div className="card-header flex flex-wrap items-center justify-between gap-2.5">
+        <div className="input-icon-group">
+          <Icon icon="search" className="input-icon" />
+          <input
+            type="text"
+            className="form-input"
+            placeholder="ค้นหาออเดอร์..."
+            value={globalFilter}
+            onChange={(e) => {
+              setGlobalFilter(e.target.value)
+              setPagination((p) => ({ ...p, pageIndex: 0 }))
+            }}
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold text-nowrap">แสดง:</label>
+            <div className="w-24">
+              <Select
+                className="select2 react-select"
+                classNamePrefix="react-select"
+                isSearchable={false}
+                options={[
+                  { value: 5, label: '5' },
+                  { value: 10, label: '10' },
+                  { value: 15, label: '15' },
+                  { value: 20, label: '20' },
+                ]}
+                value={{
+                  value: table.getState().pagination.pageSize,
+                  label: String(table.getState().pagination.pageSize),
+                }}
+                onChange={(opt: any) => table.setPageSize(Number(opt?.value ?? 10))}
+              />
+            </div>
+          </div>
+          <Link href="/orders/new" className="btn bg-primary text-white hover:bg-primary-hover">
+            <Icon icon="plus" />
+            สร้างออเดอร์
+          </Link>
+        </div>
+      </div>
+
       {/* Status Tabs — paces underline style */}
       <div className="card-header px-0 pt-0 pb-0 border-b border-default-200">
         <div className="flex gap-1 px-5 overflow-x-auto">
@@ -248,46 +292,6 @@ const OrdersList = ({ orders, activeStatus }: Props) => {
               </button>
             )
           })}
-        </div>
-      </div>
-
-      {/* Toolbar */}
-      <div className="card-header flex flex-wrap items-center justify-between gap-2.5">
-        <div className="input-icon-group">
-          <Icon icon="search" className="input-icon" />
-          <input
-            type="text"
-            className="form-input"
-            placeholder="ค้นหาออเดอร์..."
-            value={globalFilter}
-            onChange={(e) => {
-              setGlobalFilter(e.target.value)
-              setPagination((p) => ({ ...p, pageIndex: 0 }))
-            }}
-          />
-        </div>
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-nowrap">แสดง:</label>
-            <div className="w-20">
-              <ChoiceSelect
-                options={[
-                  { value: '5', label: '5' },
-                  { value: '10', label: '10' },
-                  { value: '15', label: '15' },
-                  { value: '20', label: '20' },
-                ]}
-                value={String(table.getState().pagination.pageSize)}
-                onChange={(v) => table.setPageSize(Number(v as string))}
-                search={false}
-                sorting={false}
-              />
-            </div>
-          </div>
-          <Link href="/orders/new" className="btn bg-primary text-white hover:bg-primary-hover">
-            <Icon icon="plus" />
-            สร้างออเดอร์
-          </Link>
         </div>
       </div>
 

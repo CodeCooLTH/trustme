@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
-import ChoiceSelect from '@/components/wrappers/ChoiceSelect'
+import Select from '@/components/wrappers/Select'
 
 const schema = Yup.object({
   name: Yup.string()
@@ -204,19 +204,24 @@ export default function ProductForm({ shopId, product, formId }: ProductFormProp
               <Controller
                 control={control}
                 name="type"
-                render={({ field }) => (
-                  <ChoiceSelect
-                    id="type"
-                    options={[
-                      { value: 'PHYSICAL', label: 'สินค้าจับต้องได้' },
-                      { value: 'DIGITAL', label: 'ดิจิทัล' },
-                      { value: 'SERVICE', label: 'บริการ' },
-                    ]}
-                    value={field.value}
-                    onChange={(v) => field.onChange(v)}
-                    search={false}
-                  />
-                )}
+                render={({ field }) => {
+                  const options = [
+                    { value: 'PHYSICAL', label: 'สินค้าจับต้องได้' },
+                    { value: 'DIGITAL', label: 'ดิจิทัล' },
+                    { value: 'SERVICE', label: 'บริการ' },
+                  ]
+                  return (
+                    <Select
+                      inputId="type"
+                      className="select2 react-select"
+                      classNamePrefix="react-select"
+                      isSearchable={false}
+                      options={options}
+                      value={options.find((o) => o.value === field.value) ?? null}
+                      onChange={(opt: any) => field.onChange(opt?.value ?? '')}
+                    />
+                  )
+                }}
               />
               {errors.type && <p className="text-danger mt-1 text-sm">{errors.type.message}</p>}
             </div>
