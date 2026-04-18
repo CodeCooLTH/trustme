@@ -1,22 +1,35 @@
 'use client'
 
+// React Imports
+import { useEffect, useRef, useState } from 'react'
+
+// Next Imports
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
+// MUI Imports
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
+
+// Third-party Imports
 import { yupResolver } from '@hookform/resolvers/yup'
 import { signIn } from 'next-auth/react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
 
+// Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 import Logo from '@components/layout/shared/Logo'
 
+// Styled Component Imports
+import AuthIllustrationWrapper from '@/views/pages/auth/AuthIllustrationWrapper'
+
+// Config Imports
 import { currentYear, META_DATA } from '@/config/constants'
 
 const schema = Yup.object({
@@ -132,91 +145,87 @@ export default function SignUpCard() {
 
   return (
     <div className='flex min-bs-[100dvh] justify-center items-center p-6'>
-      <Card className='flex flex-col sm:is-[480px]'>
-        <CardContent className='sm:!p-12'>
-          <Link href='/' className='flex justify-center mbe-6'>
-            <Logo />
-          </Link>
-          <div className='flex flex-col gap-1 mbe-6'>
-            <Typography variant='h4'>เริ่มต้นใช้งาน {META_DATA.name} 🚀</Typography>
-            <Typography>กรอกข้อมูลด้านล่างเพื่อสร้างบัญชี</Typography>
-          </div>
-
-          <Button
-            fullWidth
-            variant='outlined'
-            color='inherit'
-            startIcon={<i className='tabler-brand-facebook-filled text-[#1877F2]' />}
-            onClick={() => signIn('facebook', { callbackUrl: '/' })}
-          >
-            สมัครด้วย Facebook
-          </Button>
-
-          <Divider className='gap-2 text-textPrimary my-6'>หรือ</Divider>
-
-          <form onSubmit={handleSubmit(onSubmit)} noValidate className='flex flex-col gap-5'>
-            <CustomTextField
-              fullWidth
-              label='เบอร์โทรศัพท์'
-              placeholder='08xxxxxxxx'
-              type='tel'
-              slotProps={{ htmlInput: { inputMode: 'numeric', autoComplete: 'tel' } }}
-              error={!!errors.phone}
-              helperText={errors.phone?.message}
-              {...register('phone')}
-            />
-            <CustomTextField
-              fullWidth
-              label='ชื่อที่แสดง'
-              placeholder='ชื่อ-นามสกุล หรือชื่อเล่น'
-              error={!!errors.displayName}
-              helperText={errors.displayName?.message}
-              {...register('displayName')}
-            />
-            <div>
+      <AuthIllustrationWrapper>
+        <Card className='flex flex-col sm:is-[450px]'>
+          <CardContent className='sm:!p-12'>
+            <Link href='/' className='flex justify-center mbe-6'>
+              <Logo />
+            </Link>
+            <div className='flex flex-col gap-1 mbe-6'>
+              <Typography variant='h4'>{`เริ่มต้นใช้งาน ${META_DATA.name} 🚀`}</Typography>
+              <Typography>กรอกข้อมูลด้านล่างเพื่อสร้างบัญชี</Typography>
+            </div>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete='off' className='flex flex-col gap-6'>
               <CustomTextField
                 fullWidth
-                label='ชื่อผู้ใช้ (username)'
-                placeholder='a-z, 0-9, _ เท่านั้น'
-                slotProps={{ htmlInput: { autoComplete: 'off' } }}
-                error={
-                  !!errors.username ||
-                  usernameStatus.state === 'error' ||
-                  (usernameStatus.state === 'ok' ? false : false)
-                }
-                {...register('username')}
+                label='เบอร์โทรศัพท์'
+                placeholder='08xxxxxxxx'
+                type='tel'
+                slotProps={{ htmlInput: { inputMode: 'numeric', autoComplete: 'tel' } }}
+                error={!!errors.phone}
+                helperText={errors.phone?.message}
+                {...register('phone')}
               />
-              {usernameHint && (
-                <Typography
-                  className='mt-1 text-sm'
-                  color={
-                    usernameHint.color === 'success'
-                      ? 'success.main'
-                      : usernameHint.color === 'error'
-                        ? 'error.main'
-                        : 'text.secondary'
-                  }
-                >
-                  {usernameHint.text}
+              <CustomTextField
+                fullWidth
+                label='ชื่อที่แสดง'
+                placeholder='ชื่อ-นามสกุล หรือชื่อเล่น'
+                error={!!errors.displayName}
+                helperText={errors.displayName?.message}
+                {...register('displayName')}
+              />
+              <div>
+                <CustomTextField
+                  fullWidth
+                  label='ชื่อผู้ใช้ (username)'
+                  placeholder='a-z, 0-9, _ เท่านั้น'
+                  slotProps={{ htmlInput: { autoComplete: 'off' } }}
+                  error={!!errors.username || usernameStatus.state === 'error'}
+                  {...register('username')}
+                />
+                {usernameHint && (
+                  <Typography
+                    className='mt-1 text-sm'
+                    color={
+                      usernameHint.color === 'success'
+                        ? 'success.main'
+                        : usernameHint.color === 'error'
+                          ? 'error.main'
+                          : 'text.secondary'
+                    }
+                  >
+                    {usernameHint.text}
+                  </Typography>
+                )}
+              </div>
+              <Button fullWidth variant='contained' type='submit' disabled={submitDisabled}>
+                {isSubmitting ? 'กำลังส่งรหัส…' : 'สร้างบัญชีและรับรหัส OTP'}
+              </Button>
+              <div className='flex justify-center items-center flex-wrap gap-2'>
+                <Typography>มีบัญชีอยู่แล้ว?</Typography>
+                <Typography component={Link} href='/auth/sign-in' color='primary.main'>
+                  เข้าสู่ระบบ
                 </Typography>
-              )}
-            </div>
-            <Button fullWidth variant='contained' type='submit' disabled={submitDisabled}>
-              {isSubmitting ? 'กำลังส่งรหัส…' : 'สร้างบัญชีและรับรหัส OTP'}
-            </Button>
-            <div className='flex justify-center items-center flex-wrap gap-2'>
-              <Typography>มีบัญชีอยู่แล้ว?</Typography>
-              <Typography component={Link} href='/auth/sign-in' color='primary.main'>
-                เข้าสู่ระบบ
-              </Typography>
-            </div>
-          </form>
+              </div>
+              <Divider className='gap-2 text-textPrimary'>หรือ</Divider>
+              <div className='flex justify-center items-center gap-1.5'>
+                <IconButton
+                  className='text-facebook'
+                  size='small'
+                  onClick={() => signIn('facebook', { callbackUrl: '/' })}
+                  aria-label='สมัครด้วย Facebook'
+                >
+                  <i className='tabler-brand-facebook-filled' />
+                </IconButton>
+              </div>
+            </form>
 
-          <Typography className='mt-7 text-center text-sm' color='text.disabled'>
-            &copy; {currentYear} {META_DATA.name} — by {META_DATA.author}
-          </Typography>
-        </CardContent>
-      </Card>
+            <Typography className='mt-7 text-center text-sm' color='text.disabled'>
+              &copy; {currentYear} {META_DATA.name} — by {META_DATA.author}
+            </Typography>
+          </CardContent>
+        </Card>
+      </AuthIllustrationWrapper>
     </div>
   )
 }

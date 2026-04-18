@@ -1,10 +1,14 @@
 'use client'
 
+// MUI Imports
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
+
+// Third-party Imports
 import { yupResolver } from '@hookform/resolvers/yup'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
@@ -13,9 +17,14 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
 
+// Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 import Logo from '@components/layout/shared/Logo'
 
+// Styled Component Imports
+import AuthIllustrationWrapper from '@/views/pages/auth/AuthIllustrationWrapper'
+
+// Config Imports
 import { currentYear, META_DATA } from '@/config/constants'
 
 const schema = Yup.object({
@@ -56,56 +65,56 @@ export default function SignInCard() {
 
   return (
     <div className='flex min-bs-[100dvh] justify-center items-center p-6'>
-      <Card className='flex flex-col sm:is-[450px]'>
-        <CardContent className='sm:!p-12'>
-          <Link href='/' className='flex justify-center mbe-6'>
-            <Logo />
-          </Link>
-          <div className='flex flex-col gap-1 mbe-6'>
-            <Typography variant='h4'>ยินดีต้อนรับสู่ {META_DATA.name} 👋</Typography>
-            <Typography>กรอกเบอร์โทรเพื่อรับรหัส OTP เข้าสู่ระบบ</Typography>
-          </div>
-
-          <Button
-            fullWidth
-            variant='outlined'
-            color='inherit'
-            startIcon={<i className='tabler-brand-facebook-filled text-[#1877F2]' />}
-            onClick={() => signIn('facebook', { callbackUrl: '/' })}
-          >
-            เข้าสู่ระบบด้วย Facebook
-          </Button>
-
-          <Divider className='gap-2 text-textPrimary my-6'>หรือ</Divider>
-
-          <form onSubmit={handleSubmit(onSubmit)} noValidate className='flex flex-col gap-6'>
-            <CustomTextField
-              autoFocus
-              fullWidth
-              label='เบอร์โทรศัพท์'
-              placeholder='08xxxxxxxx'
-              type='tel'
-              slotProps={{ htmlInput: { inputMode: 'numeric', autoComplete: 'tel' } }}
-              error={!!errors.phone}
-              helperText={errors.phone?.message}
-              {...register('phone')}
-            />
-            <Button fullWidth variant='contained' type='submit' disabled={isSubmitting}>
-              {isSubmitting ? 'กำลังส่งรหัส…' : 'ส่งรหัส OTP'}
-            </Button>
-            <div className='flex justify-center items-center flex-wrap gap-2'>
-              <Typography>ยังไม่มีบัญชี?</Typography>
-              <Typography component={Link} href='/auth/sign-up' color='primary.main'>
-                สมัครสมาชิก
-              </Typography>
+      <AuthIllustrationWrapper>
+        <Card className='flex flex-col sm:is-[450px]'>
+          <CardContent className='sm:!p-12'>
+            <Link href='/' className='flex justify-center mbe-6'>
+              <Logo />
+            </Link>
+            <div className='flex flex-col gap-1 mbe-6'>
+              <Typography variant='h4'>{`ยินดีต้อนรับสู่ ${META_DATA.name} 👋`}</Typography>
+              <Typography>กรอกเบอร์โทรเพื่อรับรหัส OTP เข้าสู่ระบบ</Typography>
             </div>
-          </form>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete='off' className='flex flex-col gap-6'>
+              <CustomTextField
+                autoFocus
+                fullWidth
+                label='เบอร์โทรศัพท์'
+                placeholder='08xxxxxxxx'
+                type='tel'
+                slotProps={{ htmlInput: { inputMode: 'numeric', autoComplete: 'tel' } }}
+                error={!!errors.phone}
+                helperText={errors.phone?.message}
+                {...register('phone')}
+              />
+              <Button fullWidth variant='contained' type='submit' disabled={isSubmitting}>
+                {isSubmitting ? 'กำลังส่งรหัส…' : 'ส่งรหัส OTP'}
+              </Button>
+              <div className='flex justify-center items-center flex-wrap gap-2'>
+                <Typography>ยังไม่มีบัญชี?</Typography>
+                <Typography component={Link} href='/auth/sign-up' color='primary.main'>
+                  สมัครสมาชิก
+                </Typography>
+              </div>
+              <Divider className='gap-2 text-textPrimary'>หรือ</Divider>
+              <div className='flex justify-center items-center gap-1.5'>
+                <IconButton
+                  className='text-facebook'
+                  size='small'
+                  onClick={() => signIn('facebook', { callbackUrl: '/' })}
+                  aria-label='เข้าสู่ระบบด้วย Facebook'
+                >
+                  <i className='tabler-brand-facebook-filled' />
+                </IconButton>
+              </div>
+            </form>
 
-          <Typography className='mt-7 text-center text-sm' color='text.disabled'>
-            &copy; {currentYear} {META_DATA.name} — by {META_DATA.author}
-          </Typography>
-        </CardContent>
-      </Card>
+            <Typography className='mt-7 text-center text-sm' color='text.disabled'>
+              &copy; {currentYear} {META_DATA.name} — by {META_DATA.author}
+            </Typography>
+          </CardContent>
+        </Card>
+      </AuthIllustrationWrapper>
     </div>
   )
 }
