@@ -51,26 +51,17 @@ export default async function MyReviewsPage() {
   }))
 
   return (
-    <div className='p-6 lg:p-10 min-bs-[100dvh] bg-[var(--mui-palette-background-default)]'>
-      <div className='mx-auto max-w-6xl flex flex-col gap-6'>
-        <div className='flex items-center justify-between gap-3 flex-wrap'>
-          <div>
-            <Typography variant='h5'>รีวิวที่ให้</Typography>
-            <Typography color='text.secondary' className='text-sm'>
-              รวม {reviewsData.length} รีวิว
-            </Typography>
-          </div>
-          <LinkButton
-            href='/dashboard'
-            variant='outlined'
-            startIcon={<i className='tabler-arrow-left' />}
-          >
-            กลับหน้าหลัก
-          </LinkButton>
+    <>
+      <div className='flex items-center justify-between gap-3 flex-wrap'>
+        <div>
+          <Typography variant='h5'>รีวิวที่ให้</Typography>
+          <Typography color='text.secondary' className='text-sm'>
+            รวม {reviewsData.length} รีวิว
+          </Typography>
         </div>
-
-        <ManageReviews reviewsData={reviewsData} />
       </div>
-    </div>
+
+      <ManageReviews reviewsData={reviewsData} />
+    </>
   )
 }

@@ -36,42 +36,25 @@ export default async function VerificationSettingsPage() {
   if (!user) redirect('/auth/sign-in')
 
   return (
-    <div className='p-6 lg:p-10 min-bs-[100dvh] bg-[var(--mui-palette-background-default)]'>
-      <div className='mx-auto max-w-3xl'>
-        <Grid container spacing={6}>
-          <Grid size={{ xs: 12 }}>
-            <div className='flex items-center justify-between gap-3 flex-wrap'>
-              <div>
-                <Typography variant='h5'>ยืนยันตัวตน</Typography>
-                <Typography color='text.secondary' className='text-sm'>
-                  ยิ่งยืนยันหลายระดับ ยิ่งได้ Trust Score สูงขึ้น
-                </Typography>
-              </div>
-              <LinkButton
-                href='/dashboard'
-                variant='outlined'
-                startIcon={<i className='tabler-arrow-left' />}
-              >
-                กลับหน้าหลัก
-              </LinkButton>
-            </div>
-          </Grid>
-
-          <Grid size={{ xs: 12 }}>
-            <VerificationClient
-              phoneVerified={!!user.phone}
-              records={records.map((r) => ({
-                id: r.id,
-                type: r.type,
-                level: r.level,
-                status: r.status as 'PENDING' | 'APPROVED' | 'REJECTED',
-                rejectedReason: r.rejectedReason,
-                createdAt: r.createdAt.toISOString(),
-              }))}
-            />
-          </Grid>
-        </Grid>
+    <>
+      <div>
+        <Typography variant='h5'>ยืนยันตัวตน</Typography>
+        <Typography color='text.secondary' className='text-sm'>
+          ยิ่งยืนยันหลายระดับ ยิ่งได้ Trust Score สูงขึ้น
+        </Typography>
       </div>
-    </div>
+
+      <VerificationClient
+        phoneVerified={!!user.phone}
+        records={records.map((r) => ({
+          id: r.id,
+          type: r.type,
+          level: r.level,
+          status: r.status as 'PENDING' | 'APPROVED' | 'REJECTED',
+          rejectedReason: r.rejectedReason,
+          createdAt: r.createdAt.toISOString(),
+        }))}
+      />
+    </>
   )
 }

@@ -1,61 +1,45 @@
-// Third-party Imports
+/**
+ * Buyer authed app shell — Shopee-inspired layout (2026-04-18)
+ *
+ * Sequence:
+ *   1. FrontLayout (marketing header + footer) — top menu เห็นเสมอ
+ *   2. Boxed container (max-w-7xl, centered)
+ *   3. Left AccountSidebar (user card + menu) + right content
+ *
+ * AuthGuard: redirect → /auth/sign-in ถ้าไม่ login
+ *
+ * Replaces Vuexy VerticalLayout shell (R2 era) per user request — อยากให้
+ * buyer รู้สึกว่ายังอยู่ใน marketing site แทนที่จะเป็น "app dashboard" แยก
+ *
+ * Base: composed — FrontLayout มาจาก Vuexy front-pages layout,
+ * sidebar+content grid จาก Shopee pattern (reference image)
+ */
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 
-// Type Imports
 import type { ChildrenType } from '@core/types'
+import FrontLayout from '@components/layout/front-pages'
 
-// Layout Imports
-import VerticalLayout from '@layouts/VerticalLayout'
-
-// Component Imports
-import Providers from '@/components/Providers'
-import Navigation from '@/components/layout/vertical/Navigation'
-import Navbar from '@/components/layout/vertical/Navbar'
-import VerticalFooter from '@/components/layout/vertical/Footer'
-import ScrollToTop from '@core/components/scroll-to-top'
-
-// Auth Imports
 import { authOptions } from '@/lib/auth'
 
-// Util Imports
-import { getMode } from '@core/utils/serverHelpers'
+import AccountSidebar from './_components/AccountSidebar'
 
-/**
- * Buyer authed app shell. Wraps /dashboard, /orders, /reviews, /settings with
- * Providers + VerticalLayout + Navigation + Navbar + Footer.
- *
- * Base: theme/vuexy/typescript-version/full-version/src/app/[lang]/(dashboard)/(private)/layout.tsx
- * Adapted: no locale prop / i18n dictionary; redirect directly to /auth/sign-in when
- * unauthenticated; ScrollToTop button without Customizer sidebar.
- */
 export default async function BuyerAppLayout({ children }: ChildrenType) {
   const session = await getServerSession(authOptions)
-
   if (!session) {
     redirect('/auth/sign-in')
   }
 
-  const direction = 'ltr'
-  const mode = await getMode()
-
   return (
-    <Providers direction={direction}>
-      <VerticalLayout
-        navigation={<Navigation mode={mode} />}
-        navbar={<Navbar />}
-        footer={<VerticalFooter />}
-      >
-        {children}
-      </VerticalLayout>
-      <ScrollToTop className='mui-fixed'>
-        <button
-          aria-label='scroll to top'
-          className='is-10 bs-10 rounded-full p-0 bg-[var(--mui-palette-primary-main)] text-[var(--mui-palette-primary-contrastText)] flex items-center justify-center shadow-lg'
-        >
-          <i className='tabler-arrow-up' />
-        </button>
-      </ScrollToTop>
-    </Providers>
+    <FrontLayout>
+      <div className='bg-[var(--mui-palette-background-default)] min-bs-[100dvh]'>
+        <div className='mx-auto max-w-7xl px-4 sm:px-6 py-6 lg:py-10 flex flex-col lg:flex-row gap-6'>
+          <aside className='lg:w-60 shrink-0'>
+            <AccountSidebar />
+          </aside>
+          <main className='flex-1 min-w-0 flex flex-col gap-6'>{children}</main>
+        </div>
+      </div>
+    </FrontLayout>
   )
 }

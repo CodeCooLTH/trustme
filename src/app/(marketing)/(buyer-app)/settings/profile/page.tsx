@@ -41,41 +41,30 @@ export default async function ProfileSettingsPage() {
   const badgeCount = user.userBadges.length
 
   return (
-    <div className='p-6 lg:p-10 min-bs-[100dvh] bg-[var(--mui-palette-background-default)]'>
-      <div className='mx-auto max-w-3xl flex flex-col gap-6'>
-        <div className='flex items-center justify-between gap-3 flex-wrap'>
-          <div>
-            <Typography variant='h5'>แก้ไขโปรไฟล์</Typography>
-            <Typography color='text.secondary' className='text-sm'>
-              จัดการข้อมูลส่วนตัวของคุณ
-            </Typography>
-          </div>
-          <LinkButton
-            href='/dashboard'
-            variant='outlined'
-            startIcon={<i className='tabler-arrow-left' />}
-          >
-            กลับหน้าหลัก
-          </LinkButton>
-        </div>
-
-        <ProfileForm
-          user={{
-            id: user.id,
-            displayName: user.displayName,
-            username: user.username,
-            avatar: user.avatar,
-            phone: user.phone,
-            email: user.email,
-          }}
-          summary={{
-            trustScore: user.trustScore,
-            trustLevel,
-            memberSince,
-            badgeCount,
-          }}
-        />
+    <>
+      <div>
+        <Typography variant='h5'>แก้ไขโปรไฟล์</Typography>
+        <Typography color='text.secondary' className='text-sm'>
+          จัดการข้อมูลส่วนตัวของคุณ
+        </Typography>
       </div>
-    </div>
+
+      <ProfileForm
+        user={{
+          id: user.id,
+          displayName: user.displayName,
+          username: user.username,
+          avatar: user.avatar,
+          phone: user.phone,
+          email: user.email,
+        }}
+        summary={{
+          trustScore: user.trustScore,
+          trustLevel,
+          memberSince,
+          badgeCount,
+        }}
+      />
+    </>
   )
 }
