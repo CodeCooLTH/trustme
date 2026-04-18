@@ -19,6 +19,8 @@ import ThemeProvider from '@components/theme'
 // Util Imports
 import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
 
+import ToastMount from './ToastMount'
+
 import './marketing.css'
 
 const anuphan = Anuphan({
@@ -49,6 +51,7 @@ export default async function MarketingRootLayout({ children }: ChildrenType) {
           <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
             <ThemeProvider direction={direction} systemMode={systemMode}>
               <IntersectionProvider>{children}</IntersectionProvider>
+              <ToastMount />
             </ThemeProvider>
           </SettingsProvider>
         </VerticalNavProvider>
