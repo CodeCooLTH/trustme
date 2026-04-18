@@ -6,6 +6,10 @@ import { useState } from 'react'
 // Next Imports
 import Link from 'next/link'
 
+// Third-party Imports
+import { useSession } from 'next-auth/react'
+import classnames from 'classnames'
+
 // MUI Imports
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
@@ -13,15 +17,13 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import useScrollTrigger from '@mui/material/useScrollTrigger'
 import type { Theme } from '@mui/material/styles'
 
-// Third-party Imports
-import classnames from 'classnames'
-
 // Type Imports
 import type { Mode } from '@core/types'
 
 // Component Imports
 import Logo from '@components/layout/shared/Logo'
 import ModeDropdown from '@components/layout/shared/ModeDropdown'
+import UserDropdown from '@components/layout/shared/UserDropdown'
 import FrontMenu from './FrontMenu'
 import CustomIconButton from '@core/components/mui/IconButton'
 
@@ -37,6 +39,8 @@ const Header = ({ mode }: { mode: Mode }) => {
 
   // Hooks
   const isBelowLgScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
+  const { status } = useSession()
+  const isAuthed = status === 'authenticated'
 
   // Detect window scroll
   const trigger = useScrollTrigger({
@@ -68,7 +72,12 @@ const Header = ({ mode }: { mode: Mode }) => {
           )}
           <div className='flex items-center gap-2 sm:gap-4'>
             <ModeDropdown />
-            {isBelowLgScreen ? (
+            {isAuthed ? (
+              // Authed buyer ที่กลับมาดู landing — แสดง UserDropdown (avatar +
+              // เมนูไป profile / dashboard / settings / ออกจากระบบ) แทน
+              // ปุ่ม Login/Signup
+              <UserDropdown />
+            ) : isBelowLgScreen ? (
               <CustomIconButton
                 component={Link}
                 variant='contained'

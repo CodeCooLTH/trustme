@@ -22,10 +22,9 @@ export async function proxy(request: NextRequest) {
     if (pathname.startsWith('/seller') || pathname.startsWith('/admin')) {
       return NextResponse.redirect(new URL('/', request.url))
     }
-    // Authed user landing on / → send them to their account
-    if (pathname === '/' && isAuthed) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
+    // Landing `/` เข้าถึงได้ทั้ง guest + authed — ไม่ auto-redirect ไป
+    // /dashboard (user feedback 2026-04-18). Header จะแสดง UserDropdown
+    // แทนปุ่ม Login/Signup เมื่อ authed
     // /dashboard (and any nested /dashboard/*) requires login
     if (pathname.startsWith('/dashboard') && !isAuthed) {
       const signIn = new URL('/auth/sign-in', request.url)
