@@ -47,3 +47,6 @@ uploads/
 # claude code local settings
 .claude/
 .env*.local
+
+# QA screenshots (re-generated on demand)
+docs/qa-screenshots/

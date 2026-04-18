@@ -1,6 +1,7 @@
-// Base: theme/vuexy/typescript-version/full-version/src/app/[lang]/(dashboard)/(private)/pages/account-settings/page.tsx
-// + theme/vuexy/typescript-version/full-version/src/views/pages/account-settings/account/AccountDetails.tsx
-// Dropped: tabs (security / billing-plans / notifications / connections) — MVP renders Account only.
+// Base: theme/vuexy/typescript-version/full-version/src/views/pages/user-profile/profile/AboutOverview.tsx
+// + theme/vuexy/typescript-version/full-version/src/views/pages/user-profile/profile/index.tsx
+// Adapted: owner-facing edit surface for /settings/profile — AboutOverview pattern (about + summary)
+// plus an avatar card. Dropped teams/connections/activity-timeline (not relevant for self edit).
 
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
@@ -11,11 +12,18 @@ import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getTrustLevel } from '@/services/trust-score.service'
 
 import { LinkButton } from '@/app/(marketing)/_components/mui-link'
 import ProfileForm from './ProfileForm'
 
 export const metadata: Metadata = { title: 'แก้ไขโปรไฟล์' }
+
+const dateFmt = new Intl.DateTimeFormat('th-TH', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+})
 
 export default async function ProfileSettingsPage() {
   const session = await getServerSession(authOptions)
@@ -24,16 +32,13 @@ export default async function ProfileSettingsPage() {
   const userId = (session.user as { id: string }).id
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: {
-      id: true,
-      displayName: true,
-      username: true,
-      avatar: true,
-      phone: true,
-      email: true,
-    },
+    include: { userBadges: true },
   })
   if (!user) redirect('/auth/sign-in')
+
+  const trustLevel = getTrustLevel(user.trustScore)
+  const memberSince = dateFmt.format(user.createdAt)
+  const badgeCount = user.userBadges.length
 
   return (
     <div className='p-6 lg:p-10 min-bs-[100dvh] bg-[var(--mui-palette-background-default)]'>
@@ -54,7 +59,22 @@ export default async function ProfileSettingsPage() {
           </LinkButton>
         </div>
 
-        <ProfileForm user={user} />
+        <ProfileForm
+          user={{
+            id: user.id,
+            displayName: user.displayName,
+            username: user.username,
+            avatar: user.avatar,
+            phone: user.phone,
+            email: user.email,
+          }}
+          summary={{
+            trustScore: user.trustScore,
+            trustLevel,
+            memberSince,
+            badgeCount,
+          }}
+        />
       </div>
     </div>
   )

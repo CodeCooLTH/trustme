@@ -1,33 +1,32 @@
 'use client'
 
-// Base: theme/vuexy/typescript-version/full-version/src/views/pages/account-settings/account/AccountDetails.tsx
-// Kept: avatar upload (Upload/Reset), Grid layout, CustomTextField, Save/Reset action row.
-// Dropped: firstName/lastName (we use single displayName), organization, role, country, state, address,
-//   zipCode, language, timezone, currency — not in SafePay MVP user schema.
-// Added: username/phone/email (read-only), email shown as "coming soon", avatar upload wired to
-//   POST /api/upload → PATCH /api/users/me, Save submits PATCH /api/users/me { displayName }.
+// Base: theme/vuexy/typescript-version/full-version/src/views/pages/user-profile/profile/AboutOverview.tsx
+// (primary — Card + CardContent flex flex-col gap-6, renderList row pattern icon + label + value)
+// + theme/vuexy/typescript-version/full-version/src/views/pages/account-settings/account/AccountDetails.tsx
+// (kept avatar upload Upload/Reset row from R6 implementation)
+//
+// Adapted: owner-facing edit surface — "ข้อมูลส่วนตัว" (about) + "สรุป" (overview) sections.
+// Page-level edit toggle (choice A, MVP): top "แก้ไข" flips about rows into inputs; "บันทึก"/"ยกเลิก"
+// appear at bottom while editing. Only displayName is editable — username/phone/email are read-only
+// (email shows "เร็วๆ นี้" chip).
+// Dropped: Grid/CustomTextField layout from the old AccountDetails-based form.
 
-// React Imports
 import { useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
-// Next Imports
 import { useRouter } from 'next/navigation'
 
-// MUI Imports
-import Grid from '@mui/material/Grid'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
 import Typography from '@mui/material/Typography'
 
-// Third-party Imports
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as Yup from 'yup'
 
-// Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 
 type Props = {
@@ -38,6 +37,12 @@ type Props = {
     avatar: string | null
     phone: string | null
     email: string | null
+  }
+  summary: {
+    trustScore: number
+    trustLevel: string
+    memberSince: string
+    badgeCount: number
   }
 }
 
@@ -51,17 +56,18 @@ const schema = Yup.object({
 
 type FormValues = Yup.InferType<typeof schema>
 
-const ProfileForm = ({ user }: Props) => {
+const ProfileForm = ({ user, summary }: Props) => {
   const router = useRouter()
 
-  // States (mirror Vuexy AccountDetails structure)
+  // Avatar state (carried over from R6 AccountDetails-based form)
   const [fileInput, setFileInput] = useState<string>('')
   const [imgSrc, setImgSrc] = useState<string>(user.avatar ?? '/images/avatars/1.png')
   const [uploading, setUploading] = useState<boolean>(false)
   const initialAvatarRef = useRef<string | null>(user.avatar)
-  const fileInputElRef = useRef<HTMLInputElement | null>(null)
 
-  // Hooks
+  // Page-level edit toggle (choice A)
+  const [isEditing, setIsEditing] = useState<boolean>(false)
+
   const {
     register,
     handleSubmit,
@@ -91,7 +97,6 @@ const ProfileForm = ({ user }: Props) => {
     }
     reader.readAsDataURL(file)
 
-    // Upload + save
     setUploading(true)
     try {
       const form = new FormData()
@@ -165,117 +170,197 @@ const ProfileForm = ({ user }: Props) => {
       }
       toast.success('บันทึกโปรไฟล์แล้ว')
       reset({ displayName: values.displayName.trim() })
+      setIsEditing(false)
       router.refresh()
     } catch {
       toast.error('บันทึกไม่สำเร็จ')
     }
   }
 
+  const handleCancelEdit = () => {
+    reset({ displayName: user.displayName })
+    setIsEditing(false)
+  }
+
+  // Read-only "about" rows — renderList pattern from AboutOverview
+  const aboutRows: Array<{ property: string; value: string; icon: string }> = [
+    { property: 'ชื่อที่แสดง', value: user.displayName, icon: 'tabler-user' },
+    { property: 'ชื่อผู้ใช้', value: `@${user.username}`, icon: 'tabler-at' },
+    { property: 'เบอร์โทร', value: user.phone ?? '-', icon: 'tabler-phone' },
+    { property: 'อีเมล', value: user.email ?? '-', icon: 'tabler-mail' },
+  ]
+
+  const overviewRows: Array<{ property: string; value: string; icon: string }> = [
+    {
+      property: 'Trust Score',
+      value: `${summary.trustScore} (ระดับ ${summary.trustLevel})`,
+      icon: 'tabler-shield-check',
+    },
+    { property: 'สมาชิกตั้งแต่', value: summary.memberSince, icon: 'tabler-calendar' },
+    { property: 'Badge', value: `${summary.badgeCount} รายการ`, icon: 'tabler-award' },
+  ]
+
+  const renderReadonlyRow = (item: { property: string; value: string; icon: string }) => (
+    <div key={item.property} className='flex items-center gap-2'>
+      <i className={item.icon} />
+      <div className='flex items-center flex-wrap gap-2'>
+        <Typography className='font-medium'>{`${item.property}:`}</Typography>
+        <Typography>{item.value}</Typography>
+      </div>
+    </div>
+  )
+
   return (
-    <Card>
-      <CardContent className='mbe-4'>
-        <div className='flex max-sm:flex-col items-center gap-6'>
-          <img
-            height={100}
-            width={100}
-            className='rounded object-cover'
-            src={imgSrc}
-            alt={user.displayName}
-          />
-          <div className='flex grow flex-col gap-4'>
-            <div className='flex flex-col sm:flex-row gap-4'>
-              <Button
-                component='label'
-                variant='contained'
-                htmlFor='account-settings-upload-image'
-                disabled={uploading}
-              >
-                {uploading ? 'กำลังอัพโหลด…' : 'เปลี่ยนรูปโปรไฟล์'}
-                <input
-                  ref={fileInputElRef}
-                  hidden
-                  type='file'
-                  value={fileInput}
-                  accept='image/png, image/jpeg, image/webp'
-                  onChange={handleFileInputChange}
-                  id='account-settings-upload-image'
-                />
-              </Button>
-              <Button
-                variant='tonal'
-                color='secondary'
-                onClick={handleFileInputReset}
-                disabled={uploading}
-              >
-                รีเซ็ต
-              </Button>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className='flex flex-col gap-6'>
+      {/* Avatar card */}
+      <Card>
+        <CardContent>
+          <div className='flex max-sm:flex-col items-center gap-6'>
+            <img
+              height={100}
+              width={100}
+              className='rounded object-cover'
+              src={imgSrc}
+              alt={user.displayName}
+            />
+            <div className='flex grow flex-col gap-4'>
+              <div className='flex flex-col sm:flex-row gap-4'>
+                <Button
+                  component='label'
+                  variant='contained'
+                  htmlFor='account-settings-upload-image'
+                  disabled={uploading}
+                >
+                  {uploading ? 'กำลังอัพโหลด…' : 'เปลี่ยนรูปโปรไฟล์'}
+                  <input
+                    hidden
+                    type='file'
+                    value={fileInput}
+                    accept='image/png, image/jpeg, image/webp'
+                    onChange={handleFileInputChange}
+                    id='account-settings-upload-image'
+                  />
+                </Button>
+                <Button
+                  variant='tonal'
+                  color='secondary'
+                  onClick={handleFileInputReset}
+                  disabled={uploading}
+                >
+                  รีเซ็ต
+                </Button>
+              </div>
+              <Typography color='text.secondary' className='text-sm'>
+                รองรับ JPG, PNG, WEBP — ขนาดไม่เกิน 5MB
+              </Typography>
             </div>
-            <Typography>รองรับ JPG, PNG, WEBP — ขนาดไม่เกิน 5MB</Typography>
           </div>
-        </div>
-      </CardContent>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <Grid container spacing={6}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='ชื่อที่แสดง'
-                placeholder='ชื่อ-นามสกุล หรือชื่อเล่น'
-                error={!!errors.displayName}
-                helperText={errors.displayName?.message}
-                {...register('displayName')}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='ชื่อผู้ใช้ (username)'
-                value={user.username}
-                disabled
-                helperText='ไม่สามารถแก้ไขได้หลังจากตั้งค่าแล้ว'
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='เบอร์โทรศัพท์'
-                value={user.phone ?? ''}
-                disabled
-                helperText='ยืนยันตัวตนระดับ 1 แล้ว'
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='อีเมล'
-                value={user.email ?? '-'}
-                disabled
-                helperText='ยังไม่เปิดให้แก้ไขในเวอร์ชันนี้'
-              />
-            </Grid>
-            <Grid size={{ xs: 12 }} className='flex gap-4 flex-wrap'>
-              <Button
-                variant='contained'
-                type='submit'
-                disabled={isSubmitting || !isDirty}
-              >
-                {isSubmitting ? 'กำลังบันทึก…' : 'บันทึก'}
-              </Button>
-              <Button
-                variant='tonal'
-                type='reset'
-                color='secondary'
-                onClick={() => reset({ displayName: user.displayName })}
-                disabled={isSubmitting}
-              >
-                รีเซ็ต
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* About + Overview card (AboutOverview shape) */}
+      <Card>
+        <CardContent className='flex flex-col gap-6'>
+          {/* About section */}
+          <div className='flex flex-col gap-4'>
+            <div className='flex items-center justify-between gap-2 flex-wrap'>
+              <Typography className='uppercase' variant='body2' color='text.disabled'>
+                ข้อมูลส่วนตัว
+              </Typography>
+              {!isEditing && (
+                <Button
+                  size='small'
+                  variant='tonal'
+                  startIcon={<i className='tabler-pencil' />}
+                  onClick={() => setIsEditing(true)}
+                >
+                  แก้ไข
+                </Button>
+              )}
+            </div>
+
+            {isEditing ? (
+              <div className='flex flex-col gap-4'>
+                {/* Editable: displayName */}
+                <div className='flex items-start gap-2'>
+                  <i className='tabler-user mt-3' />
+                  <div className='grow'>
+                    <CustomTextField
+                      fullWidth
+                      label='ชื่อที่แสดง'
+                      placeholder='ชื่อ-นามสกุล หรือชื่อเล่น'
+                      error={!!errors.displayName}
+                      helperText={errors.displayName?.message}
+                      {...register('displayName')}
+                    />
+                  </div>
+                </div>
+
+                {/* Read-only rows (during edit, still shown as static) */}
+                <div className='flex items-center gap-2'>
+                  <i className='tabler-at' />
+                  <div className='flex items-center flex-wrap gap-2'>
+                    <Typography className='font-medium'>ชื่อผู้ใช้:</Typography>
+                    <Typography>@{user.username}</Typography>
+                    <Typography color='text.secondary' className='text-xs'>
+                      (ไม่สามารถแก้ไขได้)
+                    </Typography>
+                  </div>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <i className='tabler-phone' />
+                  <div className='flex items-center flex-wrap gap-2'>
+                    <Typography className='font-medium'>เบอร์โทร:</Typography>
+                    <Typography>{user.phone ?? '-'}</Typography>
+                    <Typography color='text.secondary' className='text-xs'>
+                      (ยืนยันแล้ว)
+                    </Typography>
+                  </div>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <i className='tabler-mail' />
+                  <div className='flex items-center flex-wrap gap-2'>
+                    <Typography className='font-medium'>อีเมล:</Typography>
+                    <Typography>{user.email ?? '-'}</Typography>
+                    <Chip size='small' label='เร็วๆ นี้' variant='tonal' color='warning' />
+                  </div>
+                </div>
+
+                {/* Action row */}
+                <div className='flex gap-4 flex-wrap pt-2'>
+                  <Button
+                    variant='contained'
+                    type='submit'
+                    disabled={isSubmitting || !isDirty}
+                  >
+                    {isSubmitting ? 'กำลังบันทึก…' : 'บันทึก'}
+                  </Button>
+                  <Button
+                    variant='tonal'
+                    type='button'
+                    color='secondary'
+                    onClick={handleCancelEdit}
+                    disabled={isSubmitting}
+                  >
+                    ยกเลิก
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              aboutRows.map(renderReadonlyRow)
+            )}
+          </div>
+
+          {/* Overview section */}
+          <div className='flex flex-col gap-4'>
+            <Typography className='uppercase' variant='body2' color='text.disabled'>
+              สรุป
+            </Typography>
+            {overviewRows.map(renderReadonlyRow)}
+          </div>
+        </CardContent>
+      </Card>
+    </form>
   )
 }
 
