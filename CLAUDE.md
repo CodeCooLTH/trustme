@@ -147,6 +147,7 @@ theme/
 ## Conventions
 
 - **Language:** TypeScript strict mode; UI copy ภาษาไทย
+- **เอกสารทั้งหมดใช้ภาษาไทยเป็นหลัก** — retros (`docs/retro/`), convention docs (`docs/conventions/`), commit message bodies, code comments อธิบาย "ทำไม" ใช้ภาษาไทยเป็น default ยกเว้น: file paths, class/function names, library names (Next.js, Prisma, Vuexy, Paces, TanStack), technical jargon ที่ไม่มีคำแปลไทยที่ชัดเจน (RSC, JWT, OAuth, OTP), commit hashes
 - **Font:** Anuphan (Google Fonts) — buyer/landing via `next/font`; Noto Sans Thai reference only
 - **Mobile-first:** Tailwind breakpoints (`sm:`/`md:`/`lg:`)
 - **Service layer** (`src/services/`) is separated from API layer (`src/app/api/`)
