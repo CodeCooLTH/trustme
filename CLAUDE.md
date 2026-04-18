@@ -45,6 +45,14 @@ Widgets adapted: Congratulations → welcome, StatisticsCard, Orders, Transactio
 Dropped: InvoiceListTable.
 ```
 
+### 4. Multi-step phases run as an agent team, not single-threaded
+
+Any phase with ≥3 tasks (e.g. P1, P2, R1-R11) MUST be executed with the agent-team workflow: Planner → (parallel Developers) → independent Reviewer per task → Controller integrates → per-phase Retro. The Controller (this main session) is the only one who commits or marks tasks complete. Reviewers must be independent agents, not the same agent that wrote the code.
+
+After every phase: write `docs/retro/YYYY-MM-DD-<phase>.md` covering problems, root causes, conventions to adopt, action items. Promote durable conventions to `CLAUDE.md` + `docs/conventions/`; personal reminders to `~/.claude/.../memory/`.
+
+Full workflow: **`docs/conventions/agent-team-workflow.md`**.
+
 ---
 
 ## Project Overview
