@@ -42,17 +42,45 @@ Every task passes through five gates before being marked complete:
 
 ## 3-level QA cadence (required)
 
-Type-check and code review alone do NOT prove a page works. QA via Chrome DevTools MCP is mandatory at three levels:
+Type-check and code review alone do NOT prove a feature works. QA via Chrome DevTools MCP is mandatory at three levels. **Level 2 and 3 are functional E2E tests, not smoke tests** — they actually fill forms, submit data, verify persistence, and walk cross-subdomain flows.
 
-| Level | When | Scope | Agent prompt hint |
+| Level | When | Scope | What it actually does |
 |---|---|---|---|
-| **Per-task smoke** | After Reviewer pass on a user-facing task | Visit the new page URL, assert key elements render (headings, forms, widgets), no runtime error in console. Under ~60 seconds of exercise. | "Navigate to `http://deepth.local:4000/<path>`, take a snapshot, verify these elements appear: …, list any console errors." |
-| **Batch integration** | After a batch of 3 tasks | Golden path across the batch — e.g. after R3/R4/R5 (dashboard/orders/reviews), walk sign-in → dashboard → click sidebar into orders → click an order → back to reviews, confirm no broken links or dead ends. | "Walk this sequence as a logged-in buyer: …" |
-| **End-of-phase** | Last task of the phase | Full PRD FR-table walk with seeded data, including cross-subdomain behavior if relevant. Produces a PASS/FAIL row per PRD feature. | "Execute every PRD feature flow for the buyer side; report per-FR status." |
+| **Per-task smoke** | After Reviewer pass on a user-facing task | Load + render check only, ~60s | Navigate to the new page URL; `take_snapshot`; assert key headings/forms/widgets appear; `list_console_messages` and fail on runtime errors. No form submission. |
+| **Batch integration** | After every batch of ≤3 tasks | **Functional E2E across the batch**, ~5min | Drive each form with realistic input (`fill_form`, `click`, `wait_for`); verify optimistic UI updates; verify DB persistence by navigating to a read-back page and finding the new data; verify toasts/status chips change; check `list_console_messages` for errors throughout. Tests the happy path + at least one negative path (e.g. wrong OTP, invalid input). |
+| **End-of-phase** | Last task of the phase | **Full PRD feature walk with cross-subdomain flows**, ~15min | Execute every PRD FR applicable to the phase. Includes cross-subdomain end-to-end: e.g. **seller creates order on `seller.deepth.local:4000` → copy `/o/{token}` → open on `deepth.local:4000` as buyer → enter OTP → confirm → submit review → navigate to `/u/{sellerUsername}` → verify rating bumped**. Produces PASS/FAIL per FR. |
 
-The QA agent always uses the real dev subdomains (`http://deepth.local:4000`, `seller.deepth.local:4000`, `admin.deepth.local:4000`) — NOT `localhost` — because `src/proxy.ts` routes by subdomain and cookies are per-host. See `feedback_qa_domains.md` memory.
+### Example QA agent scenarios for SafePay buyer
 
-**The user runs the dev server themselves on port 4000.** QA agents must NOT start a server; if `curl http://deepth.local:4000/` fails, the agent reports back to the Controller instead of starting one.
+**Per-task smoke** (after R5 /reviews):
+- Navigate to `http://deepth.local:4000/reviews` (logged in).
+- Snapshot; assert "รีวิวที่ให้" heading, filter input, table/list container render.
+- No console errors.
+
+**Batch integration** (after R5/R6/R7 — reviews / profile / verification):
+- Sign in (real OTP via `/api/otp/send` + dev log read).
+- Go to `/settings/profile` → change `displayName` → click "บันทึก" → expect toast → reload → assert new name appears on dashboard welcome.
+- Go to `/settings/verification` → upload two small PNGs as L2 → submit → expect toast + status chip → reload → chip still "กำลังตรวจสอบ".
+- Go to `/reviews` → if reviews exist, verify shop link goes to correct `/u/{username}`. If none, verify empty state copy.
+- Throughout: `list_console_messages` shows no errors.
+
+**End-of-phase** (R11 — full buyer PRD walk):
+- FR-1 auth: register via phone OTP, verify dashboard loads.
+- FR-2 verify: submit L2 docs; direct DB flip status=APPROVED; reload and assert L2 chip is "ยืนยันแล้ว".
+- FR-5/6 order: seed an order for the test buyer via prisma; navigate to `/o/{token}`; enter OTP; confirm; expect status → CONFIRMED.
+- FR-7 review: submit 5-star review on the confirmed order; verify seller `/u/{username}` shows the review with correct stars + comment.
+- FR-8 history linking: create a guest review before signup; then sign up with the same phone; verify the review shows up in `/reviews`.
+- FR-9 public profile: visit `/u/{sellerUsername}` while logged out; verify trust score, badges, reviews render.
+- Cross-subdomain: log into `seller.deepth.local:4000`; create an order; copy link; open `/o/{token}` on `deepth.local:4000`; confirm; verify trust score bumped on seller.
+
+### Operating rules
+
+- **The user runs the dev server themselves on port 4000.** QA agents must NOT start a server. If `curl http://deepth.local:4000/` fails, the agent reports back to the Controller instead of starting one.
+- **Always use the real dev subdomains** (`http://deepth.local:4000`, `seller.deepth.local:4000`, `admin.deepth.local:4000`) — NOT `localhost` — because `src/proxy.ts` routes by subdomain and cookies are per-host. See `feedback_qa_domains.md` memory.
+- **Seed data via direct Prisma** for complex setup (creating test sellers/products/orders). `.env.local` points to the Supabase instance the dev server uses — source it when running tsx scripts.
+- **OTP codes** are logged to the dev server stdout (`/tmp/dev.log` or wherever the user has the server writing) — tail the log to grab them.
+- **Cleanup** test data at end of QA agent run when possible (delete seeded sellers/orders) so subsequent QA runs start clean.
+- **Report format:** PASS/FAIL per scenario with the specific evidence (screenshot filename, assertion output, console error excerpt). Recommend MERGE or REWORK for the Controller.
 
 No skipping gates — even "obviously trivial" tasks get a reviewer pass. Trivial tasks return fast reviews; cost is low.
 
